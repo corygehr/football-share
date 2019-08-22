@@ -1,6 +1,6 @@
 ﻿using Dapper.Contrib.Extensions;
 
-namespace FootballShare.Entities.League
+namespace FootballShare.Entities.Models.League
 {
     /// <summary>
     /// Base Sports <see cref="Team"/> class
