@@ -1,7 +1,7 @@
 ﻿using Dapper.Contrib.Extensions;
 using System;
 
-namespace FootballShare.Entities.Models.League
+namespace FootballShare.Entities.League
 {
     /// <summary>
     /// Base <see cref="League"/> <see cref="Season"/> class
@@ -32,8 +32,8 @@ namespace FootballShare.Entities.Models.League
         public DateTime StartDate { get; set; }
 
         /// <summary>
-        /// <see cref="League"/> details
+        /// <see cref="SportsLeague"/> details
         /// </summary>
-        public League League = null;
+        public SportsLeague League = null;
     }
 }

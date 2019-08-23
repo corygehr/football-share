@@ -1,10 +1,10 @@
 ﻿using Dapper.Contrib.Extensions;
-using FootballShare.Entities.Models.League;
+using FootballShare.Entities.League;
 
-namespace FootballShare.Entities.Models.Group
+namespace FootballShare.Entities.Group
 {
     /// <summary>
-    /// <see cref="Group"/> <see cref="GroupPool"/> class
+    /// <see cref="BettingGroup"/> <see cref="GroupPool"/> class
     /// </summary>
     [Table("GroupPools")]
     public class GroupPool

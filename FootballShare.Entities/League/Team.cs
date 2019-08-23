@@ -1,6 +1,6 @@
 ﻿using Dapper.Contrib.Extensions;
 
-namespace FootballShare.Entities.Models.League
+namespace FootballShare.Entities.League
 {
     /// <summary>
     /// Base Sports <see cref="Team"/> class
@@ -27,8 +27,8 @@ namespace FootballShare.Entities.Models.League
         public string ShortName { get; set; }
 
         /// <summary>
-        /// <see cref="League"/> details
+        /// <see cref="SportsLeague"/> details
         /// </summary>
-        public League League = null;
+        public SportsLeague League = null;
     }
 }

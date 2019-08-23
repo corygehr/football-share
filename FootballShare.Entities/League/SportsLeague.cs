@@ -1,33 +1,33 @@
 ﻿using Dapper.Contrib.Extensions;
 
-namespace FootballShare.Entities.Models.League
+namespace FootballShare.Entities.League
 {
     /// <summary>
-    /// Base Sports <see cref="League"/> class
+    /// Base Sports <see cref="SportsLeague"/> class
     /// </summary>
-    [Table("Leagues")]
-    public class League
+    [Table("SportsLeagues")]
+    public class SportsLeague
     {
         /// <summary>
-        /// <see cref="League"/> unique identifier
+        /// <see cref="SportsLeague"/> unique identifier
         /// </summary>
         [ExplicitKey]
         public string Id { get; set; }
         /// <summary>
-        /// <see cref="League"/> name
+        /// <see cref="SportsLeague"/> name
         /// </summary>
         public string Name { get; set; }
         /// <summary>
-        /// <see cref="League"/> short/common name
+        /// <see cref="SportsLeague"/> short/common name
         /// </summary>
         public string ShortName { get; set; }
         /// <summary>
-        /// <see cref="League"/> sport
+        /// <see cref="SportsLeague"/> sport
         /// </summary>
         public string SportId { get; set; }
 
         /// <summary>
-        /// <see cref="Sport"/> details
+        /// <see cref="SportsLeague"/> details
         /// </summary>
         public Sport Sport = null;
     }

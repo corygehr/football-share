@@ -1,7 +1,7 @@
 ﻿using Dapper.Contrib.Extensions;
 using System;
 
-namespace FootballShare.Entities.Models.League
+namespace FootballShare.Entities.League
 {
     /// <summary>
     /// Base <see cref="SeasonWeek"/> class

@@ -1,24 +1,24 @@
 ﻿using Dapper.Contrib.Extensions;
 
-namespace FootballShare.Entities.Models.Group
+namespace FootballShare.Entities.Group
 {
     /// <summary>
-    /// Base Betting <see cref="Group"/> class
+    /// Base Betting <see cref="BettingGroup"/> class
     /// </summary>
-    [Table("Groups")]
-    public class Group
+    [Table("BettingGroups")]
+    public class BettingGroup
     {
         /// <summary>
-        /// Unique <see cref="Group"/> identifier
+        /// Unique <see cref="BettingGroup"/> identifier
         /// </summary>
         [Key]
         public string Id { get; set; }
         /// <summary>
-        /// <see cref="Group"/> description
+        /// <see cref="BettingGroup"/> description
         /// </summary>
         public string Description { get; set; }
         /// <summary>
-        /// <see cref="Group"/> name
+        /// <see cref="BettingGroup"/> name
         /// </summary>
         public string Name { get; set; }
     }

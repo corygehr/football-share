@@ -11,7 +11,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FootballShare.DAL\FootballShare.DAL.csproj" />
     <ProjectReference Include="..\FootballShare.Entities\FootballShare.Entities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DataAccess\" />
   </ItemGroup>
 
 </Project>

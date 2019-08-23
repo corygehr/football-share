@@ -9,3 +9,5 @@
 /FootballShare.Entities/obj
 /FootballShare/wwwroot/lib
 /FootballShare/bin/Debug/netcoreapp2.2
+/FootballShare.DAL/bin/Debug/netstandard2.0
+/FootballShare.DAL/obj
