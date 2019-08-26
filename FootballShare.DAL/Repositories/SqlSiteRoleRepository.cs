@@ -1,10 +1,9 @@
-﻿using System.Data.SqlClient;
-using System.Threading;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using FootballShare.Entities.User;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
+
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FootballShare.DAL.Repositories
 {
@@ -14,17 +13,17 @@ namespace FootballShare.DAL.Repositories
     public class SqlSiteRoleRepository : ISiteRoleRepository
     {
         /// <summary>
-        /// SQL Server connection string
+        /// Database connection provider
         /// </summary>
-        private string _connectionString;
+        private IDbConnectionFactory _connectionFactory;
 
         /// <summary>
         /// Creates a new <see cref="SqlSiteRoleRepository"/> instance
         /// </summary>
-        /// <param name="siteConfig">Site configuration data</param>
-        public SqlSiteRoleRepository(IConfiguration siteConfig)
+        /// <param name="connectionFactory">Database connection provider</param>
+        public SqlSiteRoleRepository(IDbConnectionFactory connectionFactory)
         {
-            this._connectionString = siteConfig.GetConnectionString("DefaultConnection");
+            this._connectionFactory = connectionFactory;
         }
 
         public async Task<IdentityResult> CreateAsync(SiteRole role, CancellationToken cancellationToken = default)
@@ -41,9 +40,8 @@ namespace FootballShare.DAL.Repositories
                             SELECT CAST(SCOPE_IDENTITY() AS INT);
                             ";
 
-            using(var connection = new SqlConnection(this._connectionString))
+            using(var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.OpenAsync(cancellationToken);
                 role.Id = await connection.QuerySingleAsync<int>(query, role);
             }
 
@@ -56,9 +54,8 @@ namespace FootballShare.DAL.Repositories
                               WHERE [Id] = @{nameof(SiteRole.Id)}
                               LIMIT 1";
             
-            using(var connection = new SqlConnection(this._connectionString))
+            using(var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.OpenAsync(cancellationToken);
                 await connection.ExecuteAsync(query, role);
             }
 
@@ -77,9 +74,8 @@ namespace FootballShare.DAL.Repositories
                               WHERE [Id] = @roleId
                               LIMIT 1";
 
-            using (var connection = new SqlConnection(this._connectionString))
+            using (var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.OpenAsync(cancellationToken);
                 return await connection.QuerySingleOrDefaultAsync<SiteRole>(
                     query,
                     new { roleId = id }
@@ -87,16 +83,15 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public async Task<SiteRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
+        public async Task<SiteRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken = default)
         {
             string query = $@"SELECT * 
                               FROM [dbo].[SiteRoles]
                               WHERE [NormalizedRoleName] = @roleName
                               LIMIT 1";
 
-            using (var connection = new SqlConnection(this._connectionString))
+            using (var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.OpenAsync(cancellationToken);
                 return await connection.QuerySingleOrDefaultAsync<SiteRole>(
                     query,
                     new { roleName = normalizedRoleName }
@@ -104,34 +99,34 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public Task<string> GetNormalizedRoleNameAsync(SiteRole role, CancellationToken cancellationToken)
+        public Task<string> GetNormalizedRoleNameAsync(SiteRole role, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(role.NormalizedName);
         }
 
-        public Task<string> GetRoleIdAsync(SiteRole role, CancellationToken cancellationToken)
+        public Task<string> GetRoleIdAsync(SiteRole role, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(role.Id.ToString());
         }
 
-        public Task<string> GetRoleNameAsync(SiteRole role, CancellationToken cancellationToken)
+        public Task<string> GetRoleNameAsync(SiteRole role, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(role.Name);
         }
 
-        public Task SetNormalizedRoleNameAsync(SiteRole role, string normalizedName, CancellationToken cancellationToken)
+        public Task SetNormalizedRoleNameAsync(SiteRole role, string normalizedName, CancellationToken cancellationToken = default)
         {
             role.NormalizedName = normalizedName;
             return Task.FromResult(0);
         }
 
-        public Task SetRoleNameAsync(SiteRole role, string roleName, CancellationToken cancellationToken)
+        public Task SetRoleNameAsync(SiteRole role, string roleName, CancellationToken cancellationToken = default)
         {
             role.Name = roleName;
             return Task.FromResult(0);
         }
 
-        public async Task<IdentityResult> UpdateAsync(SiteRole role, CancellationToken cancellationToken)
+        public async Task<IdentityResult> UpdateAsync(SiteRole role, CancellationToken cancellationToken = default)
         {
             string query = $@"UPDATE [dbo].[SiteRoles]
                               SET [Name] = @{nameof(SiteRole.Name)},
@@ -139,9 +134,8 @@ namespace FootballShare.DAL.Repositories
                               WHERE [Id] = @{nameof(SiteRole.Id)}
                               LIMIT 1";
 
-            using(var connection = new SqlConnection(this._connectionString))
+            using (var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.OpenAsync(cancellationToken);
                 await connection.ExecuteAsync(query, role);
             }
 

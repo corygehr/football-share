@@ -1,9 +1,7 @@
 ﻿using Dapper;
 using FootballShare.Entities.User;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 
-using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -18,20 +16,20 @@ namespace FootballShare.DAL.Repositories
     public class SqlSiteUserRepository : ISiteUserRepository
     {
         /// <summary>
-        /// SQL Server connection string
+        /// Database connection provider
         /// </summary>
-        private string _connectionString;
+        private IDbConnectionFactory _connectionFactory;
 
         /// <summary>
         /// Creates a new <see cref="SqlSiteUserRepository"/> instance
         /// </summary>
-        /// <param name="connectionFactory">Connection factory</param>
-        public SqlSiteUserRepository(IConfiguration siteConfig)
+        /// <param name="connectionFactory">Database connection provider</param>
+        public SqlSiteUserRepository(IDbConnectionFactory connectionFactory)
         {
-            this._connectionString = siteConfig.GetConnectionString("DefaultConnection");
+            this._connectionFactory = connectionFactory;
         }
 
-        public async Task AddToRoleAsync(SiteUser user, string roleName, CancellationToken cancellationToken)
+        public async Task AddToRoleAsync(SiteUser user, string roleName, CancellationToken cancellationToken = default)
         {
             string getRoleIdQuery = @"SELECT 
                                         [Id]
@@ -49,9 +47,8 @@ namespace FootballShare.DAL.Repositories
                                        )";
 
 
-            using(var connection = new SqlConnection(this._connectionString))
+            using(var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.OpenAsync(cancellationToken);
                 var roleId = await connection.ExecuteScalarAsync<int?>(
                     getRoleIdQuery,
                     new
@@ -103,9 +100,8 @@ namespace FootballShare.DAL.Repositories
                             SELECT CAST(SCOPE_IDENTITY() AS INT);
                             ";
 
-            using (var connection = new SqlConnection(this._connectionString))
+            using (var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.OpenAsync(cancellationToken);
                 newEntity.Id = await connection.QuerySingleAsync<int>(query, newEntity);
             }
 
@@ -118,9 +114,8 @@ namespace FootballShare.DAL.Repositories
                               WHERE [Id] = @{nameof(SiteUser.Id)}
                               LIMIT 1";
 
-            using(var connection = new SqlConnection(this._connectionString))
+            using(var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.OpenAsync(cancellationToken);
                 await connection.ExecuteAsync(query, user);
             }
 
@@ -132,7 +127,7 @@ namespace FootballShare.DAL.Repositories
             // Nothing to dispose
         }
 
-        public async Task<SiteUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+        public async Task<SiteUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken = default)
         {
             string query = $@"SELECT
                                 *
@@ -140,9 +135,8 @@ namespace FootballShare.DAL.Repositories
                             WHERE [NormalizedEmail] = @{nameof(SiteUser.NormalizedEmail)}
                             LIMIT 1";
 
-            using (var connection = new SqlConnection(this._connectionString))
+            using (var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.OpenAsync(cancellationToken);
                 return await connection.QuerySingleOrDefaultAsync<SiteUser>(query, new { normalizedEmail });
             }
         }
@@ -155,16 +149,15 @@ namespace FootballShare.DAL.Repositories
                             WHERE [Id] = @{nameof(SiteUser.Id)}
                             LIMIT 1";
 
-            using(var connection = new SqlConnection(this._connectionString))
+            using(var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.OpenAsync(cancellationToken);
                 return await connection.QueryFirstOrDefaultAsync<SiteUser>(
                     query, new { id }
                 );
             }
         }
 
-        public async Task<SiteUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        public async Task<SiteUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken = default)
         {
             string query = $@"SELECT
                                 *
@@ -172,7 +165,7 @@ namespace FootballShare.DAL.Repositories
                             WHERE [NormalizedUserName] = @{nameof(SiteUser.NormalizedUserName)}
                             LIMIT 1";
 
-            using (var connection = new SqlConnection(this._connectionString))
+            using (var connection = this._connectionFactory.CreateConnection())
             {
                 return await connection.QueryFirstOrDefaultAsync<SiteUser>(
                     query, new { normalizedUserName }
@@ -180,42 +173,42 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public Task<string> GetEmailAsync(SiteUser user, CancellationToken cancellationToken)
+        public Task<string> GetEmailAsync(SiteUser user, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(user.Email);
         }
 
-        public Task<bool> GetEmailConfirmedAsync(SiteUser user, CancellationToken cancellationToken)
+        public Task<bool> GetEmailConfirmedAsync(SiteUser user, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(user.EmailConfirmed);
         }
 
-        public Task<string> GetNormalizedEmailAsync(SiteUser user, CancellationToken cancellationToken)
+        public Task<string> GetNormalizedEmailAsync(SiteUser user, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(user.NormalizedEmail);
         }
 
-        public Task<string> GetNormalizedUserNameAsync(SiteUser user, CancellationToken cancellationToken)
+        public Task<string> GetNormalizedUserNameAsync(SiteUser user, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(user.NormalizedUserName);
         }
 
-        public Task<string> GetPasswordHashAsync(SiteUser user, CancellationToken cancellationToken)
+        public Task<string> GetPasswordHashAsync(SiteUser user, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(user.PasswordHash);
         }
 
-        public Task<string> GetPhoneNumberAsync(SiteUser user, CancellationToken cancellationToken)
+        public Task<string> GetPhoneNumberAsync(SiteUser user, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(user.PhoneNumber);
         }
 
-        public Task<bool> GetPhoneNumberConfirmedAsync(SiteUser user, CancellationToken cancellationToken)
+        public Task<bool> GetPhoneNumberConfirmedAsync(SiteUser user, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(user.PhoneNumberConfirmed);
         }
 
-        public async Task<IList<string>> GetRolesAsync(SiteUser user, CancellationToken cancellationToken)
+        public async Task<IList<string>> GetRolesAsync(SiteUser user, CancellationToken cancellationToken = default)
         {
             string query = $@"SELECT [sr].[Name]
                               FROM [dbo].[UserRoles] [ur]
@@ -223,31 +216,30 @@ namespace FootballShare.DAL.Repositories
                                 ON [ur].[RoleId] = [sr].[Id]
                               WHERE [ur].[UserId] = @{nameof(SiteUser.Id)}";
 
-            using(var connection = new SqlConnection(this._connectionString))
+            using(var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.OpenAsync(cancellationToken);
                 var userRoles = await connection.QueryAsync<string>(query, user);
 
                 return userRoles.ToList();
             }
         }
 
-        public Task<bool> GetTwoFactorEnabledAsync(SiteUser user, CancellationToken cancellationToken)
+        public Task<bool> GetTwoFactorEnabledAsync(SiteUser user, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(user.TwoFactorEnabled);
         }
 
-        public Task<string> GetUserIdAsync(SiteUser user, CancellationToken cancellationToken)
+        public Task<string> GetUserIdAsync(SiteUser user, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(user.Id.ToString());
         }
 
-        public Task<string> GetUserNameAsync(SiteUser user, CancellationToken cancellationToken)
+        public Task<string> GetUserNameAsync(SiteUser user, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(user.UserName);
         }
 
-        public async Task<IList<SiteUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+        public async Task<IList<SiteUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken = default)
         {
             string getRoleIdQuery = $@"SELECT [Id]
                                        FROM [dbo].[SiteRoles]
@@ -262,9 +254,8 @@ namespace FootballShare.DAL.Repositories
                                         WHERE [RoleId] = @roleId
                                       )";
 
-            using(var connection = new SqlConnection(this._connectionString))
+            using(var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.OpenAsync(cancellationToken);
                 var roleId = await connection.ExecuteScalarAsync(
                     getRoleIdQuery,
                     new
@@ -283,12 +274,12 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public Task<bool> HasPasswordAsync(SiteUser user, CancellationToken cancellationToken)
+        public Task<bool> HasPasswordAsync(SiteUser user, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(user.PasswordHash != null);
         }
 
-        public async Task<bool> IsInRoleAsync(SiteUser user, string roleName, CancellationToken cancellationToken)
+        public async Task<bool> IsInRoleAsync(SiteUser user, string roleName, CancellationToken cancellationToken = default)
         {
             string getRoleIdQuery = $@"SELECT 
                                         [Id]
@@ -302,9 +293,8 @@ namespace FootballShare.DAL.Repositories
                                            AND [RoleId] = @roleId
                                            LIMIT 1";
 
-            using(var connection = new SqlConnection(this._connectionString))
+            using(var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.OpenAsync(cancellationToken);
                 var roleId = await connection.ExecuteScalarAsync<int?>(
                     getRoleIdQuery,
                     new
@@ -333,7 +323,7 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public async Task RemoveFromRoleAsync(SiteUser user, string roleName, CancellationToken cancellationToken)
+        public async Task RemoveFromRoleAsync(SiteUser user, string roleName, CancellationToken cancellationToken = default)
         {
             string getRoleIdQuery = $@"SELECT
                                         [Id]
@@ -345,9 +335,8 @@ namespace FootballShare.DAL.Repositories
                                             WHERE [UserId] = @userId
                                             AND [RoleId] = @roleId";
                               
-            using(var connection = new SqlConnection(this._connectionString))
+            using(var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.OpenAsync(cancellationToken);
                 var roleId = await connection.ExecuteScalarAsync<int?>(getRoleIdQuery, roleName);
 
                 if(roleId.HasValue)
@@ -363,55 +352,55 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public Task SetEmailAsync(SiteUser user, string email, CancellationToken cancellationToken)
+        public Task SetEmailAsync(SiteUser user, string email, CancellationToken cancellationToken = default)
         {
             user.Email = email;
             return Task.FromResult(0);
         }
 
-        public Task SetEmailConfirmedAsync(SiteUser user, bool confirmed, CancellationToken cancellationToken)
+        public Task SetEmailConfirmedAsync(SiteUser user, bool confirmed, CancellationToken cancellationToken = default)
         {
             user.EmailConfirmed = confirmed;
             return Task.FromResult(0);
         }
 
-        public Task SetNormalizedEmailAsync(SiteUser user, string normalizedEmail, CancellationToken cancellationToken)
+        public Task SetNormalizedEmailAsync(SiteUser user, string normalizedEmail, CancellationToken cancellationToken = default)
         {
             user.NormalizedEmail = normalizedEmail;
             return Task.FromResult(0);
         }
 
-        public Task SetNormalizedUserNameAsync(SiteUser user, string normalizedName, CancellationToken cancellationToken)
+        public Task SetNormalizedUserNameAsync(SiteUser user, string normalizedName, CancellationToken cancellationToken = default)
         {
             user.NormalizedUserName = normalizedName;
             return Task.FromResult(0);
         }
 
-        public Task SetPasswordHashAsync(SiteUser user, string passwordHash, CancellationToken cancellationToken)
+        public Task SetPasswordHashAsync(SiteUser user, string passwordHash, CancellationToken cancellationToken = default)
         {
             user.PasswordHash = passwordHash;
             return Task.FromResult(0);
         }
 
-        public Task SetPhoneNumberAsync(SiteUser user, string phoneNumber, CancellationToken cancellationToken)
+        public Task SetPhoneNumberAsync(SiteUser user, string phoneNumber, CancellationToken cancellationToken = default)
         {
             user.PhoneNumber = phoneNumber;
             return Task.FromResult(0);
         }
 
-        public Task SetPhoneNumberConfirmedAsync(SiteUser user, bool confirmed, CancellationToken cancellationToken)
+        public Task SetPhoneNumberConfirmedAsync(SiteUser user, bool confirmed, CancellationToken cancellationToken = default)
         {
             user.PhoneNumberConfirmed = confirmed;
             return Task.FromResult(0);
         }
 
-        public Task SetTwoFactorEnabledAsync(SiteUser user, bool enabled, CancellationToken cancellationToken)
+        public Task SetTwoFactorEnabledAsync(SiteUser user, bool enabled, CancellationToken cancellationToken = default)
         {
             user.TwoFactorEnabled = enabled;
             return Task.FromResult(0);
         }
 
-        public Task SetUserNameAsync(SiteUser user, string userName, CancellationToken cancellationToken)
+        public Task SetUserNameAsync(SiteUser user, string userName, CancellationToken cancellationToken = default)
         {
             user.UserName = userName;
             return Task.FromResult(0);
@@ -431,9 +420,8 @@ namespace FootballShare.DAL.Repositories
                               WHERE [Id] = @{nameof(SiteUser.Id)}
                               LIMIT 1";
                 
-            using(var connection = new SqlConnection(this._connectionString))
+            using(var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.OpenAsync(cancellationToken);
                 await connection.ExecuteAsync(query, entity);
             }
 

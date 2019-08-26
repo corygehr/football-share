@@ -1,8 +1,10 @@
 ﻿using FootballShare.DAL;
+using FootballShare.DAL.Repositories;
 using FootballShare.Entities.User;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +23,15 @@ namespace FootballShare
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Set database connection provider
+            services.AddTransient<IDbConnectionFactory>(db => new SqlDbConnectionFactory(
+                Configuration.GetConnectionString("DefaultConnection")
+            ));
+
+            // Add identity stores
+            services.AddTransient<IUserStore<SiteUser>, SqlSiteUserRepository>();
+            services.AddTransient<IRoleStore<SiteRole>, SqlSiteRoleRepository>();
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
