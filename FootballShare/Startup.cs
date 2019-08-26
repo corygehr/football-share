@@ -39,7 +39,7 @@ namespace FootballShare
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDefaultIdentity<SiteUser>();
+            services.AddIdentity<SiteUser, SiteRole>();
             services.AddAuthentication()
                 .AddMicrosoftAccount(msaOptions =>
                 {
