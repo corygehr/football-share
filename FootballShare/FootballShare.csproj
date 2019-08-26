@@ -15,8 +15,4 @@
     <ProjectReference Include="..\FootballShare.Entities\FootballShare.Entities.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DataAccess\" />
-  </ItemGroup>
-
 </Project>

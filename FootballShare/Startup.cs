@@ -37,11 +37,6 @@ namespace FootballShare
                 });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
-            // Set database connection provider
-            services.AddTransient<IDbConnectionFactory>(db => new SqlDbConnectionFactory(
-                Configuration.GetConnectionString("DefaultConnection")
-            ));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
