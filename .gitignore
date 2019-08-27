@@ -11,3 +11,8 @@
 /FootballShare/bin/Debug/netcoreapp2.2
 /FootballShare.DAL/bin/Debug/netstandard2.0
 /FootballShare.DAL/obj
+/FootballShare.Web/bin/Debug/netcoreapp2.2
+/FootballShare.Web/obj
+/FootballShare.Web/Properties/launchSettings.json
+/FootballShare.Web/appsettings.Development.json
+*.user
