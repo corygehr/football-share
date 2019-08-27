@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using FootballShare.Models;
 using Microsoft.AspNetCore.Mvc;
-using FootballShare.Models;
+
+using System.Diagnostics;
 
 namespace FootballShare.Controllers
 {
@@ -15,17 +12,13 @@ namespace FootballShare.Controllers
             return View();
         }
 
-        public IActionResult About()
+        public IActionResult Rules()
         {
-            ViewData["Message"] = "Your application description page.";
-
             return View();
         }
 
         public IActionResult Contact()
         {
-            ViewData["Message"] = "Your contact page.";
-
             return View();
         }
 
