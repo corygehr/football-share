@@ -53,11 +53,8 @@ namespace FootballShare.Web
                 })
                 .AddGoogle(googleOptions =>
                 {
-                    IConfigurationSection googleAuthNSection =
-                        Configuration.GetSection("Authentication:Google");
-
-                    googleOptions.ClientId = googleAuthNSection["Authentication:Google:ClientId"];
-                    googleOptions.ClientSecret = googleAuthNSection["Authentication:Google:ClientSecret"];
+                    googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                    googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
                 });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
