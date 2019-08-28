@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using FootballShare.Entities.User;
 using Microsoft.AspNetCore.Identity;
-
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,6 +28,12 @@ namespace FootballShare.DAL.Repositories
 
         public async Task<IdentityResult> CreateAsync(SiteRole role, CancellationToken cancellationToken = default)
         {
+            // Check for required parameters
+            if(role == null)
+            {
+                throw new ArgumentNullException("role");
+            }
+
             string query = $@"INSERT INTO [dbo].[SiteRoles](
                                 [Name],
                                 [NormalizedName]
@@ -50,9 +56,14 @@ namespace FootballShare.DAL.Repositories
 
         public async Task<IdentityResult> DeleteAsync(SiteRole role, CancellationToken cancellationToken = default)
         {
+            // Check required parameters
+            if(role == null)
+            {
+                throw new ArgumentNullException("role");
+            }
+
             string query = $@"DELETE FROM [dbo].[SiteRoles]
-                              WHERE [Id] = @{nameof(SiteRole.Id)}
-                              LIMIT 1";
+                              WHERE [Id] = @{nameof(SiteRole.Id)}";
             
             using(var connection = this._connectionFactory.CreateConnection())
             {
@@ -69,10 +80,15 @@ namespace FootballShare.DAL.Repositories
 
         public async Task<SiteRole> FindByIdAsync(string id, CancellationToken cancellationToken = default)
         {
-            string query = $@"SELECT * 
+            // Check for required parameters
+            if(String.IsNullOrEmpty(id))
+            {
+                throw new ArgumentNullException("id");
+            }
+
+            string query = $@"SELECT TOP 1 * 
                               FROM [dbo].[SiteRoles]
-                              WHERE [Id] = @roleId
-                              LIMIT 1";
+                              WHERE [Id] = @roleId";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
@@ -85,10 +101,15 @@ namespace FootballShare.DAL.Repositories
 
         public async Task<SiteRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken = default)
         {
-            string query = $@"SELECT * 
+            // Check for required parameters
+            if(String.IsNullOrEmpty(normalizedRoleName))
+            {
+                throw new ArgumentNullException("normalizedRoleName");
+            }
+
+            string query = $@"SELECT TOP 1 * 
                               FROM [dbo].[SiteRoles]
-                              WHERE [NormalizedRoleName] = @roleName
-                              LIMIT 1";
+                              WHERE [NormalizedRoleName] = @roleName";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
@@ -128,11 +149,16 @@ namespace FootballShare.DAL.Repositories
 
         public async Task<IdentityResult> UpdateAsync(SiteRole role, CancellationToken cancellationToken = default)
         {
+            // Check for required parameters
+            if(role == null)
+            {
+                throw new ArgumentNullException("role");
+            }
+
             string query = $@"UPDATE [dbo].[SiteRoles]
                               SET [Name] = @{nameof(SiteRole.Name)},
                                   [NormalizedName] = @{nameof(SiteRole.NormalizedName)}
-                              WHERE [Id] = @{nameof(SiteRole.Id)}
-                              LIMIT 1";
+                              WHERE [Id] = @{nameof(SiteRole.Id)}";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {

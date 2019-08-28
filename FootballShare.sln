@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FootballShare.Entities", "F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FootballShare.DAL", "FootballShare.DAL\FootballShare.DAL.csproj", "{ACF1AF05-5723-435F-952D-E855F90BB705}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballShare.Web", "FootballShare.Web\FootballShare.Web.csproj", "{D3C08BA1-E461-4E8C-AB8E-42CEA1C2FC8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FootballShare.Web", "FootballShare.Web\FootballShare.Web.csproj", "{D3C08BA1-E461-4E8C-AB8E-42CEA1C2FC8E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E172F13E-D916-40D4-9E00-9BE1AD2B0479}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

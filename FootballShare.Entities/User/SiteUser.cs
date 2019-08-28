@@ -18,7 +18,7 @@ namespace FootballShare.Entities.User
         /// unused by the application itself.
         /// </remarks>
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> email address
         /// </summary>
@@ -40,27 +40,16 @@ namespace FootballShare.Entities.User
         /// </summary>
         public string NormalizedUserName { get; set; }
         /// <summary>
-        /// <see cref="SiteUser"/> password hash
+        /// <see cref="SiteUser"/> Password Hash
         /// </summary>
         /// <remarks>
-        /// Unused due to deferrence to OpenID.
+        /// Should be unused due to reliance on external login providers
         /// </remarks>
         public string PasswordHash { get; set; }
         /// <summary>
-        /// <see cref="SiteUser"/> phone number
+        /// <see cref="SiteUser"/> Security Stamp string
         /// </summary>
-        public string PhoneNumber { get; set; }
-        /// <summary>
-        /// <see cref="SiteUser"/> has confirmed they own their listed Phone Number
-        /// </summary>
-        public bool PhoneNumberConfirmed { get; set; }
-        /// <summary>
-        /// <see cref="SiteUser"/> has enabled Two-Factor Authentication
-        /// </summary>
-        /// <remarks>
-        /// Unused due to deferrence to OpenID.
-        /// </remarks>
-        public bool TwoFactorEnabled { get; set; }
+        public string SecurityStamp { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> logon name
         /// </summary>

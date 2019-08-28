@@ -7,8 +7,8 @@ namespace FootballShare.DAL.Repositories
     /// <see cref="SiteUser"/> repository interface
     /// </summary>
     public interface ISiteUserRepository
-        : IRepository<SiteUser>, IUserStore<SiteUser>, IUserEmailStore<SiteUser>, IUserPhoneNumberStore<SiteUser>,
-          IUserTwoFactorStore<SiteUser>, IUserPasswordStore<SiteUser>, IUserRoleStore<SiteUser>
+        : IRepository<SiteUser>, IUserStore<SiteUser>, IUserEmailStore<SiteUser>,
+          IUserLoginStore<SiteUser>, IUserPasswordStore<SiteUser>, IUserRoleStore<SiteUser>
     {
     }
 }

@@ -1,5 +1,4 @@
-﻿using FootballShare.DAL.Providers;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
 
 namespace FootballShare.DAL
@@ -26,7 +25,6 @@ namespace FootballShare.DAL
         public IDbConnection CreateConnection()
         {
             SqlConnection connection = new SqlConnection(this._connectionString);
-            connection.AccessToken = AzureSqlMsiAuthProvider.GetTokenAsync().Result;
             connection.Open();
             return connection;
         }
