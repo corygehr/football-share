@@ -46,13 +46,17 @@ namespace FootballShare.DAL.Repositories
                                 [ExternalLoginId],
                                 [UserId],
                                 [LoginProvider],
-                                [ProviderKey]
+                                [ProviderKey],
+                                [ProviderDisplayName],
+                                [WhenRegistered]
                             )
-                            VALUES 
+                            VALUES (
                                 @externalLoginId,
                                 @userId,
                                 @loginProvider,
-                                @providerKey
+                                @providerKey,
+                                @providerDisplayName,
+                                CURRENT_TIMESTAMP
                             )";
 
             using(var connection = this._connectionFactory.CreateConnection())
@@ -62,7 +66,9 @@ namespace FootballShare.DAL.Repositories
                     externalLoginId = Guid.NewGuid(),
                     userId = user.Id,
                     loginProvider = login.LoginProvider,
-                    providerKey = login.ProviderKey
+                    providerKey = login.ProviderKey,
+                    providerDisplayName = login.ProviderDisplayName,
+                    whenRegistered = DateTimeOffset.UtcNow
                 });
             }
         }
@@ -133,7 +139,8 @@ namespace FootballShare.DAL.Repositories
                                 [Email],
                                 [NormalizedEmail],
                                 [EmailConfirmed],
-                                [WhenRegistered]
+                                [WhenRegistered],
+                                [WhenUpdated]
                             )
                             VALUES (
                                 @{nameof(SiteUser.Id)},
@@ -142,6 +149,7 @@ namespace FootballShare.DAL.Repositories
                                 @{nameof(SiteUser.Email)},
                                 @{nameof(SiteUser.NormalizedEmail)},
                                 @{nameof(SiteUser.EmailConfirmed)},
+                                CURRENT_TIMESTAMP,
                                 CURRENT_TIMESTAMP
                             )";
 
@@ -270,16 +278,21 @@ namespace FootballShare.DAL.Repositories
                 throw new ArgumentNullException("user");
             }
 
-            string query = $@"SELECT TOP 1
-                                [LoginProvider],
-                                [ProviderKey]
+            string query = $@"SELECT *
                               FROM [dbo].[SiteUserLoginProviders]
                               WHERE [UserId] = @{nameof(SiteUser.Id)}";
 
             using(var connection = this._connectionFactory.CreateConnection())
             {
-                IEnumerable<UserLoginInfo> result = await connection.QueryAsync<UserLoginInfo>(query, user);
-                return result.ToList();
+                IEnumerable<SiteUserLoginProvider> rawResult = await connection
+                    .QueryAsync<SiteUserLoginProvider>(query, user);
+
+                // Cast return object into expected results
+                List<UserLoginInfo> result = rawResult
+                    .Select(r => new UserLoginInfo(r.LoginProvider, r.ProviderKey, r.ProviderDisplayName))
+                    .ToList();
+
+                return result;
             }
         }
 
@@ -295,7 +308,7 @@ namespace FootballShare.DAL.Repositories
 
         public Task<string> GetPasswordHashAsync(SiteUser user, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(user.PasswordHash);
+            throw new NotImplementedException();
         }
 
         public async Task<IList<string>> GetRolesAsync(SiteUser user, CancellationToken cancellationToken = default)
@@ -360,7 +373,7 @@ namespace FootballShare.DAL.Repositories
 
         public Task<bool> HasPasswordAsync(SiteUser user, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(String.IsNullOrEmpty(user.PasswordHash));
+            return Task.FromResult(false);
         }
 
         public async Task<bool> IsInRoleAsync(SiteUser user, string roleName, CancellationToken cancellationToken = default)
@@ -492,8 +505,7 @@ namespace FootballShare.DAL.Repositories
 
         public Task SetPasswordHashAsync(SiteUser user, string passwordHash, CancellationToken cancellationToken = default)
         {
-            user.PasswordHash = passwordHash;
-            return Task.FromResult(0);
+            throw new NotImplementedException();
         }
 
         public Task SetUserNameAsync(SiteUser user, string userName, CancellationToken cancellationToken = default)
@@ -506,11 +518,11 @@ namespace FootballShare.DAL.Repositories
         {
             string query = $@"UPDATE [dbo].[SiteUsers]
                               SET [FullName] = @{nameof(SiteUser.FullName)},
+                                  [DisplayName] = @{nameof(SiteUser.DisplayName)},
                                   [Email] = @{nameof(SiteUser.Email)},
                                   [NormalizedEmail] = @{nameof(SiteUser.NormalizedEmail)},
-                                  [EmailConfimed] = @{nameof(SiteUser.EmailConfirmed)},
-                                  [PasswordHash] = @{nameof(SiteUser.PasswordHash)},
-                                  [SecurityStamp] = @{nameof(SiteUser.SecurityStamp)}
+                                  [EmailConfirmed] = @{nameof(SiteUser.EmailConfirmed)},
+                                  [WhenUpdated] = CURRENT_TIMESTAMP
                               WHERE [Id] = @{nameof(SiteUser.Id)}";
                 
             using(var connection = this._connectionFactory.CreateConnection())

@@ -1,5 +1,5 @@
 ﻿using Dapper.Contrib.Extensions;
-
+using Microsoft.AspNetCore.Identity;
 using System;
 
 namespace FootballShare.Entities.User
@@ -20,8 +20,13 @@ namespace FootballShare.Entities.User
         [Key]
         public Guid Id { get; set; }
         /// <summary>
+        /// <see cref="SiteUser"/> display name
+        /// </summary>
+        public string DisplayName { get; set; }
+        /// <summary>
         /// <see cref="SiteUser"/> email address
         /// </summary>
+        [PersonalData]
         public string Email { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> has confirmed they own their listed email address
@@ -34,22 +39,12 @@ namespace FootballShare.Entities.User
         /// <summary>
         /// <see cref="SiteUser"/> normalized email address
         /// </summary>
+        [PersonalData]
         public string NormalizedEmail { get; set; }
         /// <summary>
         /// Normalized <see cref="SiteUser"/> logon name
         /// </summary>
         public string NormalizedUserName { get; set; }
-        /// <summary>
-        /// <see cref="SiteUser"/> Password Hash
-        /// </summary>
-        /// <remarks>
-        /// Should be unused due to reliance on external login providers
-        /// </remarks>
-        public string PasswordHash { get; set; }
-        /// <summary>
-        /// <see cref="SiteUser"/> Security Stamp string
-        /// </summary>
-        public string SecurityStamp { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> logon name
         /// </summary>
@@ -58,5 +53,9 @@ namespace FootballShare.Entities.User
         /// Date/Time of <see cref="SiteUser"/> registration
         /// </summary>
         public DateTimeOffset WhenRegistered { get; set; }
+        /// <summary>
+        /// Date/Time of last <see cref="SiteUser"/> update
+        /// </summary>
+        public DateTimeOffset WhenUpdated { get; set; }
     }
 }

@@ -32,6 +32,7 @@ namespace FootballShare.Web
             // Add identity stores
             services.AddTransient<IUserStore<SiteUser>, SqlSiteUserRepository>();
             services.AddTransient<IRoleStore<SiteRole>, SqlSiteRoleRepository>();
+            services.AddTransient<ISiteUserRepository, SqlSiteUserRepository>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -49,6 +50,14 @@ namespace FootballShare.Web
                 {
                     msaOptions.ClientId = Configuration["Authentication:Microsoft:ClientId"];
                     msaOptions.ClientSecret = Configuration["Authentication:Microsoft:ClientSecret"];
+                })
+                .AddGoogle(googleOptions =>
+                {
+                    IConfigurationSection googleAuthNSection =
+                        Configuration.GetSection("Authentication:Google");
+
+                    googleOptions.ClientId = googleAuthNSection["Authentication:Google:ClientId"];
+                    googleOptions.ClientSecret = googleAuthNSection["Authentication:Google:ClientSecret"];
                 });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
