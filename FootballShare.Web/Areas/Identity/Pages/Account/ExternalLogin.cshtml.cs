@@ -1,4 +1,5 @@
-﻿using FootballShare.Entities.User;
+﻿using FootballShare.DAL.Repositories;
+using FootballShare.Entities.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,15 +17,18 @@ namespace FootballShare.Web.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<SiteUser> _signInManager;
         private readonly UserManager<SiteUser> _userManager;
+        private readonly ISiteUserRepository _userRepo;
         private readonly ILogger<ExternalLoginModel> _logger;
 
         public ExternalLoginModel(
             SignInManager<SiteUser> signInManager,
             UserManager<SiteUser> userManager,
+            ISiteUserRepository userRepo,
             ILogger<ExternalLoginModel> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
+            _userRepo = userRepo;
             _logger = logger;
         }
 
@@ -40,6 +44,12 @@ namespace FootballShare.Web.Areas.Identity.Pages.Account
 
         public class InputModel
         {
+            [Required]
+            [Display(Name = "Display Name")]
+            public string DisplayName { get; set; }
+            [Required]
+            [Display(Name = "Full Name")]
+            public string FullName { get; set; }
             [Required]
             [EmailAddress]
             public string Email { get; set; }
@@ -93,7 +103,8 @@ namespace FootballShare.Web.Areas.Identity.Pages.Account
                 {
                     Input = new InputModel
                     {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
+                        Email = info.Principal.FindFirstValue(ClaimTypes.Email),
+                        FullName = info.Principal.FindFirstValue(ClaimTypes.Name)
                     };
                 }
                 return Page();
@@ -113,7 +124,14 @@ namespace FootballShare.Web.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var user = new SiteUser { UserName = Input.Email, Email = Input.Email };
+                var user = new SiteUser
+                {
+                    DisplayName = Input.DisplayName,
+                    Email = Input.Email,
+                    FullName = Input.FullName,
+                    UserName = Input.Email,
+                };
+
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
