@@ -4,10 +4,10 @@ using FootballShare.Entities.League;
 namespace FootballShare.Entities.Group
 {
     /// <summary>
-    /// <see cref="BettingGroup"/> <see cref="GroupPool"/> class
+    /// <see cref="BettingGroupPool"/> class
     /// </summary>
-    [Table("GroupPools")]
-    public class GroupPool
+    [Table("BettingGroupPools")]
+    public class BettingGroupPool
     {
         /// <summary>
         /// <see cref="GroupPool"/> unique identifier
@@ -15,10 +15,18 @@ namespace FootballShare.Entities.Group
         [Key]
         public int Id { get; set; }
         /// <summary>
-        /// <see cref="Season"/> this <see cref="GroupPool"/> is associated with
+        /// <see cref="BettingGroup"/> associated with this <see cref="BettingGroupPool"/>
+        /// </summary>
+        public int BettingGroupId { get; set; }
+        /// <summary>
+        /// <see cref="Season"/> this <see cref="BettingGroupPool"/> is associated with
         /// </summary>
         public string SeasonId { get; set; }
 
+        /// <summary>
+        /// <see cref="BettingGroup"/> details
+        /// </summary>
+        public BettingGroup BettingGroup { get; set; }
         /// <summary>
         /// <see cref="Season"/> details
         /// </summary>

@@ -1,4 +1,5 @@
 ﻿using Dapper.Contrib.Extensions;
+using System;
 
 namespace FootballShare.Entities.Group
 {
@@ -12,7 +13,11 @@ namespace FootballShare.Entities.Group
         /// Unique <see cref="BettingGroup"/> identifier
         /// </summary>
         [Key]
-        public string Id { get; set; }
+        public int Id { get; set; }
+        /// <summary>
+        /// <see cref="BettingGroup"/> is publicly visible
+        /// </summary>
+        public bool IsPublic { get; set; }
         /// <summary>
         /// <see cref="BettingGroup"/> description
         /// </summary>
@@ -21,5 +26,9 @@ namespace FootballShare.Entities.Group
         /// <see cref="BettingGroup"/> name
         /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// Date/Time of <see cref="BettingGroup"/> creation
+        /// </summary>
+        public DateTimeOffset WhenCreated { get; set; }
     }
 }
