@@ -1,22 +1,19 @@
-﻿@model IEnumerable<FootballShare.Entities.Group.GroupPool>
+﻿@model IEnumerable<FootballShare.Entities.Group.BettingGroup>
 
 @{
     ViewData["Title"] = "View";
 }
 
-<h1>My Betting Pools</h1>
+<h1>My Betting Groups</h1>
 
 <p>
-    <a asp-action="Create">Create New Pool</a>
+    <a asp-action="Create">Create New Group</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SeasonId)
+                @Html.DisplayNameFor(model => model.Name)
             </th>
             <th></th>
         </tr>
@@ -25,10 +22,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SeasonId)
+                @Html.DisplayFor(modelItem => item.Name)
             </td>
         </tr>
 }

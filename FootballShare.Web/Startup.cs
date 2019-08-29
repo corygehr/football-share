@@ -33,6 +33,7 @@ namespace FootballShare.Web
             services.AddTransient<IUserStore<SiteUser>, SqlSiteUserRepository>();
             services.AddTransient<IRoleStore<SiteRole>, SqlSiteRoleRepository>();
             services.AddTransient<ISiteUserRepository, SqlSiteUserRepository>();
+            services.AddTransient<IBettingGroupRepository, SqlBettingGroupRepository>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {
