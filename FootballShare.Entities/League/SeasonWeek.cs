@@ -7,7 +7,7 @@ namespace FootballShare.Entities.League
     /// Base <see cref="SeasonWeek"/> class
     /// </summary>
     [Table("SeasonWeeks")]
-    public class SeasonWeek
+    public class SeasonWeek : Entity
     {
         /// <summary>
         /// <see cref="SeasonWeek"/> unique identifier

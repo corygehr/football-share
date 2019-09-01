@@ -1,5 +1,6 @@
 ﻿using Dapper.Contrib.Extensions;
 using Microsoft.AspNetCore.Identity;
+
 using System;
 
 namespace FootballShare.Entities.User
@@ -8,7 +9,7 @@ namespace FootballShare.Entities.User
     /// Base <see cref="SiteUser"/> class
     /// </summary>
     [Table("SiteUsers")]
-    public class SiteUser
+    public class SiteUser : EditableEntity
     {
         /// <summary>
         /// <see cref="SiteUser"/> unique identifier
@@ -49,13 +50,5 @@ namespace FootballShare.Entities.User
         /// <see cref="SiteUser"/> logon name
         /// </summary>
         public string UserName { get; set; }
-        /// <summary>
-        /// Date/Time of <see cref="SiteUser"/> registration
-        /// </summary>
-        public DateTimeOffset WhenRegistered { get; set; }
-        /// <summary>
-        /// Date/Time of last <see cref="SiteUser"/> update
-        /// </summary>
-        public DateTimeOffset WhenUpdated { get; set; }
     }
 }

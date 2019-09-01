@@ -7,7 +7,7 @@ namespace FootballShare.Entities.Group
     /// <see cref="BettingGroupPool"/> class
     /// </summary>
     [Table("BettingGroupPools")]
-    public class BettingGroupPool
+    public class BettingGroupPool : EditableEntity
     {
         /// <summary>
         /// <see cref="GroupPool"/> unique identifier

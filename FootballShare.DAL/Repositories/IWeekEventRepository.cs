@@ -1,4 +1,5 @@
-﻿using FootballShare.Entities.League;
+﻿using FootballShare.Entities.Betting;
+using FootballShare.Entities.League;
 
 using System.Collections.Generic;
 using System.Threading;
@@ -18,5 +19,12 @@ namespace FootballShare.DAL.Repositories
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns><see cref="SeasonWeek"/> <see cref="WeekEvent"/> objects</returns>
         Task<IEnumerable<WeekEvent>> GetAllForWeekAsync(SeasonWeek week, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Retrieves the current <see cref="Spread"/> for the specified <see cref="WeekEvent"/>
+        /// </summary>
+        /// <param name="weekEvent">Target <see cref="WeekEvent"/></param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns><see cref="Spread"/> for specified <see cref="WeekEvent"/></returns>
+        Task<Spread> GetSpreadAsync(WeekEvent weekEvent, CancellationToken cancellationToken = default);
     }
 }

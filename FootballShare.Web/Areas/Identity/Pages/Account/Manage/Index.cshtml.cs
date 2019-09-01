@@ -62,7 +62,7 @@ namespace FootballShare.Web.Areas.Identity.Pages.Account.Manage
             }
 
             // Get User data from repository
-            SiteUser userData = await this._userRepo.FindByIdAsync(user.Id.ToString());
+            SiteUser userData = await this._userRepo.GetAsync(user.Id.ToString());
 
             if (userData == null)
             {
@@ -97,7 +97,7 @@ namespace FootballShare.Web.Areas.Identity.Pages.Account.Manage
             }
 
             // Get User data from repository
-            SiteUser userData = await this._userRepo.FindByIdAsync(user.Id.ToString());
+            SiteUser userData = await this._userRepo.GetAsync(user.Id.ToString());
 
             if (userData == null)
             {
@@ -119,9 +119,9 @@ namespace FootballShare.Web.Areas.Identity.Pages.Account.Manage
             }
 
             // Update user in database
-            IdentityResult result = await this._userRepo.UpdateAsync(userData, CancellationToken.None);
+            SiteUser result = await this._userRepo.UpdateAsync(userData, CancellationToken.None);
 
-            if(result.Succeeded)
+            if(result != null)
             {
                 await _signInManager.RefreshSignInAsync(userData);
                 StatusMessage = "Your profile has been updated";

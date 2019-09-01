@@ -11,11 +11,5 @@ namespace FootballShare.DAL.Repositories
     /// </summary>
     public interface ISportsLeagueRepository : IRepository<SportsLeague>
     {
-        /// <summary>
-        /// Retrieves all <see cref="SportsLeague"/> objects available
-        /// </summary>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Collection of <see cref="SportsLeague"/> objects</returns>
-        Task<IEnumerable<SportsLeague>> GetAllAsync(CancellationToken cancellationToken = default);
     }
 }

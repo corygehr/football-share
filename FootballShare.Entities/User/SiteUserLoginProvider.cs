@@ -1,4 +1,5 @@
 ﻿using Dapper.Contrib.Extensions;
+
 using System;
 
 namespace FootballShare.Entities.User
@@ -7,7 +8,7 @@ namespace FootballShare.Entities.User
     /// Pairs a <see cref="SiteUser"/> to an External Login provider
     /// </summary>
     [Table("SiteUserLoginProviders")]
-    public class SiteUserLoginProvider
+    public class SiteUserLoginProvider : Entity
     {
         /// <summary>
         /// External Login unique identifier
@@ -30,9 +31,5 @@ namespace FootballShare.Entities.User
         /// <see cref="SiteUser"/> unique identifier
         /// </summary>
         public Guid UserId { get; set; }
-        /// <summary>
-        /// <see cref="SiteUserLoginProvider"/> registration date/time
-        /// </summary>
-        public DateTimeOffset WhenRegistered { get; set; }
     }
 }

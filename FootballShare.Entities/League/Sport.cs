@@ -6,7 +6,7 @@ namespace FootballShare.Entities.League
     /// <see cref="Sport"/> base class
     /// </summary>
     [Table("Sports")]
-    public class Sport
+    public class Sport : Entity
     {
         /// <summary>
         /// <see cref="Sport"/> unique identifier

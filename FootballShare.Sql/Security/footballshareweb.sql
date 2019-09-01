@@ -1,0 +1,2 @@
+﻿CREATE USER [footballshareweb] FOR EXTERNAL PROVIDER;
+

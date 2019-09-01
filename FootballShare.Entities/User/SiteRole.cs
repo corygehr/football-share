@@ -6,7 +6,7 @@ namespace FootballShare.Entities.User
     /// Role definition
     /// </summary>
     [Table("SiteRoles")]
-    public class SiteRole
+    public class SiteRole : Entity
     {
         /// <summary>
         /// <see cref="SiteRole"/> unique identifier

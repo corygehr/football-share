@@ -29,7 +29,7 @@ namespace FootballShare.DAL.Repositories
 
         public async Task<BettingGroup> CreateAsync(BettingGroup newEntity, CancellationToken cancellationToken = default)
         {
-            if(newEntity == null)
+            if (newEntity == null)
             {
                 throw new ArgumentNullException("newEntity");
             }
@@ -37,80 +37,102 @@ namespace FootballShare.DAL.Repositories
             string query = $@"INSERT INTO [dbo].[BettingGroups] (
                                 [Description],
                                 [Name],
-                                [WhenCreated]
+                                [WhenCreated],
+                                [WhenUpdated]
                               )
                               VALUES (
                                 @{nameof(BettingGroup.Description)},
                                 @{nameof(BettingGroup.Name)},
+                                CURRENT_TIMESTAMP,
                                 CURRENT_TIMESTAMP
                               );
-                              SELECT CAST(SCOPE_IDENTITY() AS INT);
+                              SELECT TOP 1 *
+                              FROM [dbo].[BettingGroups]
+                              WHERE [Id] = (CAST(SCOPE_IDENTITY() AS INT));
                             ";
 
-            using(var connection = this._connectionFactory.CreateConnection())
+            using (var connection = this._connectionFactory.CreateConnection())
             {
-                int newId = await connection.QuerySingleAsync<int>(query, newEntity);
-                newEntity.Id = newId;
-                return newEntity;
+                return await connection.QuerySingleAsync<BettingGroup>(query, newEntity);
             }
         }
 
         public async Task DeleteAsync(BettingGroup entity, CancellationToken cancellationToken = default)
         {
-            if(entity == null)
+            // Use overloaded method
+            await this.DeleteAsync(entity.Id.ToString(), cancellationToken);
+        }
+
+        public async Task DeleteAsync(string entityId, CancellationToken cancellationToken = default)
+        {
+            if (String.IsNullOrEmpty(entityId))
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entityId));
             }
 
             string query = $@"DELETE FROM [dbo].[BettingGroups]
-                              WHERE [Id] = @{nameof(BettingGroup.Id)}";
+                              WHERE [Id] = @id";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.ExecuteAsync(query, entity);
+                await connection.ExecuteAsync(query, new
+                {
+                    id = entityId
+                });
             }
         }
 
-        public async Task<IEnumerable<BettingGroup>> FindAllPublicAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<BettingGroup>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            string query = @"SELECT * 
-                             FROM [dbo].[BettingGroups]
-                             WHERE [IsPublic] = 1";
+            string query = @"SELECT *
+                             FROM [dbo].[BettingGroups]";
 
-            using(var connection = this._connectionFactory.CreateConnection())
+            using (var connection = this._connectionFactory.CreateConnection())
             {
                 return await connection.QueryAsync<BettingGroup>(query);
             }
         }
 
-        public async Task<BettingGroup> FindByIdAsync(string id, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<BettingGroup>> GetAllPublicAsync(CancellationToken cancellationToken = default)
         {
-            if(String.IsNullOrEmpty(id))
+            string query = @"SELECT * 
+                             FROM [dbo].[BettingGroups]
+                             WHERE [IsPublic] = 1";
+
+            using (var connection = this._connectionFactory.CreateConnection())
             {
-                throw new ArgumentNullException("id");
+                return await connection.QueryAsync<BettingGroup>(query);
+            }
+        }
+
+        public async Task<BettingGroup> GetAsync(BettingGroup entity, CancellationToken cancellationToken = default)
+        {
+            // Use overloaded method
+            return await this.GetAsync(entity.Id.ToString());
+        }
+
+        public async Task<BettingGroup> GetAsync(string entityId, CancellationToken cancellationToken = default)
+        {
+            if (String.IsNullOrEmpty(entityId))
+            {
+                throw new ArgumentNullException(nameof(entityId));
             }
 
             string query = $@"SELECT TOP 1 *
                               FROM [dbo].[BettingGroups]
-                              WHERE [Id] = @id
-                            ";
+                              WHERE [Id] = @id";
 
-            using(var connection = this._connectionFactory.CreateConnection())
+            using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QuerySingleAsync<BettingGroup>(query, new
+                return await connection.QuerySingleOrDefaultAsync<BettingGroup>(query, new
                 {
-                    id = id
+                    id = entityId
                 });
             }
         }
 
-        public async Task<IEnumerable<BettingGroupMember>> GetBettingGroupMembersAsync(string groupId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<BettingGroupMember>> GetBettingGroupMembersAsync(int groupId, CancellationToken cancellationToken = default)
         {
-            if(String.IsNullOrEmpty(groupId))
-            {
-                throw new ArgumentNullException("groupId");
-            }
-
             string query = $@"SELECT *
                               FROM [dbo].[BettingGroupMembers]
                               WHERE [BettingGroupId] = @groupId";
@@ -124,13 +146,8 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public async Task<IEnumerable<BettingGroupPool>> GetBettingGroupPoolsAsync(string groupId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<BettingGroupPool>> GetBettingGroupPoolsAsync(int groupId, CancellationToken cancellationToken = default)
         {
-            if(String.IsNullOrEmpty(groupId))
-            {
-                throw new ArgumentNullException(groupId);
-            }
-
             string query = $@"SELECT *
                               FROM [dbo].[BettingGroupPools]
                               WHERE [BettingGroupId] = @groupId";
@@ -186,9 +203,9 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public async Task UpdateAsync(BettingGroup entity, CancellationToken cancellationToken = default)
+        public async Task<BettingGroup> UpdateAsync(BettingGroup entity, CancellationToken cancellationToken = default)
         {
-            if(entity == null)
+            if (entity == null)
             {
                 throw new ArgumentNullException("entity");
             }
@@ -196,12 +213,16 @@ namespace FootballShare.DAL.Repositories
             string query = $@"UPDATE [dbo].[BettingGroups]
                               SET [Name] = @{nameof(BettingGroup.Name)},
                                   [Description] = @{nameof(BettingGroup.Description)},
-                                  [IsPublic] = @{nameof(BettingGroup.IsPublic)}
-                              WHERE [Id] = @{nameof(BettingGroup.Id)}";
+                                  [IsPublic] = @{nameof(BettingGroup.IsPublic)},
+                                  [WhenUpdated] = CURRENT_TIMESTAMP
+                              WHERE [Id] = @{nameof(BettingGroup.Id)};
+                              SELECT TOP 1 *
+                              FROM [dbo].[BettingGroups]
+                              WHERE [Id] = @{nameof(BettingGroup.Id)};";
 
-            using(var connection = this._connectionFactory.CreateConnection())
+            using (var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.ExecuteAsync(query, entity);
+                return await connection.QuerySingleOrDefaultAsync<BettingGroup>(query, entity);
             }
         }
     }

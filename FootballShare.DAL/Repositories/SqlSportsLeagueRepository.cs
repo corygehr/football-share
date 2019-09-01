@@ -27,24 +27,20 @@ namespace FootballShare.DAL.Repositories
             this._connectionFactory = connectionFactory;
         }
 
-        public async Task<SportsLeague> FindByIdAsync(string id, CancellationToken cancellationToken = default)
+        public Task<SportsLeague> CreateAsync(SportsLeague entity, CancellationToken cancellationToken = default)
         {
-            if(String.IsNullOrEmpty(id))
-            {
-                throw new ArgumentNullException(nameof(id));
-            }
+            throw new NotImplementedException();
+        }
 
-            string query = $@"SELECT TOP 1 *
-                              FROM [dbo].[SportsLeagues]
-                              WHERE [Id] = @id";
+        public async Task DeleteAsync(SportsLeague entity, CancellationToken cancellationToken = default)
+        {
+            // Use overload
+            await this.DeleteAsync(entity.Id, cancellationToken);
+        }
 
-            using(var connection = this._connectionFactory.CreateConnection())
-            {
-                return await connection.QuerySingleAsync<SportsLeague>(query, new
-                {
-                    id = id
-                });
-            }
+        public Task DeleteAsync(string entityId, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<IEnumerable<SportsLeague>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -55,6 +51,37 @@ namespace FootballShare.DAL.Repositories
             {
                 return await connection.QueryAsync<SportsLeague>(query);
             }
+        }
+
+        public async Task<SportsLeague> GetAsync(string entityId, CancellationToken cancellationToken = default)
+        {
+            if (String.IsNullOrEmpty(entityId))
+            {
+                throw new ArgumentNullException(nameof(entityId));
+            }
+
+            string query = $@"SELECT TOP 1 *
+                              FROM [dbo].[SportsLeagues]
+                              WHERE [Id] = @id";
+
+            using (var connection = this._connectionFactory.CreateConnection())
+            {
+                return await connection.QuerySingleAsync<SportsLeague>(query, new
+                {
+                    id = entityId
+                });
+            }
+        }
+
+        public async Task<SportsLeague> GetAsync(SportsLeague entity, CancellationToken cancellationToken = default)
+        {
+            // Use overload
+            return await this.GetAsync(entity.Id, cancellationToken);
+        }
+
+        public Task<SportsLeague> UpdateAsync(SportsLeague entity, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
         }
     }
 }

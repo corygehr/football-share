@@ -1,4 +1,5 @@
 ﻿using Dapper.Contrib.Extensions;
+
 using System;
 
 namespace FootballShare.Entities.League
@@ -7,7 +8,7 @@ namespace FootballShare.Entities.League
     /// Base <see cref="League"/> <see cref="Season"/> class
     /// </summary>
     [Table("Seasons")]
-    public class Season
+    public class Season : Entity
     {
         /// <summary>
         /// <see cref="Season"/> unique identifier

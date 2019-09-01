@@ -1,6 +1,7 @@
-﻿using FootballShare.Entities.User;
+﻿using FootballShare.DAL;
 using FootballShare.DAL.Repositories;
-using FootballShare.DAL;
+using FootballShare.DAL.Services;
+using FootballShare.Entities.User;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
@@ -9,7 +10,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication;
 
 namespace FootballShare.Web
 {
@@ -30,14 +30,23 @@ namespace FootballShare.Web
                 Configuration.GetConnectionString("DefaultConnection")
             ));
 
-            // Add identity stores
-            services.AddTransient<IUserStore<SiteUser>, SqlSiteUserRepository>();
-            services.AddTransient<IRoleStore<SiteRole>, SqlSiteRoleRepository>();
-            services.AddTransient<ISiteUserRepository, SqlSiteUserRepository>();
+            // Add data repositories
             services.AddTransient<IBettingGroupRepository, SqlBettingGroupRepository>();
-            services.AddTransient<ISportsLeagueRepository, SqlSportsLeagueRepository>();
             services.AddTransient<ISeasonRepository, SqlSeasonRepository>();
+            services.AddTransient<ISiteRoleRepository, SqlSiteRoleRepository>();
+            services.AddTransient<ISiteUserLoginProviderRepository, SqlSiteUserLoginProviderRepository>();
+            services.AddTransient<ISiteUserRepository, SqlSiteUserRepository>();
+            services.AddTransient<ISportsLeagueRepository, SqlSportsLeagueRepository>();
+            services.AddTransient<IWagerRepository, SqlWagerRepository>();
             services.AddTransient<IWeekEventRepository, SqlWeekEventRepository>();
+
+            // Add identity services
+            services.AddTransient<IUserStore<SiteUser>, SiteUserService>();
+            services.AddTransient<IRoleStore<SiteRole>, SiteRoleService>();
+
+            // Add data services
+            services.AddTransient<IBettingService, BettingService>();
+            services.AddTransient<IGroupManagementService, GroupManagementService>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {
