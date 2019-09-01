@@ -33,6 +33,11 @@ namespace FootballShare.DAL.Services
             this._userRepo = userRepo;
         }
 
+        public async Task<BettingGroup> CreateNewGroupAsync(BettingGroup group, CancellationToken cancellationToken = default)
+        {
+            return await this._groupRepo.CreateAsync(group, cancellationToken);
+        }
+
         public Task<IEnumerable<BettingGroupMember>> GetGroupMembersAsync(int id, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();

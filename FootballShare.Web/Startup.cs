@@ -32,6 +32,7 @@ namespace FootballShare.Web
 
             // Add data repositories
             services.AddTransient<IBettingGroupRepository, SqlBettingGroupRepository>();
+            services.AddTransient<IBettingGroupMemberRepository, SqlBettingGroupMemberRepository>();
             services.AddTransient<ISeasonRepository, SqlSeasonRepository>();
             services.AddTransient<ISiteRoleRepository, SqlSiteRoleRepository>();
             services.AddTransient<ISiteUserLoginProviderRepository, SqlSiteUserLoginProviderRepository>();
