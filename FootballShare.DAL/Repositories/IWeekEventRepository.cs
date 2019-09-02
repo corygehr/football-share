@@ -18,13 +18,6 @@ namespace FootballShare.DAL.Repositories
         /// <param name="week">Target <see cref="SeasonWeek"/></param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns><see cref="SeasonWeek"/> <see cref="WeekEvent"/> objects</returns>
-        Task<IEnumerable<WeekEvent>> GetAllForWeekAsync(SeasonWeek week, CancellationToken cancellationToken = default);
-        /// <summary>
-        /// Retrieves the current <see cref="Spread"/> for the specified <see cref="WeekEvent"/>
-        /// </summary>
-        /// <param name="weekEvent">Target <see cref="WeekEvent"/></param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns><see cref="Spread"/> for specified <see cref="WeekEvent"/></returns>
-        Task<Spread> GetSpreadAsync(WeekEvent weekEvent, CancellationToken cancellationToken = default);
+        Task<IEnumerable<WeekEvent>> GetWeekEventsAsync(SeasonWeek week, CancellationToken cancellationToken = default);
     }
 }

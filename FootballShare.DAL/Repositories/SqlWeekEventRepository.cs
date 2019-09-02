@@ -123,24 +123,6 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public async Task<IEnumerable<WeekEvent>> GetAllForWeekAsync(SeasonWeek week, CancellationToken cancellationToken = default)
-        {
-            if(week == null)
-            {
-                throw new ArgumentNullException(nameof(week));
-            }
-
-            string query = $@"SELECT *
-                              FROM [dbo].[WeekEvents]
-                              WHERE [SeasonWeekId] = @{nameof(SeasonWeek.Id)}
-                              ORDER BY [Time]";
-
-            using (var connection = this._connectionFactory.CreateConnection())
-            {
-                return await connection.QueryAsync<WeekEvent>(query, week);
-            }
-        }
-
         public async Task<WeekEvent> GetAsync(string entityId, CancellationToken cancellationToken = default)
         {
             if(String.IsNullOrEmpty(entityId))
@@ -170,21 +152,21 @@ namespace FootballShare.DAL.Repositories
             return await this.GetAsync(entity.Id.ToString(), cancellationToken);
         }
 
-        public async Task<Spread> GetSpreadAsync(WeekEvent weekEvent, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<WeekEvent>> GetWeekEventsAsync(SeasonWeek week, CancellationToken cancellationToken = default)
         {
-            if(weekEvent == null)
+            if (week == null)
             {
-                throw new ArgumentNullException(nameof(weekEvent));
+                throw new ArgumentNullException(nameof(week));
             }
 
-            string query = $@"SELECT TOP 1 *
-                              FROM [dbo].[Spreads]
-                              WHERE [dbo].[WeekEventId] = @{nameof(WeekEvent.Id)}
-                              ORDER BY [Timestamp] DESC";
+            string query = $@"SELECT *
+                              FROM [dbo].[WeekEvents]
+                              WHERE [SeasonWeekId] = @{nameof(SeasonWeek.Id)}
+                              ORDER BY [Time]";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QuerySingleAsync<Spread>(query, weekEvent);
+                return await connection.QueryAsync<WeekEvent>(query, week);
             }
         }
 

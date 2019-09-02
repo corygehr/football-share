@@ -153,7 +153,7 @@ namespace FootballShare.DAL.Repositories
             return await this.GetAsync(entity.Id, cancellationToken);
         }
 
-        public async Task<Season> GetCurrentForLeagueAsync(string leagueId, CancellationToken cancellationToken)
+        public async Task<Season> GetCurrentLeagueSeasonAsync(string leagueId, CancellationToken cancellationToken)
         {
             if(String.IsNullOrEmpty(leagueId))
             {
@@ -162,7 +162,8 @@ namespace FootballShare.DAL.Repositories
 
             string query = $@"SELECT TOP 1 *
                               FROM [dbo].[Seasons]
-                              WHERE [LeagueId] = @id
+                              WHERE [LeagueId] = @id 
+                              AND [EndDate] > (GETDATE())
                               ORDER BY [StartDate] DESC";
 
             using (var connection = this._connectionFactory.CreateConnection())

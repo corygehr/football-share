@@ -30,6 +30,6 @@ namespace FootballShare.DAL.Repositories
         /// <param name="leagueId">Target <see cref="SportsLeague"/> ID</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Current <see cref="SportsLeague"/> <see cref="Season"/></returns>
-        Task<Season> GetCurrentForLeagueAsync(string leagueId, CancellationToken cancellationToken);
+        Task<Season> GetCurrentLeagueSeasonAsync(string leagueId, CancellationToken cancellationToken);
     }
 }

@@ -34,11 +34,13 @@ namespace FootballShare.Web
             services.AddTransient<IPoolRepository, SqlPoolRepository>();
             services.AddTransient<IPoolMemberRepository, SqlPoolMemberRepository>();
             services.AddTransient<ISeasonRepository, SqlSeasonRepository>();
+            services.AddTransient<ISeasonWeekRepository, SqlSeasonWeekRepository>();
             services.AddTransient<ISiteRoleRepository, SqlSiteRoleRepository>();
             services.AddTransient<ISiteUserLoginProviderRepository, SqlSiteUserLoginProviderRepository>();
             services.AddTransient<ISiteUserRepository, SqlSiteUserRepository>();
             services.AddTransient<ISportRepository, SqlSportRepository>();
             services.AddTransient<ISportsLeagueRepository, SqlSportsLeagueRepository>();
+            services.AddTransient<ISpreadRepository, SqlSpreadRepository>();
             services.AddTransient<IWagerRepository, SqlWagerRepository>();
             services.AddTransient<IWeekEventRepository, SqlWeekEventRepository>();
 
