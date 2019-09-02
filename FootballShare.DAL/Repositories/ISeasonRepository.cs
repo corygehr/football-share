@@ -21,9 +21,9 @@ namespace FootballShare.DAL.Repositories
         /// <summary>
         /// Retrieves the current <see cref="Season"/> for the specific <see cref="SportsLeague"/>
         /// </summary>
-        /// <param name="league">Target <see cref="SportsLeague"/></param>
+        /// <param name="leagueId">Target <see cref="SportsLeague"/> ID</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Current <see cref="SportsLeague"/> <see cref="Season"/></returns>
-        Task<Season> GetCurrentForLeagueAsync(SportsLeague league, CancellationToken cancellationToken);
+        Task<Season> GetCurrentForLeagueAsync(string leagueId, CancellationToken cancellationToken);
     }
 }

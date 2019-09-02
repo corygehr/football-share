@@ -2,7 +2,7 @@
 
 using System;
 
-namespace FootballShare.Entities.User
+namespace FootballShare.Entities.Users
 {
     /// <summary>
     /// Pairs a <see cref="SiteUser"/> to an External Login provider
@@ -31,6 +31,5 @@ namespace FootballShare.Entities.User
         /// <see cref="SiteUser"/> unique identifier
         /// </summary>
         public Guid UserId { get; set; }
-        public DateTimeOffset WhenCreated { get; set; }
     }
 }

@@ -142,21 +142,27 @@ namespace FootballShare.DAL.Repositories
             return await this.GetAsync(entity.Id, cancellationToken);
         }
 
-        public async Task<Season> GetCurrentForLeagueAsync(SportsLeague league, CancellationToken cancellationToken)
+        public async Task<Season> GetCurrentForLeagueAsync(string leagueId, CancellationToken cancellationToken)
         {
-            if(league == null)
+            if(String.IsNullOrEmpty(leagueId))
             {
-                throw new ArgumentNullException(nameof(league));
+                throw new ArgumentNullException(nameof(leagueId));
             }
 
             string query = $@"SELECT TOP 1 *
                               FROM [dbo].[Seasons]
-                              WHERE [LeagueId] = @{nameof(SportsLeague.Id)}
+                              WHERE [LeagueId] = @id
                               ORDER BY [StartDate] DESC";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QuerySingleAsync<Season>(query, league);
+                return await connection.QuerySingleAsync<Season>(
+                    query,
+                    new
+                    {
+                        id = leagueId
+                    }
+                );
             }
         }
 

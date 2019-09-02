@@ -1,7 +1,7 @@
 ﻿using FootballShare.DAL;
 using FootballShare.DAL.Repositories;
 using FootballShare.DAL.Services;
-using FootballShare.Entities.User;
+using FootballShare.Entities.Users;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
@@ -31,12 +31,13 @@ namespace FootballShare.Web
             ));
 
             // Add data repositories
-            services.AddTransient<IBettingGroupRepository, SqlBettingGroupRepository>();
-            services.AddTransient<IBettingGroupMemberRepository, SqlBettingGroupMemberRepository>();
+            services.AddTransient<IPoolRepository, SqlPoolRepository>();
+            services.AddTransient<IPoolMemberRepository, SqlPoolMemberRepository>();
             services.AddTransient<ISeasonRepository, SqlSeasonRepository>();
             services.AddTransient<ISiteRoleRepository, SqlSiteRoleRepository>();
             services.AddTransient<ISiteUserLoginProviderRepository, SqlSiteUserLoginProviderRepository>();
             services.AddTransient<ISiteUserRepository, SqlSiteUserRepository>();
+            services.AddTransient<ISportRepository, SqlSportRepository>();
             services.AddTransient<ISportsLeagueRepository, SqlSportsLeagueRepository>();
             services.AddTransient<IWagerRepository, SqlWagerRepository>();
             services.AddTransient<IWeekEventRepository, SqlWeekEventRepository>();
@@ -47,7 +48,7 @@ namespace FootballShare.Web
 
             // Add data services
             services.AddTransient<IBettingService, BettingService>();
-            services.AddTransient<IGroupManagementService, GroupManagementService>();
+            services.AddTransient<IPoolService, PoolService>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {

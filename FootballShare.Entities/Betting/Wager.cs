@@ -1,5 +1,7 @@
 ﻿using Dapper.Contrib.Extensions;
 using FootballShare.Entities.League;
+using FootballShare.Entities.Pools;
+using FootballShare.Entities.Users;
 
 namespace FootballShare.Entities.Betting
 {
@@ -9,6 +11,11 @@ namespace FootballShare.Entities.Betting
     [Table("Wagers")]
     public class Wager : Entity
     {
+        /// <summary>
+        /// <see cref="Wager"/> unique identifier
+        /// </summary>
+        [Key]
+        public int Id { get; set; }
         /// <summary>
         /// <see cref="Wager"/> amount
         /// </summary>
@@ -21,6 +28,10 @@ namespace FootballShare.Entities.Betting
         /// Home Team <see cref="Spread"/> at time of wager
         /// </summary>
         public double HomeSpread { get; set; }
+        /// <summary>
+        /// <see cref="Pool"/> bet is placed in
+        /// </summary>
+        public int PoolId { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> placing bet
         /// </summary>
@@ -38,5 +49,13 @@ namespace FootballShare.Entities.Betting
         /// <see cref="WeekEvent"/> details
         /// </summary>
         public WeekEvent Event { get; set; }
+        /// <summary>
+        /// <see cref="Pool"/> details
+        /// </summary>
+        public Pool Pool { get; set; }
+        /// <summary>
+        /// <see cref="SiteUser"/> details
+        /// </summary>
+        public SiteUser User { get; set; }
     }
 }

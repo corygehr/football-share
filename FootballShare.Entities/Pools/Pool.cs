@@ -1,32 +1,36 @@
 ﻿using Dapper.Contrib.Extensions;
 using FootballShare.Entities.League;
 
-namespace FootballShare.Entities.Group
+namespace FootballShare.Entities.Pools
 {
     /// <summary>
-    /// <see cref="BettingGroupPool"/> class
+    /// <see cref="Pool"/> class
     /// </summary>
-    [Table("BettingGroupPools")]
-    public class BettingGroupPool : EditableEntity
+    [Table("Pools")]
+    public class Pool : EditableEntity
     {
         /// <summary>
-        /// <see cref="GroupPool"/> unique identifier
+        /// <see cref="Pool"/> unique identifier
         /// </summary>
         [Key]
         public int Id { get; set; }
         /// <summary>
-        /// <see cref="BettingGroup"/> associated with this <see cref="BettingGroupPool"/>
+        /// <see cref="Pool"/> is publicly available
         /// </summary>
-        public int BettingGroupId { get; set; }
+        public bool IsPublic { get; set; }
+        /// <summary>
+        /// <see cref="Pool"/> name
+        /// </summary>
+        public string Name { get; set; }
         /// <summary>
         /// <see cref="Season"/> this <see cref="BettingGroupPool"/> is associated with
         /// </summary>
         public string SeasonId { get; set; }
-
         /// <summary>
-        /// <see cref="BettingGroup"/> details
+        /// Amount each <see cref="PoolMember"/> starts with
         /// </summary>
-        public BettingGroup BettingGroup { get; set; }
+        public double StartingBalance { get; set; }
+
         /// <summary>
         /// <see cref="Season"/> details
         /// </summary>

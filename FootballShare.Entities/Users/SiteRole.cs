@@ -1,6 +1,6 @@
 ﻿using Dapper.Contrib.Extensions;
 
-namespace FootballShare.Entities.User
+namespace FootballShare.Entities.Users
 {
     /// <summary>
     /// Role definition

@@ -1,11 +1,12 @@
-﻿using FootballShare.DAL.Repositories;
+﻿using FootballShare.DAL.Services;
+using FootballShare.Entities.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using FootballShare.Entities.User;
+
 
 namespace FootballShare.Web.Controllers
 {
@@ -13,9 +14,9 @@ namespace FootballShare.Web.Controllers
     public class PoolsController : Controller
     {
         /// <summary>
-        /// <see cref="BettingGroup"/> data repository
+        /// <see cref="Pool"/> service object
         /// </summary>
-        private readonly IBettingGroupRepository _groupRepo;
+        private readonly IPoolService _poolService;
         /// <summary>
         /// Identity manager
         /// </summary>
@@ -24,11 +25,11 @@ namespace FootballShare.Web.Controllers
         /// <summary>
         /// Creates a new <see cref="PoolsController"/> instance
         /// </summary>
-        /// <param name="groupRepo"><see cref="BettingGroup"/> repository</param>
+        /// <param name="poolService"><see cref="Pool"/> service object</param>
         /// <param name="userManager">Identity manager</param>
-        public PoolsController(IBettingGroupRepository groupRepo, UserManager<SiteUser> userManager)
+        public PoolsController(IPoolService poolService, UserManager<SiteUser> userManager)
         {
-            this._groupRepo = groupRepo;
+            this._poolService = poolService;
             this._userManager = userManager;
         }
 
@@ -38,17 +39,13 @@ namespace FootballShare.Web.Controllers
             // Get current user ID
             var user = this._userManager.GetUserAsync(HttpContext.User);
 
-            return View(await this._groupRepo
-                .SearchByMemberUserIdAsync(
-                    user.Id.ToString()
-                )
-            );
+            return View(await this._poolService.GetUserMembershipsAsync(user.Id.ToString()));
         }
 
         // GET: Pools/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(int id)
         {
-            return View();
+            return View(await this._poolService.GetPoolAsync(id));
         }
 
         // GET: Pools/Create
@@ -79,15 +76,15 @@ namespace FootballShare.Web.Controllers
         }
 
         // GET: Pools/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> Edit(int id)
         {
-            return View();
+            return View(await this._poolService.GetPoolAsync(id));
         }
 
         // POST: Pools/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> Edit(int id, IFormCollection collection)
         {
             try
             {
@@ -97,24 +94,25 @@ namespace FootballShare.Web.Controllers
             }
             catch
             {
-                return View();
+                return View(await this._poolService.GetPoolAsync(id));
             }
         }
 
         // GET: Pools/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            return View();
+            return View(await this._poolService.GetPoolAsync(id));
         }
 
         // POST: Pools/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> Delete(int id, IFormCollection collection)
         {
             try
             {
-                // TODO: Add delete logic here
+                // Delete pool
+                await this._poolService.DeletePoolAsync(id);
                 return RedirectToAction(nameof(Index));
             }
             catch

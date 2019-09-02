@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 
 using System;
 
-namespace FootballShare.Entities.User
+namespace FootballShare.Entities.Users
 {
     /// <summary>
     /// Base <see cref="SiteUser"/> class
