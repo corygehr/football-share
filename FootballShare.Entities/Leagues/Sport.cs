@@ -17,5 +17,9 @@ namespace FootballShare.Entities.League
         /// <see cref="Sport"/> name
         /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// <see cref="Sport"/> short name
+        /// </summary>
+        public string ShortName { get; set; }
     }
 }

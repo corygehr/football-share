@@ -1,16 +1,22 @@
-﻿@model IEnumerable<FootballShare.Entities.Pools.Pool>
+﻿@model IEnumerable<FootballShare.Entities.Pools.PoolMember>
 
 @{
-    ViewData["Title"] = "View";
+    ViewData["Title"] = "My Pools";
 }
 
-<h1>My Pools</h1>
+<h1>Joined Pools</h1>
 
+<p>
+    <a asp-action="Create">Create a Pool</a>
+</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Pool.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Balance)
             </th>
             <th></th>
         </tr>
@@ -19,34 +25,15 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
+                @Html.DisplayFor(modelItem => item.Pool.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Balance)
+            </td>
+            <td>
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ })
             </td>
         </tr>
 }
-    </tbody>
-</table>
-
-<h1>Open Pools</h1>
-<p>
-    <a asp-action="Create">Create New Pool</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-            </tr>
-        }
     </tbody>
 </table>

@@ -116,9 +116,11 @@ namespace FootballShare.DAL.Services
 
             for(int i=0; i<memberships.Count(); i++)
             {
-                PoolMember member = populatedMemberships[i];
+                PoolMember member = memberships.ElementAt(i);
                 member.Pool = await this.GetPoolAsync(member.PoolId, cancellationToken);
                 member.User = await this._userRepo.GetAsync(member.SiteUserId.ToString(), cancellationToken);
+                // Push populated member data
+                populatedMemberships[i] = member;
             }
 
             return populatedMemberships.ToList();

@@ -12,6 +12,12 @@ namespace FootballShare.DAL.Repositories
     public interface ISeasonRepository : IRepository<Season>
     {
         /// <summary>
+        /// Retrieves the current <see cref="Season"/> for each <see cref="SportsLeague"/>
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Collection of <see cref="Season"/> objects</returns>
+        Task<IEnumerable<Season>> GetAllCurrentSeasonsAsync(CancellationToken cancellationToken);
+        /// <summary>
         /// Retrieves all <see cref="SeasonWeek"/> objects for the specified <see cref="Season"/>
         /// </summary>
         /// <param name="season">Target <see cref="Season"/></param>

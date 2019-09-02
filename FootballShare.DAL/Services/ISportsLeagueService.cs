@@ -12,6 +12,12 @@ namespace FootballShare.DAL.Services
     public interface ISportsLeagueService : IService
     {
         /// <summary>
+        /// Gets all current <see cref="Season"/> objects
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Collection of <see cref="Season"/> objects</returns>
+        Task<IEnumerable<Season>> GetAllCurrentSeasonsAsync(CancellationToken cancellationToken = default);
+        /// <summary>
         /// Gets the specified <see cref="SportsLeague"/>
         /// </summary>
         /// <param name="leagueId"><see cref="SportsLeague"/> ID</param>

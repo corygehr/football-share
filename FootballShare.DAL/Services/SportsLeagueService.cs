@@ -39,6 +39,11 @@ namespace FootballShare.DAL.Services
             this._sportRepo = sportRepo;
         }
 
+        public async Task<IEnumerable<Season>> GetAllCurrentSeasonsAsync(CancellationToken cancellationToken = default)
+        {
+            return await this._seasonRepo.GetAllCurrentSeasonsAsync(cancellationToken);
+        }
+
         public async Task<SportsLeague> GetLeagueAsync(string leagueId, CancellationToken cancellationToken = default)
         {
             SportsLeague league = await this._leagueRepo.GetAsync(leagueId, cancellationToken);
@@ -57,7 +62,7 @@ namespace FootballShare.DAL.Services
 
             if(current != null)
             {
-                current.League = await this.GetLeagueAsync(current.LeagueId, cancellationToken);
+                current.League = await this.GetLeagueAsync(current.SportsLeagueId, cancellationToken);
             }
 
             return current;
@@ -69,7 +74,7 @@ namespace FootballShare.DAL.Services
 
             if(season != null)
             {
-                season.League = await this.GetLeagueAsync(season.LeagueId, cancellationToken);
+                season.League = await this.GetLeagueAsync(season.SportsLeagueId, cancellationToken);
             }
 
             return season;

@@ -98,6 +98,17 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
+        public async Task<IEnumerable<Season>> GetAllCurrentSeasonsAsync(CancellationToken cancellationToken)
+        {
+            string query = $@"SELECT [s].*
+                              FROM [dbo].[Seasons] [s]";
+
+            using (var connection = this._connectionFactory.CreateConnection())
+            {
+                return await connection.QueryAsync<Season>(query);
+            }
+        }
+
         public async Task<IEnumerable<SeasonWeek>> GetAllWeeksAsync(Season season, CancellationToken cancellationToken)
         {
             if(season == null)
@@ -175,7 +186,7 @@ namespace FootballShare.DAL.Repositories
 
             string query = $@"UPDATE [dbo].[Seasons]
                               SET [EndDate] = @{nameof(Season.EndDate)},
-                                  [LeagueId] = @{nameof(Season.LeagueId)},
+                                  [SportsLeagueId] = @{nameof(Season.SportsLeagueId)},
                                   [Name] = @{nameof(Season.Name)},
                                   [StartDate] = @{nameof(Season.StartDate)},
                                   [WhenUpdated] = CURRENT_TIMESTAMP

@@ -1,0 +1,43 @@
+﻿@model FootballShare.Web.Models.CreatePoolViewModel
+
+@{
+    ViewData["Title"] = "Create Pool";
+}
+
+<h1>Create a Pool</h1>
+
+<h4>Pool</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="PoolName" class="control-label"></label>
+                <input asp-for="PoolName" class="form-control" />
+                <span asp-validation-for="PoolName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SeasonId" class="control-label"></label>
+                @Html.DropDownListFor(m => m.SeasonId, Model.AvailableSeasons)
+                <span asp-validation-for="SeasonId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StartingBalance" class="control-label"></label>
+                <input asp-for="StartingBalance" class="form-control" />
+                <span asp-validation-for="StartingBalance" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to Pools</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

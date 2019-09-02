@@ -1,4 +1,5 @@
 ﻿@using FootballShare.Entities.Users
+@using FootballShare.Web.Extensions
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<SiteUser> SignInManager
 <!DOCTYPE html>
@@ -54,6 +55,14 @@
     </header>
     <div class="container">
         <partial name="_CookieConsentPartial" />
+        @if (TempData["UserMessage"] != null)
+        {
+            UserMessageViewModel message = TempData.Get<UserMessageViewModel>("UserMessage");
+            <div class="alert @message.CssClassName">
+                <strong>@message.Title</strong>
+                @message.Message
+            </div>
+        }
         <main role="main" class="pb-3">
             @RenderBody()
         </main>

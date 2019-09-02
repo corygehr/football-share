@@ -66,7 +66,7 @@ namespace FootballShare.DAL.Repositories
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QuerySingleAsync(
+                return await connection.QuerySingleAsync<Sport>(
                     query,
                     new
                     {

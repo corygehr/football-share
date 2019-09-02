@@ -20,13 +20,13 @@ namespace FootballShare.Entities.League
         /// </summary>
         public DateTime EndDate { get; set; }
         /// <summary>
-        /// <see cref="League"/> ID
-        /// </summary>
-        public string LeagueId { get; set; }
-        /// <summary>
         /// <see cref="Season"/> name
         /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// <see cref="SportsLeague"/> ID
+        /// </summary>
+        public string SportsLeagueId { get; set; }
         /// <summary>
         /// <see cref="Season"/> start date
         /// </summary>
