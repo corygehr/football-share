@@ -31,5 +31,6 @@ namespace FootballShare.Entities.User
         /// <see cref="SiteUser"/> unique identifier
         /// </summary>
         public Guid UserId { get; set; }
+        public DateTimeOffset WhenCreated { get; set; }
     }
 }

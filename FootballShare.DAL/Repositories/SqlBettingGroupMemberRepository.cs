@@ -43,14 +43,14 @@ namespace FootballShare.DAL.Repositories
                               )
                               VALUES (
                                 @{nameof(BettingGroupMember.SiteUserId)},
-                                @{nameof(BettingGroupMember.GroupId)},
+                                @{nameof(BettingGroupMember.BettingGroupId)},
                                 @{nameof(BettingGroupMember.IsAdmin)},
                                 CURRENT_TIMESTAMP
                               );
                               SELECT TOP 1 *
                               FROM [dbo].[BettingGroupMembers]
                               WHERE [SiteUserId] = @{nameof(BettingGroupMember.SiteUserId)}
-                              AND [GroupId] = @{nameof(BettingGroupMember.GroupId)};";
+                              AND [BettingGroupId] = @{nameof(BettingGroupMember.BettingGroupId)};";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
@@ -67,7 +67,7 @@ namespace FootballShare.DAL.Repositories
 
             string query = $@"DELETE FROM [dbo].[BettingGroupMembers]
                               WHERE [SiteUserId] = @{nameof(BettingGroupMember.SiteUserId)}
-                              AND [GroupId] = @{nameof(BettingGroupMember.GroupId)}";
+                              AND [BettingGroupId] = @{nameof(BettingGroupMember.BettingGroupId)}";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
@@ -100,7 +100,7 @@ namespace FootballShare.DAL.Repositories
             string query = $@"SELECT TOP 1 *
                               FROM [dbo].[BettingGroupMembers]
                               WHERE [SiteUserId] = @{nameof(BettingGroupMember.SiteUserId)}
-                              AND [GroupId] = @{nameof(BettingGroupMember.GroupId)}";
+                              AND [BettingGroupId] = @{nameof(BettingGroupMember.BettingGroupId)}";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {

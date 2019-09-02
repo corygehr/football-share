@@ -66,7 +66,7 @@ namespace FootballShare.DAL.Services
 
                 foreach(BettingGroupMember member in members)
                 {
-                    IEnumerable<Wager> userWagers = await this.GetUserWagersForSeasonAsync(member.SiteUserId, seasonId, cancellationToken);
+                    IEnumerable<Wager> userWagers = await this.GetUserWagersForSeasonAsync(member.SiteUserId.ToString(), seasonId, cancellationToken);
 
                     if(userWagers != null)
                     {
@@ -94,7 +94,7 @@ namespace FootballShare.DAL.Services
                 {
                     // Get user
 
-                    IEnumerable<Wager> userWagers = await this.GetUserWagersForWeekAsync(member.SiteUserId, weekId, cancellationToken);
+                    IEnumerable<Wager> userWagers = await this.GetUserWagersForWeekAsync(member.SiteUserId.ToString(), weekId, cancellationToken);
 
                     if (userWagers != null)
                     {
@@ -113,12 +113,12 @@ namespace FootballShare.DAL.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Wager>> GetUserWagersForSeasonAsync(int userId, string seasonId, CancellationToken cancellationToken = default)
+        public Task<IEnumerable<Wager>> GetUserWagersForSeasonAsync(string userId, string seasonId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Wager>> GetUserWagersForWeekAsync(int userId, int weekId, CancellationToken cancellationToken = default)
+        public Task<IEnumerable<Wager>> GetUserWagersForWeekAsync(string userId, int weekId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

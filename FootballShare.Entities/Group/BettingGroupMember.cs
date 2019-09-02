@@ -1,6 +1,8 @@
 ﻿using Dapper.Contrib.Extensions;
 using FootballShare.Entities.User;
 
+using System;
+
 namespace FootballShare.Entities.Group
 {
     /// <summary>
@@ -12,11 +14,11 @@ namespace FootballShare.Entities.Group
         /// <summary>
         /// <see cref="BettingGroup"/> ID
         /// </summary>
-        public int GroupId { get; set; }
+        public int BettingGroupId { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> ID
         /// </summary>
-        public int SiteUserId { get; set; }
+        public Guid SiteUserId { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> is a <see cref="BettingGroup"/> Administrator
         /// </summary>

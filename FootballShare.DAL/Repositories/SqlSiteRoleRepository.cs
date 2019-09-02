@@ -44,9 +44,9 @@ namespace FootballShare.DAL.Repositories
 
             if(targetRole != null)
             {
-                string query = @"INSERT INTO [dbo].[UserRoles] (
-                                   [UserId],
-                                   [RoleId],
+                string query = @"INSERT INTO [dbo].[SiteUserRoles] (
+                                   [SiteUserId],
+                                   [SiteRoleId],
                                    [WhenCreated]
                                  )
                                  VALUES (
@@ -197,10 +197,10 @@ namespace FootballShare.DAL.Repositories
             }
 
             string query = $@"SELECT [ur].*
-                              FROM [dbo].[UserRoles] [ur]
+                              FROM [dbo].[SiteUserRoles] [ur]
                               INNER JOIN [dbo].[SiteRoles] [sr]
-                                ON [ur].[RoleId] = [sr].[Id]
-                              WHERE [ur].[UserId] = @id";
+                                ON [ur].[SiteRoleId] = [sr].[Id]
+                              WHERE [ur].[SiteUserId] = @id";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {

@@ -134,7 +134,7 @@ namespace FootballShare.DAL.Services
             if(providers != null)
             {
                 return providers
-                    .Select(p => new UserLoginInfo(p.LoginProvider, p.ProviderDisplayName, p.ProviderKey))
+                    .Select(p => new UserLoginInfo(p.LoginProvider, p.ProviderKey, p.ProviderDisplayName))
                     .ToList();
             }
             else
