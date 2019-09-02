@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace FootballShare.Entities.Users
 {
@@ -18,16 +19,20 @@ namespace FootballShare.Entities.Users
         /// Some fields are here due to a database dependency (OpenID), but are 
         /// unused by the application itself.
         /// </remarks>
-        [Key]
         public Guid Id { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> display name
         /// </summary>
+        [Display(Name = "Display Name", ShortName = "Nickname", Description = "Name shown around the site.")]
         public string DisplayName { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> email address
         /// </summary>
         [PersonalData]
+        [Display(Name = "Email Address", ShortName = "Email", Description = "User email address.")]
+        [EmailAddress]
+        [Required]
+
         public string Email { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> has confirmed they own their listed email address
@@ -36,6 +41,8 @@ namespace FootballShare.Entities.Users
         /// <summary>
         /// <see cref="SiteUser"/> name
         /// </summary>
+        [Display(Name = "Full Name", ShortName = "Name", Description = "User full name.")]
+        [PersonalData]
         public string FullName { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> normalized email address
@@ -49,6 +56,7 @@ namespace FootballShare.Entities.Users
         /// <summary>
         /// <see cref="SiteUser"/> logon name
         /// </summary>
+        [Display(Name = "Username")]
         public string UserName { get; set; }
     }
 }

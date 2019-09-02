@@ -12,7 +12,7 @@ namespace FootballShare.Web.Models
         /// <summary>
         /// Available <see cref="Season"/> objects for <see cref="Pool"/> creation
         /// </summary>
-        public IEnumerable<SelectListItem> AvailableSeasons { get; set; }
+        public List<SelectListItem> AvailableSeasons { get; set; }
         /// <summary>
         /// <see cref="Pool"/> being created
         /// </summary>
@@ -23,7 +23,8 @@ namespace FootballShare.Web.Models
         [Required]
         public string SeasonId { get; set; }
         [Display(Name="Starting Balance ($)", ShortName="Balance ($)", Description = "Amount of money each player starts with.")]
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         [Required]
-        public double StartingBalance { get; set; } = 10000.00;
+        public decimal StartingBalance { get; set; } = 10000m;
     }
 }

@@ -75,6 +75,25 @@ namespace FootballShare.DAL.Services
             await this._poolRepo.DeleteAsync(poolId.ToString(), cancellationToken);
         }
 
+        public async Task<IEnumerable<PoolMember>> GetMembersAsync(int poolId, CancellationToken cancellationToken = default)
+        {
+            Pool pool = await this._poolRepo.GetAsync(poolId.ToString(), cancellationToken);
+            IEnumerable<PoolMember> members = await this._poolMemberRepo.GetPoolMembersAsync(poolId, cancellationToken);
+
+            // Get User objects for each member
+            PoolMember[] fullMembers = new PoolMember[members.Count()];
+
+            for (int i = 0; i < members.Count(); i++)
+            {
+                PoolMember member = members.ElementAt(i);
+                member.User = await this._userRepo.GetAsync(member.SiteUserId.ToString(), cancellationToken);
+                member.Pool = pool;
+                fullMembers[i] = member;
+            }
+
+            return fullMembers.ToList();
+        }
+
         public async Task<Pool> GetPoolAsync(int poolId, CancellationToken cancellationToken = default)
         {
             Pool pool = await this._poolRepo.GetAsync(poolId.ToString(), cancellationToken);
@@ -88,23 +107,30 @@ namespace FootballShare.DAL.Services
             return pool;
         }
 
-        public async Task<IEnumerable<PoolMember>> GetMembersAsync(int poolId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Pool>> GetPublicPoolsAsync(CancellationToken cancellationToken = default)
         {
-            Pool pool = await this._poolRepo.GetAsync(poolId.ToString(), cancellationToken);
-            IEnumerable<PoolMember> members = await this._poolMemberRepo.GetPoolMembersAsync(poolId, cancellationToken);
+            IEnumerable<Pool> pools = await this._poolRepo.GetAllPublicAsync(cancellationToken);
+            Pool[] populated = new Pool[pools.Count()];
 
-            // Get User objects for each member
-            PoolMember[] fullMembers = new PoolMember[members.Count()];
-
-            for(int i=0; i<members.Count(); i++)
+            for(int i=0; i<pools.Count(); i++)
             {
-                PoolMember member = members.ElementAt(i);
-                member.User = await this._userRepo.GetAsync(member.SiteUserId.ToString(), cancellationToken);
-                member.Pool = pool;
-                fullMembers[i] = member;
+                Pool pool = pools.ElementAt(i);
+                pool.Season = await this._leagueService.GetSeasonAsync(pool.SeasonId, cancellationToken);
+                populated[i] = pool;
             }
 
-            return fullMembers.ToList();
+            return populated;
+        }
+
+        public async Task<IEnumerable<Pool>> GetPublicPoolsNotJoinedAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            // Get all public pools
+            IEnumerable<Pool> publicPools = await this.GetPublicPoolsAsync(cancellationToken);
+            // Get user pools
+            IEnumerable<PoolMember> userPools = await this._poolMemberRepo.GetUserMembershipsAsync(userId, cancellationToken);
+
+            // Get pools which the user is not a member of
+            return publicPools.Where(p => userPools.Where(up => up.PoolId == p.Id).Count() == 0);
         }
 
         public async Task<IEnumerable<PoolMember>> GetUserMembershipsAsync(Guid userId, CancellationToken cancellationToken = default)

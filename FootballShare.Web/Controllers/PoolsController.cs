@@ -52,7 +52,17 @@ namespace FootballShare.Web.Controllers
             // Get current user ID
             SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
 
-            return View(await this._poolService.GetUserMembershipsAsync(user.Id));
+            IEnumerable<Pool> publicPools = await this._poolService.GetPublicPoolsNotJoinedAsync(user.Id);
+            IEnumerable<PoolMember> userPools = await this._poolService.GetUserMembershipsAsync(user.Id);
+
+            // Get user pools and unjoined pools
+            ListPoolsViewModel vm = new ListPoolsViewModel
+            {
+                PublicPools = publicPools.ToList(),
+                UserPools = userPools.ToList()
+            };
+
+            return View(vm);
         }
 
         // GET: Pools/Details/5
@@ -69,12 +79,15 @@ namespace FootballShare.Web.Controllers
 
             CreatePoolViewModel vm = new CreatePoolViewModel
             {
-                AvailableSeasons = seasons.Select(s => new SelectListItem
+                AvailableSeasons = seasons
+                .Select(s => new SelectListItem
                 {
                     Value = s.Id,
                     Text = s.Name
                 })
+                .ToList()
             };
+
             return View(vm);
         }
 
@@ -104,7 +117,7 @@ namespace FootballShare.Web.Controllers
 
                     TempData.Put("UserMessage", new UserMessageViewModel
                     {
-                        CssClassName = "success",
+                        CssClassName = "alert-success",
                         Title = "Pool Created",
                         Message = "Your pool has been created successfully!"
                     });
@@ -115,7 +128,7 @@ namespace FootballShare.Web.Controllers
                 {
                     TempData.Put("UserMessage", new UserMessageViewModel
                     {
-                        CssClassName = "error",
+                        CssClassName = "alert-error",
                         Title = "Error",
                         Message = "One or more problems were found with your responses. Please check them and try again."
                     });
@@ -129,11 +142,13 @@ namespace FootballShare.Web.Controllers
 
                 CreatePoolViewModel vm = new CreatePoolViewModel
                 {
-                    AvailableSeasons = seasons.Select(s => new SelectListItem
+                    AvailableSeasons = seasons
+                    .Select(s => new SelectListItem
                     {
                         Value = s.Id,
                         Text = s.Name
                     })
+                    .ToList()
                 };
 
                 return View(vm);

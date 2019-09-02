@@ -67,9 +67,12 @@ namespace FootballShare.DAL.Services
                 await this._userRepo.CreateAsync(user, cancellationToken);
                 return IdentityResult.Success;
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-                return IdentityResult.Failed();
+                return IdentityResult.Failed(new IdentityError
+                {
+                    Description = ex.Message
+                });
             }
         }
 
@@ -80,9 +83,12 @@ namespace FootballShare.DAL.Services
                 await this._userRepo.DeleteAsync(user, cancellationToken);
                 return IdentityResult.Success;
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-                return IdentityResult.Failed();
+                return IdentityResult.Failed(new IdentityError
+                {
+                    Description = ex.Message
+                });
             }
         }
 
@@ -238,9 +244,12 @@ namespace FootballShare.DAL.Services
                 await this._userRepo.UpdateAsync(user, cancellationToken);
                 return IdentityResult.Success;
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-                return IdentityResult.Failed();
+                return IdentityResult.Failed(new IdentityError
+                {
+                    Description = ex.Message
+                });
             }
         }
     }

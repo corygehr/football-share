@@ -45,7 +45,7 @@ namespace FootballShare.DAL.Repositories
                                 [Email],
                                 [NormalizedEmail],
                                 [EmailConfirmed],
-                                [WhenRegistered],
+                                [WhenCreated],
                                 [WhenUpdated]
                               )
                               VALUES (

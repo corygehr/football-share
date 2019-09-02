@@ -103,7 +103,7 @@ namespace FootballShare.DAL.Repositories
         {
             string query = $@"SELECT *
                               FROM [dbo].[Pools]
-                              WHERE [IsAdmin] = 1";
+                              WHERE [IsPublic] = 1";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {

@@ -40,8 +40,7 @@ namespace FootballShare.DAL.Repositories
                                 [LoginProvider],
                                 [ProviderKey],
                                 [ProviderDisplayName],
-                                [WhenRegistered],
-                                [WhenUpdated]
+                                [WhenCreated]
                               )
                               VALUES (
                                 @{nameof(SiteUserLoginProvider.ExternalLoginId)},
@@ -49,7 +48,6 @@ namespace FootballShare.DAL.Repositories
                                 @{nameof(SiteUserLoginProvider.LoginProvider)},
                                 @{nameof(SiteUserLoginProvider.ProviderKey)},
                                 @{nameof(SiteUserLoginProvider.ProviderDisplayName)},
-                                CURRENT_TIMESTAMP,
                                 CURRENT_TIMESTAMP
                               );
                               SELECT TOP 1 *

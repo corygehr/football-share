@@ -17,18 +17,15 @@ namespace FootballShare.Web.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<SiteUser> _signInManager;
         private readonly UserManager<SiteUser> _userManager;
-        private readonly ISiteUserRepository _userRepo;
         private readonly ILogger<ExternalLoginModel> _logger;
 
         public ExternalLoginModel(
             SignInManager<SiteUser> signInManager,
             UserManager<SiteUser> userManager,
-            ISiteUserRepository userRepo,
             ILogger<ExternalLoginModel> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
-            _userRepo = userRepo;
             _logger = logger;
         }
 
@@ -104,6 +101,7 @@ namespace FootballShare.Web.Areas.Identity.Pages.Account
                     Input = new InputModel
                     {
                         Email = info.Principal.FindFirstValue(ClaimTypes.Email),
+                        DisplayName = info.Principal.FindFirstValue(ClaimTypes.GivenName),
                         FullName = info.Principal.FindFirstValue(ClaimTypes.Name)
                     };
                 }

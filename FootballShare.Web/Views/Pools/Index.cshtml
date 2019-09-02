@@ -1,10 +1,11 @@
-﻿@model IEnumerable<FootballShare.Entities.Pools.PoolMember>
+﻿@using FootballShare.Entities.Pools
+@model FootballShare.Web.Models.ListPoolsViewModel
 
 @{
-    ViewData["Title"] = "My Pools";
+    ViewData["Title"] = "Pools";
 }
 
-<h1>Joined Pools</h1>
+<h2>Joined Pools</h2>
 
 <p>
     <a asp-action="Create">Create a Pool</a>
@@ -13,27 +14,60 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Pool.Name)
+                @Html.DisplayNameFor(model => model.UserPools[0].Pool.Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Balance)
+                @Html.DisplayNameFor(model => model.UserPools[0].Balance)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model.UserPools)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Pool.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Balance)
+                </td>
+                <td>
+                    @Html.ActionLink("Details", "Details", new { id=item.Id })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>Available Pools</h2>
+
+<table class="table">
+    <thead>
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Pool.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Balance)
-            </td>
-            <td>
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ })
-            </td>
+            <th>
+                Name
+            </th>
+            <th>
+                Season
+            </th>
+            <th></th>
         </tr>
-}
+    </thead>
+    <tbody>
+        @foreach (var item in Model.PublicPools)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Season.Name)
+                </td>
+                <td>
+                    @Html.ActionLink("Join", "Join", new { id=item.Id })
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

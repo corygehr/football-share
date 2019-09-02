@@ -8,10 +8,10 @@ namespace FootballShare.Web.Models
         /// <summary>
         /// <see cref="Pool"/> objects available to join
         /// </summary>
-        public IEnumerable<Pool> PublicPools { get; set; }
+        public List<Pool> PublicPools { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> <see cref="Pool"/> memberships
         /// </summary>
-        public IEnumerable<PoolMember> UserPools { get; set; }
+        public List<PoolMember> UserPools { get; set; }
     }
 }
