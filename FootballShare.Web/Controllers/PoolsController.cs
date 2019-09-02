@@ -151,7 +151,7 @@ namespace FootballShare.Web.Controllers
                 {
                     TempData.Put("UserMessage", new UserMessageViewModel
                     {
-                        CssClassName = "alert-error",
+                        CssClassName = "alert-danger",
                         Title = "Error",
                         Message = "One or more problems were found with your responses. Please check them and try again."
                     });
@@ -225,7 +225,7 @@ namespace FootballShare.Web.Controllers
                     {
                         TempData.Put("UserMessage", new UserMessageViewModel
                         {
-                            CssClassName = "alert-error",
+                            CssClassName = "alert-danger",
                             Title = "Error",
                             Message = $"Failed to update the pool. Please try again."
                         });
@@ -254,7 +254,18 @@ namespace FootballShare.Web.Controllers
         // GET: Pools/Delete/5
         public async Task<ActionResult> Delete(int id)
         {
-            return View(await this._poolService.GetPoolAsync(id));
+            // Check if user is an administrator
+            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+            PoolMember member = await this._poolService.GetUserPoolProfileAsync(user.Id, id);
+
+            if(member != null && member.IsAdmin)
+            {
+                return View(member.Pool);
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         // POST: Pools/Delete/5
@@ -262,15 +273,54 @@ namespace FootballShare.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(int id, IFormCollection collection)
         {
-            try
+            // Check if user is an administrator
+            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+            PoolMember member = await this._poolService.GetUserPoolProfileAsync(user.Id, id);
+
+            if(member != null && member.IsAdmin)
             {
-                // Delete pool
-                await this._poolService.DeletePoolAsync(id);
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    if (ModelState.IsValid)
+                    {
+                        // Delete pool
+                        await this._poolService.DeletePoolAsync(id);
+
+                        TempData.Put("UserMessage", new UserMessageViewModel
+                        {
+                            CssClassName = "alert-success",
+                            Title = "Success!",
+                            Message = $"Pool deleted successfully."
+                        });
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        TempData.Put("UserMessage", new UserMessageViewModel
+                        {
+                            CssClassName = "alert-warning",
+                            Title = "Warning",
+                            Message = $"One or more fields failed to validate. Please check them and try again."
+                        });
+
+                        return View(member.Pool);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    TempData.Put("UserMessage", new UserMessageViewModel
+                    {
+                        CssClassName = "alert-danger",
+                        Title = "Error",
+                        Message = $"Failed to delete pool: {ex.Message}."
+                    });
+                    return View(member.Pool);
+                }
             }
-            catch
+            else
             {
-                return View();
+                return Unauthorized();
             }
         }
 
@@ -297,7 +347,7 @@ namespace FootballShare.Web.Controllers
             {
                 TempData.Put("UserMessage", new UserMessageViewModel
                 {
-                    CssClassName = "alert-error",
+                    CssClassName = "alert-danger",
                     Title = "Error",
                     Message = "Failed to join the requested pool. Pleae try again later."
                 });

@@ -2,11 +2,13 @@
 
 @{
     ViewData["Title"] = "Edit " + Model.Name;
+    var parameters = new Dictionary<string, string>
+    {
+        { "id", Model.Id.ToString() }
+    };
 }
 
-<h1>Edit</h1>
-
-<h4>@Html.DisplayFor(modelItem => modelItem.Name)</h4>
+<h1>Edit @Html.DisplayFor(modelItem => modelItem.Name)</h1>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -34,14 +36,9 @@
         </form>
     </div>
 </div>
-@{
-    var parameters = new Dictionary<string, string>
-    {
-        { "id", Model.Id.ToString() }
-    };
-}
 <div>
-    <a asp-action="Details" asp-all-route-data="parameters">Back to Pool Details</a>
+    <a asp-action="Details" asp-all-route-data="parameters">Back to Pool Details</a> |
+    <a asp-action="Delete" asp-all-route-data="parameters">Delete Pool</a>
 </div>
 
 @section Scripts {

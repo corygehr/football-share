@@ -1,14 +1,18 @@
 ﻿@model FootballShare.Entities.Pools.PoolMember
 
 @{
-    ViewData["Title"] = "View";
+    ViewData["Title"] = "Leave " + Model.Pool.Name;
+    var parameters = new Dictionary<string, string>
+    {
+        { "id", Model.Pool.Id.ToString() }
+    };
 }
 
 <h1>Leave @Html.DisplayFor(model => model.Pool.Name)</h1>
-
-<h5>Are you sure you want to leave? This cannot be undone.</h5>
+<a asp-action="Details" asp-all-route-data="parameters">Back to Pool</a>
 <div>
     <hr />
+    <p>Are you sure you want to leave? <b>You will lose all progress for this season!</b></p>
     <dl class="row">
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Pool.Season.Name)
@@ -23,15 +27,6 @@
             @Html.DisplayFor(model => model.Balance)
         </dd>
     </dl>
-@{
-    var parameters = new Dictionary<string, string>
-    {
-        { "id", Model.Pool.Id.ToString() }
-    };
-}
-
-    <a asp-action="Details" asp-all-route-data="parameters">Back to Pool</a>
-    <br/><br/>
     <form asp-action="View">
         <input type="submit" value="Leave" class="btn btn-danger" />
     </form>

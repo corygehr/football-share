@@ -5,81 +5,87 @@
     ViewData["Title"] = "Pools";
 }
 
-<h2>My Pools</h2>
-
+<h1>Pools</h1>
 <p>
     <a asp-action="Create">Create a Pool</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.UserPools[0].Pool.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UserPools[0].Pool.Season.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UserPools[0].Balance)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.UserPools)
-        {
+@if (Model.UserPools.Count > 0)
+{
+    <h3>My Pools</h3>
+    <table class="table">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Pool.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Pool.Season.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Balance)
-                </td>
-                <td>
-                    @Html.ActionLink("Details", "Details", new { id=item.Pool.Id })
-                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserPools[0].Pool.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserPools[0].Pool.Season.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserPools[0].Balance)
+                </th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.UserPools)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Pool.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Pool.Season.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Balance)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Details", "Details", new { id = item.Pool.Id })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
-<h2>Available Pools</h2>
+@if (Model.PublicPools.Count > 0)
+{
+    <h3>Available Pools</h3>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.PublicPools[0].Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PublicPools[0].Season.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PublicPools[0].StartingBalance)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.PublicPools)
-        {
+    <table class="table">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Season.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.StartingBalance)
-                </td>
-                <td>
-                    @Html.ActionLink("Join", "Join", new { id=item.Id })
-                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.PublicPools[0].Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PublicPools[0].Season.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PublicPools[0].StartingBalance)
+                </th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.PublicPools)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Season.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StartingBalance)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Join", "Join", new { id = item.Id })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,19 @@
+﻿@model FootballShare.Entities.Pools.Pool
+
+@{
+    ViewData["Title"] = "Delete " + Model.Name;
+    var parameters = new Dictionary<string, string>
+    {
+        { "id", Model.Id.ToString() }
+    };
+}
+
+<h1>Delete @Model.Name</h1>
+<a asp-action="Edit" asp-all-route-data="parameters">Back to Edit Pool</a>
+<div>
+    <hr />
+    <p>Are you sure you want to delete this pool? <b>All bets made for the season will be lost!</b></p>
+    <form asp-action="Delete">
+        <input type="submit" value="Delete" class="btn btn-danger" />
+    </form>
+</div>
