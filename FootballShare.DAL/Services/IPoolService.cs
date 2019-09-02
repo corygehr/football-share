@@ -85,6 +85,12 @@ namespace FootballShare.DAL.Services
         /// <returns><see cref="PoolMember"/></returns>
         Task<PoolMember> GetUserPoolProfileAsync(Guid userId, int poolId, CancellationToken cancellationToken = default);
         /// <summary>
+        /// Removes a <see cref="PoolMember"/>
+        /// </summary>
+        /// <param name="poolMemberId"><see cref="PoolMember"/> ID</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        Task RemovePoolMemberAsync(int poolMemberId, CancellationToken cancellationToken = default);
+        /// <summary>
         /// Updates the provided <see cref="Pool"/>
         /// </summary>
         /// <param name="pool"><see cref="Pool"/> to update</param>

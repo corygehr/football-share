@@ -6,7 +6,7 @@
 
 <h1>Leave @Html.DisplayFor(model => model.Pool.Name)</h1>
 
-<h3>Are you sure you want to leave? This cannot be undone.</h3>
+<h5>Are you sure you want to leave? This cannot be undone.</h5>
 <div>
     <hr />
     <dl class="row">
@@ -23,16 +23,16 @@
             @Html.DisplayFor(model => model.Balance)
         </dd>
     </dl>
-    
-@{ 
+@{
     var parameters = new Dictionary<string, string>
     {
         { "id", Model.Pool.Id.ToString() }
     };
 }
 
+    <a asp-action="Details" asp-all-route-data="parameters">Back to Pool</a>
+    <br/><br/>
     <form asp-action="View">
-        <input type="submit" value="Leave" class="btn btn-danger" /> |
-        <a asp-action="Details" asp-all-route-data="parameters">Back to Pool</a>
+        <input type="submit" value="Leave" class="btn btn-danger" />
     </form>
 </div>

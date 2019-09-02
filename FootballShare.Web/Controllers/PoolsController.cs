@@ -216,7 +216,7 @@ namespace FootballShare.Web.Controllers
                         {
                             CssClassName = "alert-success",
                             Title = "Success!",
-                            Message = $"Pool updated succeeded."
+                            Message = $"Pool update succeeded."
                         });
 
                         return View(updatedPool);
@@ -309,10 +309,18 @@ namespace FootballShare.Web.Controllers
         // GET: Pools/Leave/5
         public async Task<ActionResult> Leave(int id)
         {
-            // Get user
+            // Get user and membership
             SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+            PoolMember member = await this._poolService.GetUserPoolProfileAsync(user.Id, id);
 
-            return View(await this._poolService.GetUserPoolProfileAsync(user.Id, id));
+            if(member != null)
+            {
+                return View(member);
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         // POST: Pools/Leave/5
@@ -320,10 +328,41 @@ namespace FootballShare.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Leave(int id, IFormCollection collection)
         {
-            // Get user
+            // Get user and membership
             SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+            PoolMember member = await this._poolService.GetUserPoolProfileAsync(user.Id, id);
 
-            return View(await this._poolService.GetUserPoolProfileAsync(user.Id, id));
+            if(member != null)
+            {
+                if (ModelState.IsValid)
+                {
+                    await this._poolService.RemovePoolMemberAsync(member.Id);
+
+                    TempData.Put("UserMessage", new UserMessageViewModel
+                    {
+                        CssClassName = "alert-success",
+                        Title = "Success!",
+                        Message = $"Successfully left {member.Pool.Name}."
+                    });
+
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    TempData.Put("UserMessage", new UserMessageViewModel
+                    {
+                        CssClassName = "alert-warning",
+                        Title = "Warning",
+                        Message = "Request failed to validate. Please try again."
+                    });
+
+                    return View(member);
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
     }
 }

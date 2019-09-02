@@ -176,5 +176,10 @@ namespace FootballShare.DAL.Services
         {
             return await this._poolRepo.UpdateAsync(pool, cancellationToken);
         }
+
+        public async Task RemovePoolMemberAsync(int poolMemberId, CancellationToken cancellationToken = default)
+        {
+            await this._poolMemberRepo.DeleteAsync(poolMemberId.ToString(), cancellationToken);
+        }
     }
 }

@@ -24,7 +24,7 @@ namespace FootballShare.Entities.League
         /// <summary>
         /// <see cref="Season"/> name
         /// </summary>
-        [Display(Name = "Season Name", ShortName = "Name")]
+        [Display(Name = "Season", ShortName = "Name")]
         [Required]
         public string Name { get; set; }
         /// <summary>

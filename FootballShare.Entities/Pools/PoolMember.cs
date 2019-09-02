@@ -19,7 +19,7 @@ namespace FootballShare.Entities.Pools
         /// <summary>
         /// Available balance ($)
         /// </summary>
-        [Display(Name = "Balance ($)", ShortName = "Balance", Description = "Amount each user starts a season with.")]
+        [Display(Name = "Balance", ShortName = "Balance", Description = "Amount each user starts a season with.")]
         [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         [Required]
         public decimal Balance { get; set; }
