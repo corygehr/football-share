@@ -128,6 +128,31 @@ namespace FootballShare.DAL.Repositories
             return await this.GetAsync(entity.Id.ToString(), cancellationToken);
         }
 
+        public async Task<PoolMember> GetMembershipAsync(Guid userId, int poolId, CancellationToken cancellationToken = default)
+        {
+            if(userId == null)
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
+
+            string query = $@"SELECT TOP 1 *
+                              FROM [dbo].[PoolMembers]
+                              WHERE [SiteUserId] = @userId 
+                              AND [PoolId] = @poolId";
+
+            using (var connection = this._connectionFactory.CreateConnection())
+            {
+                return await connection.QuerySingleAsync<PoolMember>(
+                    query,
+                    new
+                    {
+                        userId = userId,
+                        poolId = poolId
+                    }
+                );
+            }
+        }
+
         public async Task<IEnumerable<PoolMember>> GetPoolMembersAsync(int poolId, CancellationToken cancellationToken = default)
         {
             string query = $@"SELECT *

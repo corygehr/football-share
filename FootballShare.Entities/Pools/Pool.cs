@@ -29,7 +29,6 @@ namespace FootballShare.Entities.Pools
         /// <summary>
         /// <see cref="Season"/> this <see cref="BettingGroupPool"/> is associated with
         /// </summary>
-        [Required]
         public string SeasonId { get; set; }
         /// <summary>
         /// Amount each <see cref="PoolMember"/> starts with

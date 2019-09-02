@@ -50,6 +50,13 @@ namespace FootballShare.DAL.Services
         /// <returns>Matching <see cref="Pool"/></returns>
         Task<Pool> GetPoolAsync(int poolId, CancellationToken cancellationToken = default);
         /// <summary>
+        /// Gets a specific <see cref="PoolMember"/>
+        /// </summary>
+        /// <param name="poolMemberId"><see cref="PoolMember"/> ID</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns><see cref="PoolMember"/> matching ID</returns>
+        Task<PoolMember> GetPoolMemberAsync(int poolMemberId, CancellationToken cancellationToken = default);
+        /// <summary>
         /// Gets all publicly joinable <see cref="Pool"/> objects
         /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -69,6 +76,14 @@ namespace FootballShare.DAL.Services
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Collection of <see cref="PoolMember"/> objects</returns>
         Task<IEnumerable<PoolMember>> GetUserMembershipsAsync(Guid userId, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Retrieves details about a <see cref="SiteUser"/> membership in a <see cref="Pool"/>
+        /// </summary>
+        /// <param name="userId"><see cref="SiteUser"/> ID</param>
+        /// <param name="poolId"><see cref="Pool"/> ID</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns><see cref="PoolMember"/></returns>
+        Task<PoolMember> GetUserPoolProfileAsync(Guid userId, int poolId, CancellationToken cancellationToken = default);
         /// <summary>
         /// Updates the provided <see cref="Pool"/>
         /// </summary>

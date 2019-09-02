@@ -68,7 +68,30 @@ namespace FootballShare.Web.Controllers
         // GET: Pools/Details/5
         public async Task<ActionResult> Details(int id)
         {
-            return View(await this._poolService.GetPoolAsync(id));
+            // Get user
+            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+
+            // Confirm user is in Pool
+            PoolMember userProfile = await this._poolService.GetUserPoolProfileAsync(user.Id, id);
+
+            if(userProfile != null)
+            {
+                // Get pool data
+                IEnumerable<PoolMember> members = await this._poolService.GetMembersAsync(userProfile.PoolId);
+
+                PoolDetailsViewModel vm = new PoolDetailsViewModel
+                {
+                    CurrentUserMembership = userProfile,
+                    Members = members.ToList(),
+                    Pool = userProfile.Pool
+                };
+
+                return View(vm);
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         // GET: Pools/Create
@@ -158,23 +181,73 @@ namespace FootballShare.Web.Controllers
         // GET: Pools/Edit/5
         public async Task<ActionResult> Edit(int id)
         {
-            return View(await this._poolService.GetPoolAsync(id));
+            // Get user membership
+            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+            PoolMember member = await this._poolService.GetUserPoolProfileAsync(user.Id, id);
+
+            if(member != null && member.IsAdmin)
+            {
+                return View(member.Pool);
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         // POST: Pools/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> Edit(int id, Pool pool)
         {
-            try
-            {
-                // TODO: Add update logic here
+            // Get user membership
+            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+            PoolMember member = await this._poolService.GetUserPoolProfileAsync(user.Id, id);
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
+            if (member != null && member.IsAdmin)
             {
-                return View(await this._poolService.GetPoolAsync(id));
+                if(ModelState.IsValid)
+                {
+                    try
+                    {
+                        Pool updatedPool = await this._poolService.UpdatePoolAsync(pool);
+
+                        TempData.Put("UserMessage", new UserMessageViewModel
+                        {
+                            CssClassName = "alert-success",
+                            Title = "Success!",
+                            Message = $"Pool updated succeeded."
+                        });
+
+                        return View(updatedPool);
+                    }
+                    catch
+                    {
+                        TempData.Put("UserMessage", new UserMessageViewModel
+                        {
+                            CssClassName = "alert-error",
+                            Title = "Error",
+                            Message = $"Failed to update the pool. Please try again."
+                        });
+
+                        return View(member.Pool);
+                    }
+                }
+                else
+                {
+                    TempData.Put("UserMessage", new UserMessageViewModel
+                    {
+                        CssClassName = "alert-warning",
+                        Title = "Warning",
+                        Message = $"One or more fields failed to validate. Please check them and try again."
+                    });
+
+                    return View(pool);
+                }
+            }
+            else
+            {
+                return Unauthorized();
             }
         }
 
@@ -199,6 +272,58 @@ namespace FootballShare.Web.Controllers
             {
                 return View();
             }
+        }
+
+        // GET: Pools/Join/5
+        public async Task<ActionResult> Join(int id)
+        {
+            try
+            {
+                Pool targetPool = await this._poolService.GetPoolAsync(id);
+                SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+
+                await this._poolService.AddPoolMemberAsync(user, targetPool);
+
+                TempData.Put("UserMessage", new UserMessageViewModel
+                {
+                    CssClassName = "alert-success",
+                    Title = "Success!",
+                    Message = $"You have joined {targetPool.Name}."
+                });
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                TempData.Put("UserMessage", new UserMessageViewModel
+                {
+                    CssClassName = "alert-error",
+                    Title = "Error",
+                    Message = "Failed to join the requested pool. Pleae try again later."
+                });
+
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        // GET: Pools/Leave/5
+        public async Task<ActionResult> Leave(int id)
+        {
+            // Get user
+            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+
+            return View(await this._poolService.GetUserPoolProfileAsync(user.Id, id));
+        }
+
+        // POST: Pools/Leave/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Leave(int id, IFormCollection collection)
+        {
+            // Get user
+            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+
+            return View(await this._poolService.GetUserPoolProfileAsync(user.Id, id));
         }
     }
 }

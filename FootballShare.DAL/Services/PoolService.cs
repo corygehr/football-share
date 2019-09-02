@@ -1,6 +1,7 @@
 ﻿using FootballShare.DAL.Repositories;
 using FootballShare.Entities.Pools;
 using FootballShare.Entities.Users;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,6 +76,19 @@ namespace FootballShare.DAL.Services
             await this._poolRepo.DeleteAsync(poolId.ToString(), cancellationToken);
         }
 
+        public async Task<PoolMember> GetPoolMemberAsync(int poolMemberId, CancellationToken cancellationToken = default)
+        {
+            PoolMember member = await this._poolMemberRepo.GetAsync(poolMemberId.ToString(), cancellationToken);
+
+            if(member != null)
+            {
+                member.Pool = await this.GetPoolAsync(member.PoolId, cancellationToken);
+                member.User = await this._userRepo.GetAsync(member.SiteUserId.ToString());
+            }
+
+            return member;
+        }
+
         public async Task<IEnumerable<PoolMember>> GetMembersAsync(int poolId, CancellationToken cancellationToken = default)
         {
             Pool pool = await this._poolRepo.GetAsync(poolId.ToString(), cancellationToken);
@@ -86,9 +100,7 @@ namespace FootballShare.DAL.Services
             for (int i = 0; i < members.Count(); i++)
             {
                 PoolMember member = members.ElementAt(i);
-                member.User = await this._userRepo.GetAsync(member.SiteUserId.ToString(), cancellationToken);
-                member.Pool = pool;
-                fullMembers[i] = member;
+                fullMembers[i] = await this.GetPoolMemberAsync(member.Id, cancellationToken);
             }
 
             return fullMembers.ToList();
@@ -150,6 +162,14 @@ namespace FootballShare.DAL.Services
             }
 
             return populatedMemberships.ToList();
+        }
+
+        public async Task<PoolMember> GetUserPoolProfileAsync(Guid userId, int poolId, CancellationToken cancellationToken = default)
+        {
+            // Get PoolMember
+            PoolMember membership = await this._poolMemberRepo.GetMembershipAsync(userId, poolId, cancellationToken);
+
+            return await this.GetPoolMemberAsync(membership.Id, cancellationToken);
         }
 
         public async Task<Pool> UpdatePoolAsync(Pool pool, CancellationToken cancellationToken = default)

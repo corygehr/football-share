@@ -23,7 +23,7 @@ namespace FootballShare.Entities.Users
         /// <summary>
         /// <see cref="SiteUser"/> display name
         /// </summary>
-        [Display(Name = "Display Name", ShortName = "Nickname", Description = "Name shown around the site.")]
+        [Display(Name = "Name", Description = "Name shown around the site.")]
         public string DisplayName { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> email address

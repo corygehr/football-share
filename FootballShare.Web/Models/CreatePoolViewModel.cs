@@ -16,7 +16,7 @@ namespace FootballShare.Web.Models
         /// <summary>
         /// <see cref="Pool"/> being created
         /// </summary>
-        [Display(Name="Pool")]
+        [Display(Name="Pool Name", ShortName="Name")]
         [Required]
         public string PoolName { get; set; }
         [Display(Name="Season")]

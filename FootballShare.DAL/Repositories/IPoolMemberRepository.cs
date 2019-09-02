@@ -13,6 +13,14 @@ namespace FootballShare.DAL.Repositories
     public interface IPoolMemberRepository : IRepository<PoolMember>
     {
         /// <summary>
+        /// Get a specific <see cref="PoolMember"/> instance
+        /// </summary>
+        /// <param name="userId"><see cref="SiteUser"/> ID</param>
+        /// <param name="poolId"><see cref="Pool"/> ID</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns><see cref="PoolMember"/> object</returns>
+        Task<PoolMember> GetMembershipAsync(Guid userId, int poolId, CancellationToken cancellationToken = default);
+        /// <summary>
         /// Gets all <see cref="PoolMember"/> objects belonging to a specific <see cref="Pool"/>
         /// </summary>
         /// <param name="poolId"><see cref="Pool"/> unique identifier</param>
