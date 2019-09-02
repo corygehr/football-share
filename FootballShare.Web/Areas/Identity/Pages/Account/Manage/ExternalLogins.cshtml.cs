@@ -1,4 +1,4 @@
-﻿using FootballShare.Entities.User;
+﻿using FootballShare.Entities.Users;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

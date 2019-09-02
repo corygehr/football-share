@@ -1,7 +1,7 @@
 ﻿using FootballShare.DAL.Repositories;
 using FootballShare.Entities.Pools;
 using FootballShare.Entities.Users;
-
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -60,9 +60,9 @@ namespace FootballShare.DAL.Services
                 cancellationToken);
         }
 
-        public async Task<Pool> CreatePoolAsync(Pool pool, string userId, CancellationToken cancellationToken = default)
+        public async Task<Pool> CreatePoolAsync(Pool pool, Guid userId, CancellationToken cancellationToken = default)
         {
-            SiteUser adminUser = await this._userRepo.GetAsync(userId, cancellationToken);
+            SiteUser adminUser = await this._userRepo.GetAsync(userId.ToString(), cancellationToken);
             Pool newPool = await this._poolRepo.CreateAsync(pool, cancellationToken);
             // Add creating user as an administrator
             await this.AddPoolMemberAsync(adminUser, newPool, true, cancellationToken);
@@ -107,7 +107,7 @@ namespace FootballShare.DAL.Services
             return fullMembers.ToList();
         }
 
-        public async Task<IEnumerable<PoolMember>> GetUserMembershipsAsync(string userId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<PoolMember>> GetUserMembershipsAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             IEnumerable<PoolMember> memberships = await this._poolMemberRepo.GetUserMembershipsAsync(userId, cancellationToken);
 

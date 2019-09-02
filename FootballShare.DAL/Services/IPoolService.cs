@@ -1,6 +1,7 @@
 ﻿using FootballShare.Entities.Pools;
 using FootballShare.Entities.Users;
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace FootballShare.DAL.Services
         /// <param name="userId">Creating <see cref="SiteUser"/> ID</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Created <see cref="BettingGroup"/></returns>
-        Task<Pool> CreatePoolAsync(Pool pool, string userId, CancellationToken cancellationToken = default);
+        Task<Pool> CreatePoolAsync(Pool pool, Guid userId, CancellationToken cancellationToken = default);
         /// <summary>
         /// Deletes the specified <see cref="Pool"/>
         /// </summary>
@@ -54,7 +55,7 @@ namespace FootballShare.DAL.Services
         /// <param name="userId"><see cref="SiteUser"/> ID</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Collection of <see cref="PoolMember"/> objects</returns>
-        Task<IEnumerable<PoolMember>> GetUserMembershipsAsync(string userId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<PoolMember>> GetUserMembershipsAsync(Guid userId, CancellationToken cancellationToken = default);
         /// <summary>
         /// Updates the provided <see cref="Pool"/>
         /// </summary>

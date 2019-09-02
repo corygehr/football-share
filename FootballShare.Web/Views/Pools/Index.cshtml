@@ -1,14 +1,11 @@
-﻿@model IEnumerable<FootballShare.Entities.Group.BettingGroup>
+﻿@model IEnumerable<FootballShare.Entities.Pools.Pool>
 
 @{
     ViewData["Title"] = "View";
 }
 
-<h1>My Betting Groups</h1>
+<h1>My Pools</h1>
 
-<p>
-    <a asp-action="Create">Create New Group</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -26,5 +23,30 @@
             </td>
         </tr>
 }
+    </tbody>
+</table>
+
+<h1>Open Pools</h1>
+<p>
+    <a asp-action="Create">Create New Pool</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

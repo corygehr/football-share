@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using FootballShare.Entities.User;
+using FootballShare.Entities.Users;
 
 using System;
 using System.Collections.Generic;
@@ -27,9 +27,9 @@ namespace FootballShare.DAL.Repositories
             this._connectionFactory = connectionFactory;
         }
 
-        public async Task AddRoleMemberAsync(string userId, string roleName, CancellationToken cancellationToken = default)
+        public async Task AddRoleMemberAsync(Guid userId, string roleName, CancellationToken cancellationToken = default)
         {
-            if (String.IsNullOrEmpty(userId))
+            if (userId == null)
             {
                 throw new ArgumentNullException(nameof(userId));
             }
@@ -189,9 +189,9 @@ namespace FootballShare.DAL.Repositories
             return Task.FromResult(role.NormalizedName);
         }
 
-        public async Task<IEnumerable<SiteRole>> GetUserRolesAsync(string userId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<SiteRole>> GetUserRolesAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            if (String.IsNullOrEmpty(userId))
+            if (userId == null)
             {
                 throw new ArgumentNullException(nameof(userId));
             }
@@ -239,9 +239,9 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public async Task RemoveRoleMemberAsync(string userId, string roleName, CancellationToken cancellationToken = default)
+        public async Task RemoveRoleMemberAsync(Guid userId, string roleName, CancellationToken cancellationToken = default)
         {
-            if (String.IsNullOrEmpty(userId))
+            if (userId == null)
             {
                 throw new ArgumentNullException(nameof(userId));
             }
@@ -290,9 +290,9 @@ namespace FootballShare.DAL.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<bool> UserInRoleAsync(string userId, string roleName, CancellationToken cancellationToken = default)
+        public async Task<bool> UserInRoleAsync(Guid userId, string roleName, CancellationToken cancellationToken = default)
         {
-            if (String.IsNullOrEmpty(userId))
+            if (userId == null)
             {
                 throw new ArgumentNullException(nameof(userId));
             }

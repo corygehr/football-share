@@ -1,5 +1,6 @@
-﻿using FootballShare.Entities.User;
+﻿using FootballShare.Entities.Users;
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace FootballShare.DAL.Repositories
         /// <param name="userId"><see cref="SiteUser"/> ID for <see cref="SiteRole"/> assignment</param>
         /// <param name="roleName"><see cref="SiteRole"/> name</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        Task AddRoleMemberAsync(string userId, string roleName, CancellationToken cancellationToken = default);
+        Task AddRoleMemberAsync(Guid userId, string roleName, CancellationToken cancellationToken = default);
         /// <summary>
         /// Retrieves a specific <see cref="SiteRole"/> by its name
         /// </summary>
@@ -31,7 +32,7 @@ namespace FootballShare.DAL.Repositories
         /// <param name="userId">Target <see cref="SiteUser"/> ID</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Collection of <see cref="SiteRole"/> objects</returns>
-        Task<IEnumerable<SiteRole>> GetUserRolesAsync(string userId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<SiteRole>> GetUserRolesAsync(Guid userId, CancellationToken cancellationToken = default);
         /// <summary>
         /// Retrieves all <see cref="SiteUser"/> objects with a given <see cref="SiteRole"/>
         /// </summary>
@@ -45,7 +46,7 @@ namespace FootballShare.DAL.Repositories
         /// <param name="userId"><see cref="SiteUser"/> ID for <see cref="SiteRole"/> de-assignment</param>
         /// <param name="roleName"><see cref="SiteRole"/> name</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        Task RemoveRoleMemberAsync(string userId, string roleName, CancellationToken cancellationToken = default);
+        Task RemoveRoleMemberAsync(Guid userId, string roleName, CancellationToken cancellationToken = default);
         /// <summary>
         /// Checks if the specified <see cref="SiteUser"/> is in the requested <see cref="SiteRole"/>
         /// </summary>
@@ -53,6 +54,6 @@ namespace FootballShare.DAL.Repositories
         /// <param name="roleName">Target <see cref="SiteRole"/> name</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>True if <see cref="SiteUser"/> is in requested <see cref="SiteRole"/>, false if not</returns>
-        Task<bool> UserInRoleAsync(string userId, string roleName, CancellationToken cancellationToken = default);
+        Task<bool> UserInRoleAsync(Guid userId, string roleName, CancellationToken cancellationToken = default);
     }
 }

@@ -37,9 +37,9 @@ namespace FootballShare.Web.Controllers
         public async Task<ActionResult> Index()
         {
             // Get current user ID
-            var user = this._userManager.GetUserAsync(HttpContext.User);
+            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
 
-            return View(await this._poolService.GetUserMembershipsAsync(user.Id.ToString()));
+            return View(await this._poolService.GetUserMembershipsAsync(user.Id));
         }
 
         // GET: Pools/Details/5

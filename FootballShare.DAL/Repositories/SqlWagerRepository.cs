@@ -105,14 +105,14 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public async Task<IEnumerable<Wager>> FindByWeekAndUser(SeasonWeek weekEvent, string userId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Wager>> FindByWeekAndUser(SeasonWeek weekEvent, Guid userId, CancellationToken cancellationToken = default)
         {
             if(weekEvent == null)
             {
                 throw new ArgumentNullException(nameof(weekEvent));
             }
 
-            if(String.IsNullOrEmpty(userId))
+            if(userId == null)
             {
                 throw new ArgumentNullException(nameof(userId));
             }

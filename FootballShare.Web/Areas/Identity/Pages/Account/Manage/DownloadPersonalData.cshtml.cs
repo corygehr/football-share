@@ -1,4 +1,4 @@
-﻿using FootballShare.Entities.User;
+﻿using FootballShare.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

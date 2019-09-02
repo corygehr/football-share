@@ -63,7 +63,7 @@ namespace FootballShare.DAL.Repositories
         public async Task DeleteAsync(PoolMember entity, CancellationToken cancellationToken = default)
         {
             // Use overload
-            return await this.DeleteAsync(entity.Id.ToString(), cancellationToken);
+            await this.DeleteAsync(entity.Id.ToString(), cancellationToken);
         }
 
         public async Task DeleteAsync(string entityId, CancellationToken cancellationToken = default)
@@ -146,9 +146,9 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public async Task<IEnumerable<PoolMember>> GetUserMembershipsAsync(string userId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<PoolMember>> GetUserMembershipsAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            if(String.IsNullOrEmpty(userId))
+            if(userId == null)
             {
                 throw new ArgumentNullException(nameof(userId));
             }

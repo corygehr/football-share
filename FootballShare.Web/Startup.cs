@@ -49,6 +49,7 @@ namespace FootballShare.Web
             // Add data services
             services.AddTransient<IBettingService, BettingService>();
             services.AddTransient<IPoolService, PoolService>();
+            services.AddTransient<ISportsLeagueService, SportsLeagueService>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {

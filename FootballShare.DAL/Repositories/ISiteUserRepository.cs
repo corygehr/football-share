@@ -1,4 +1,4 @@
-﻿using FootballShare.Entities.User;
+﻿using FootballShare.Entities.Users;
 
 using System.Threading;
 using System.Threading.Tasks;

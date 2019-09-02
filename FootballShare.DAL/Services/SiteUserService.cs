@@ -1,5 +1,5 @@
 ﻿using FootballShare.DAL.Repositories;
-using FootballShare.Entities.User;
+using FootballShare.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 
 using System;
@@ -57,7 +57,7 @@ namespace FootballShare.DAL.Services
 
         public async Task AddToRoleAsync(SiteUser user, string roleName, CancellationToken cancellationToken = default)
         {
-            await this._roleRepo.AddRoleMemberAsync(user.Id.ToString(), roleName, cancellationToken);
+            await this._roleRepo.AddRoleMemberAsync(user.Id, roleName, cancellationToken);
         }
 
         public async Task<IdentityResult> CreateAsync(SiteUser user, CancellationToken cancellationToken = default)
@@ -129,7 +129,7 @@ namespace FootballShare.DAL.Services
         {
             // Get login providers
             IEnumerable<SiteUserLoginProvider> providers = await this._userLoginProviderRepo
-                .GetAllForUserAsync(user.Id.ToString(), cancellationToken);
+                .GetAllForUserAsync(user.Id, cancellationToken);
 
             if(providers != null)
             {
@@ -157,7 +157,7 @@ namespace FootballShare.DAL.Services
         {
             // Get roles for user
             IEnumerable<SiteRole> userRoles = await this._roleRepo
-                .GetUserRolesAsync(user.Id.ToString(), cancellationToken);
+                .GetUserRolesAsync(user.Id, cancellationToken);
 
             // Interface only wants the Role name(s)
             return userRoles.Select(r => r.Name).ToList();
@@ -181,12 +181,12 @@ namespace FootballShare.DAL.Services
 
         public async Task<bool> IsInRoleAsync(SiteUser user, string roleName, CancellationToken cancellationToken)
         {
-            return await this._roleRepo.UserInRoleAsync(user.Id.ToString(), roleName, cancellationToken);
+            return await this._roleRepo.UserInRoleAsync(user.Id, roleName, cancellationToken);
         }
 
         public async Task RemoveFromRoleAsync(SiteUser user, string roleName, CancellationToken cancellationToken)
         {
-            await this._roleRepo.RemoveRoleMemberAsync(user.Id.ToString(), roleName, cancellationToken);
+            await this._roleRepo.RemoveRoleMemberAsync(user.Id, roleName, cancellationToken);
         }
 
         public async Task RemoveLoginAsync(SiteUser user, string loginProvider, string providerKey, CancellationToken cancellationToken)

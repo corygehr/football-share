@@ -1,5 +1,6 @@
 ﻿using FootballShare.Entities.Pools;
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +25,6 @@ namespace FootballShare.DAL.Repositories
         /// <param name="userId"><see cref="SiteUser"/> unique identifier</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Collection of <see cref="PoolMember"/> objects</returns>
-        Task<IEnumerable<PoolMember>> GetUserMembershipsAsync(string userId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<PoolMember>> GetUserMembershipsAsync(Guid userId, CancellationToken cancellationToken = default);
     }
 }

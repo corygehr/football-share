@@ -1,5 +1,5 @@
 ﻿using FootballShare.DAL.Repositories;
-using FootballShare.Entities.User;
+using FootballShare.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;

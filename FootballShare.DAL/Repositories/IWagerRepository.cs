@@ -1,6 +1,7 @@
 ﻿using FootballShare.Entities.Betting;
 using FootballShare.Entities.League;
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +16,6 @@ namespace FootballShare.DAL.Repositories
         /// <summary>
         /// Retrieves a collection of <see cref="Wager"/> objects for a given user on a specific week
         /// </summary>
-        Task<IEnumerable<Wager>> FindByWeekAndUser(SeasonWeek weekEvent, string userId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Wager>> FindByWeekAndUser(SeasonWeek weekEvent, Guid userId, CancellationToken cancellationToken = default);
     }
 }

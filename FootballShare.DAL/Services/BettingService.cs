@@ -1,10 +1,10 @@
 ﻿using FootballShare.DAL.Repositories;
 using FootballShare.Entities.Betting;
-using FootballShare.Entities.Group;
 using FootballShare.Entities.League;
-using FootballShare.Entities.User;
+using FootballShare.Entities.Pools;
+using FootballShare.Entities.Users;
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -22,9 +22,13 @@ namespace FootballShare.DAL.Services
         /// </summary>
         private readonly IWeekEventRepository _eventRepo;
         /// <summary>
-        /// <see cref="BettingGroup"/> repository
+        /// <see cref="Pool"/> repository
         /// </summary>
-        private readonly IBettingGroupRepository _groupRepo;
+        private readonly IPoolRepository _poolRepo;
+        /// <summary>
+        /// <see cref="PoolMember"/> repository
+        /// </summary>
+        private readonly IPoolMemberRepository _poolMemberRepo;
         /// <summary>
         /// <see cref="SiteUser"/> repository
         /// </summary>
@@ -38,18 +42,20 @@ namespace FootballShare.DAL.Services
         /// Creates a new <see cref="BettingService"/> instance
         /// </summary>
         /// <param name="eventRepo"><see cref="WeekEvent"/> repository</param>
-        /// <param name="groupRepo"><see cref="BettingGroup"/> repository</param>
+        /// <param name="poolRepo"><see cref="Pool"/> repository</param>
+        /// <param name="poolMemberRepo"><see cref="PoolMember"/> repository</param>
         /// <param name="userRepo"><see cref="SiteUser"/> repository</param>
         /// <param name="wagerRepo"><see cref="Wager"/> repository</param>
-        public BettingService(IWeekEventRepository eventRepo, IBettingGroupRepository groupRepo, 
-            ISiteUserRepository userRepo, IWagerRepository wagerRepo)
+        public BettingService(IWeekEventRepository eventRepo, IPoolRepository poolRepo, 
+            IPoolMemberRepository poolMemberRepo,ISiteUserRepository userRepo, IWagerRepository wagerRepo)
         {
             this._eventRepo = eventRepo;
-            this._groupRepo = groupRepo;
+            this._poolRepo = poolRepo;
+            this._poolMemberRepo = poolMemberRepo;
             this._wagerRepo = wagerRepo;
         }
 
-        public async Task<IEnumerable<Wager>> GetGroupWagersForSeasonAsync(int groupId, string seasonId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Wager>> GetPoolWagersForSeasonAsync(int poolId, string seasonId, CancellationToken cancellationToken = default)
         {
             if(String.IsNullOrEmpty(seasonId))
             {
@@ -57,16 +63,16 @@ namespace FootballShare.DAL.Services
             }
 
             // Get all users in selected group
-            IEnumerable<BettingGroupMember> members = await this._groupRepo.GetBettingGroupMembersAsync(groupId, cancellationToken);
+            IEnumerable<PoolMember> members = await this._poolMemberRepo.GetPoolMembersAsync(poolId, cancellationToken);
 
             if(members.Count() > 0)
             {
                 // Aggregate users
                 List<Wager> wagers = new List<Wager>();
 
-                foreach(BettingGroupMember member in members)
+                foreach(PoolMember member in members)
                 {
-                    IEnumerable<Wager> userWagers = await this.GetUserWagersForSeasonAsync(member.SiteUserId.ToString(), seasonId, cancellationToken);
+                    IEnumerable<Wager> userWagers = await this.GetUserWagersForSeasonAsync(member.SiteUserId, seasonId, cancellationToken);
 
                     if(userWagers != null)
                     {
@@ -80,21 +86,22 @@ namespace FootballShare.DAL.Services
             return null;
         }
 
-        public async Task<IEnumerable<Wager>> GetGroupWagersForWeekAsync(int groupId, int weekId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Wager>> GetPoolWagersForWeekAsync(int poolId, int weekId, CancellationToken cancellationToken = default)
         {
             // Get all users in selected group
-            IEnumerable<BettingGroupMember> members = await this._groupRepo.GetBettingGroupMembersAsync(groupId, cancellationToken);
+            IEnumerable<PoolMember> members = await this._poolMemberRepo
+                .GetPoolMembersAsync(poolId, cancellationToken);
 
             if (members.Count() > 0)
             {
                 // Aggregate users
                 List<Wager> wagers = new List<Wager>();
 
-                foreach (BettingGroupMember member in members)
+                foreach (PoolMember member in members)
                 {
                     // Get user
 
-                    IEnumerable<Wager> userWagers = await this.GetUserWagersForWeekAsync(member.SiteUserId.ToString(), weekId, cancellationToken);
+                    IEnumerable<Wager> userWagers = await this.GetUserWagersForWeekAsync(member.SiteUserId, weekId, cancellationToken);
 
                     if (userWagers != null)
                     {
@@ -113,12 +120,12 @@ namespace FootballShare.DAL.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Wager>> GetUserWagersForSeasonAsync(string userId, string seasonId, CancellationToken cancellationToken = default)
+        public Task<IEnumerable<Wager>> GetUserWagersForSeasonAsync(Guid userId, string seasonId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Wager>> GetUserWagersForWeekAsync(string userId, int weekId, CancellationToken cancellationToken = default)
+        public Task<IEnumerable<Wager>> GetUserWagersForWeekAsync(Guid userId, int weekId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

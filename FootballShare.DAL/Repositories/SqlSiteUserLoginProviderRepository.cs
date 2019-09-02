@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using FootballShare.Entities.User;
+using FootballShare.Entities.Users;
 
 using System;
 using System.Collections.Generic;
@@ -93,12 +93,12 @@ namespace FootballShare.DAL.Repositories
         public async Task<IEnumerable<SiteUserLoginProvider>> GetAllForUserAsync(SiteUser user, CancellationToken cancellationToken = default)
         {
             // Use overload
-            return await this.GetAllForUserAsync(user.Id.ToString(), cancellationToken);
+            return await this.GetAllForUserAsync(user.Id, cancellationToken);
         }
 
-        public async Task<IEnumerable<SiteUserLoginProvider>> GetAllForUserAsync(string userId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<SiteUserLoginProvider>> GetAllForUserAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            if (String.IsNullOrEmpty(userId))
+            if (userId == null)
             {
                 throw new ArgumentNullException(nameof(userId));
             }
