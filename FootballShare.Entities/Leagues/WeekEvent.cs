@@ -1,6 +1,7 @@
 ﻿using Dapper.Contrib.Extensions;
 
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace FootballShare.Entities.League
 {
@@ -13,11 +14,11 @@ namespace FootballShare.Entities.League
         /// <summary>
         /// <see cref="WeekEvent"/> unique identifier
         /// </summary>
-        [Key]
         public int Id { get; set; }
         /// <summary>
         /// Away <see cref="Team"/> score
         /// </summary>
+        [Display(Name = "Away Team Score", ShortName = "Away Score")]
         public int AwayScore { get; set; }
         /// <summary>
         /// Away <see cref="Team"/> ID
@@ -26,6 +27,7 @@ namespace FootballShare.Entities.League
         /// <summary>
         /// Home <see cref="Team"/> score
         /// </summary>
+        [Display(Name = "Home Team Score", ShortName = "Home Score")]
         public int HomeScore { get; set; }
         /// <summary>
         /// Home <see cref="Team"/> ID
@@ -46,6 +48,7 @@ namespace FootballShare.Entities.League
         /// <summary>
         /// Date/Time of <see cref="WeekEvent"/>
         /// </summary>
+        [DisplayFormat(DataFormatString = "{0:f}")]
         public DateTimeOffset Time { get; set; }
 
         /// <summary>

@@ -30,6 +30,10 @@ namespace FootballShare.DAL.Services
         /// </summary>
         private readonly IPoolMemberRepository _poolMemberRepo;
         /// <summary>
+        /// <see cref="Season"/> repository
+        /// </summary>
+        private readonly ISeasonRepository _seasonRepo;
+        /// <summary>
         /// <see cref="SeasonWeek"/> repository
         /// </summary>
         private readonly ISeasonWeekRepository _seasonWeekRepo;
@@ -56,19 +60,21 @@ namespace FootballShare.DAL.Services
         /// <param name="eventRepo"><see cref="WeekEvent"/> repository</param>
         /// <param name="poolRepo"><see cref="Pool"/> repository</param>
         /// <param name="poolMemberRepo"><see cref="PoolMember"/> repository</param>
+        /// <param name="seasonRepo"><see cref="Season"/> repository</param>
         /// <param name="seasonWeekRepo"><see cref="SeasonWeek"/> repository</param>
         /// <param name="teamRepo"><see cref="Team"/> repository</param>
         /// <param name="userRepo"><see cref="SiteUser"/> repository</param>
         /// <param name="wagerRepo"><see cref="Wager"/> repository</param>
         /// <param name="weekEventRepo"><see cref="WeekEvent"/> repository</param>
         public BettingService(IWeekEventRepository eventRepo, IPoolRepository poolRepo, 
-            IPoolMemberRepository poolMemberRepo, ISeasonWeekRepository seasonWeekRepo, 
+            IPoolMemberRepository poolMemberRepo, ISeasonRepository seasonRepo, ISeasonWeekRepository seasonWeekRepo, 
             ISpreadRepository spreadRepo, ITeamRepository teamRepo, ISiteUserRepository userRepo,
             IWagerRepository wagerRepo, IWeekEventRepository weekEventRepo)
         {
             this._eventRepo = eventRepo;
             this._poolRepo = poolRepo;
             this._poolMemberRepo = poolMemberRepo;
+            this._seasonRepo = seasonRepo;
             this._seasonWeekRepo = seasonWeekRepo;
             this._spreadRepo = spreadRepo;
             this._teamRepo = teamRepo;
@@ -153,7 +159,9 @@ namespace FootballShare.DAL.Services
 
         public async Task<SeasonWeek> GetSeasonWeekAsync(string seasonWeekId, CancellationToken cancellationToken = default)
         {
-            return await this._seasonWeekRepo.GetAsync(seasonWeekId, cancellationToken);
+            SeasonWeek seasonWeek = await this._seasonWeekRepo.GetAsync(seasonWeekId, cancellationToken);
+            seasonWeek.Season = await this._seasonRepo.GetAsync(seasonWeek.SeasonId, cancellationToken);
+            return seasonWeek;
         }
 
         public async Task<Spread> GetSpreadForEventAsync(int eventId, CancellationToken cancellationToken = default)
