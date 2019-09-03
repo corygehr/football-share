@@ -186,7 +186,7 @@ namespace FootballShare.DAL.Services
         public async Task<WeekEvent> GetWeekEventAsync(int eventId, CancellationToken cancellationToken = default)
         {
             WeekEvent weekEvent = await this._weekEventRepo.GetAsync(eventId.ToString(), cancellationToken);
-            weekEvent.Week = await this._seasonWeekRepo.GetAsync(weekEvent.SeasonWeekId.ToString(), cancellationToken);
+            weekEvent.Week = await this.GetSeasonWeekAsync(weekEvent.SeasonWeekId.ToString(), cancellationToken);
             weekEvent.AwayTeam = await this._teamRepo.GetAsync(weekEvent.AwayTeamId, cancellationToken);
             weekEvent.HomeTeam = await this._teamRepo.GetAsync(weekEvent.HomeTeamId, cancellationToken);
             return weekEvent;
