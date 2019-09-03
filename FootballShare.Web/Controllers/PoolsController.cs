@@ -21,6 +21,10 @@ namespace FootballShare.Web.Controllers
     public class PoolsController : Controller
     {
         /// <summary>
+        /// Betting-related Service object
+        /// </summary>
+        private readonly IBettingService _bettingService;
+        /// <summary>
         /// <see cref="SportsLeague"/> service object
         /// </summary>
         private readonly ISportsLeagueService _leagueService;
@@ -36,62 +40,16 @@ namespace FootballShare.Web.Controllers
         /// <summary>
         /// Creates a new <see cref="PoolsController"/> instance
         /// </summary>
+        /// <param name="bettingService">Betting service</param>
         /// <param name="leagueService"><see cref="SportsLeague"/> service object</param>
         /// <param name="poolService"><see cref="Pool"/> service object</param>
         /// <param name="userManager">Identity manager</param>
-        public PoolsController(ISportsLeagueService leagueService, IPoolService poolService, UserManager<SiteUser> userManager)
+        public PoolsController(IBettingService bettingService, ISportsLeagueService leagueService, IPoolService poolService, UserManager<SiteUser> userManager)
         {
+            this._bettingService = bettingService;
             this._leagueService = leagueService;
             this._poolService = poolService;
             this._userManager = userManager;
-        }
-
-        // GET: Pools
-        public async Task<ActionResult> Index()
-        {
-            // Get current user ID
-            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
-
-            IEnumerable<Pool> publicPools = await this._poolService.GetPublicPoolsNotJoinedAsync(user.Id);
-            IEnumerable<PoolMember> userPools = await this._poolService.GetUserMembershipsAsync(user.Id);
-
-            // Get user pools and unjoined pools
-            ListPoolsViewModel vm = new ListPoolsViewModel
-            {
-                PublicPools = publicPools.ToList(),
-                UserPools = userPools.ToList()
-            };
-
-            return View(vm);
-        }
-
-        // GET: Pools/Details/5
-        public async Task<ActionResult> Details(int id)
-        {
-            // Get user
-            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
-
-            // Confirm user is in Pool
-            PoolMember userProfile = await this._poolService.GetUserPoolProfileAsync(user.Id, id);
-
-            if(userProfile != null)
-            {
-                // Get pool data
-                IEnumerable<PoolMember> members = await this._poolService.GetMembersAsync(userProfile.PoolId);
-
-                PoolDetailsViewModel vm = new PoolDetailsViewModel
-                {
-                    CurrentUserMembership = userProfile,
-                    Members = members.ToList(),
-                    Pool = userProfile.Pool
-                };
-
-                return View(vm);
-            }
-            else
-            {
-                return Unauthorized();
-            }
         }
 
         // GET: Pools/Create
@@ -178,6 +136,111 @@ namespace FootballShare.Web.Controllers
             }
         }
 
+        // GET: Pools/Delete/5
+        public async Task<ActionResult> Delete(int id)
+        {
+            // Check if user is an administrator
+            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+            PoolMember member = await this._poolService.GetUserPoolProfileAsync(user.Id, id);
+
+            if (member != null && member.IsAdmin)
+            {
+                return View(member.Pool);
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        // POST: Pools/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Delete(int id, IFormCollection collection)
+        {
+            // Check if user is an administrator
+            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+            PoolMember member = await this._poolService.GetUserPoolProfileAsync(user.Id, id);
+
+            if (member != null && member.IsAdmin)
+            {
+                try
+                {
+                    if (ModelState.IsValid)
+                    {
+                        // Delete pool
+                        await this._poolService.DeletePoolAsync(id);
+
+                        TempData.Put("UserMessage", new UserMessageViewModel
+                        {
+                            CssClassName = "alert-success",
+                            Title = "Success!",
+                            Message = $"Pool deleted successfully."
+                        });
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        TempData.Put("UserMessage", new UserMessageViewModel
+                        {
+                            CssClassName = "alert-warning",
+                            Title = "Warning",
+                            Message = $"One or more fields failed to validate. Please check them and try again."
+                        });
+
+                        return View(member.Pool);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData.Put("UserMessage", new UserMessageViewModel
+                    {
+                        CssClassName = "alert-danger",
+                        Title = "Error",
+                        Message = $"Failed to delete pool: {ex.Message}."
+                    });
+                    return View(member.Pool);
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        // GET: Pools/Details/5
+        public async Task<ActionResult> Details(int id)
+        {
+            // Get user
+            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+
+            // Confirm user is in Pool
+            PoolMember userProfile = await this._poolService.GetUserPoolProfileAsync(user.Id, id);
+
+            if (userProfile != null)
+            {
+                // Get pool data
+                IEnumerable<PoolMember> members = await this._poolService.GetMembersAsync(userProfile.PoolId);
+                IEnumerable<SeasonWeek> previousWeeks = await this._bettingService.GetPreviousSeasonWeeksAsync(userProfile.PoolId.ToString());
+
+                PoolDetailsViewModel vm = new PoolDetailsViewModel
+                {
+                    CurrentSeasonWeek = await this._bettingService.GetCurrentSeasonWeekAsync(userProfile.Pool.SeasonId),
+                    CurrentUserMembership = userProfile,
+                    Members = members.ToList(),
+                    Pool = userProfile.Pool,
+                    PreviousSeasonWeeks = previousWeeks.ToList()
+                };
+
+                return View(vm);
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
         // GET: Pools/Edit/5
         public async Task<ActionResult> Edit(int id)
         {
@@ -251,77 +314,23 @@ namespace FootballShare.Web.Controllers
             }
         }
 
-        // GET: Pools/Delete/5
-        public async Task<ActionResult> Delete(int id)
+        // GET: Pools
+        public async Task<ActionResult> Index()
         {
-            // Check if user is an administrator
+            // Get current user ID
             SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
-            PoolMember member = await this._poolService.GetUserPoolProfileAsync(user.Id, id);
 
-            if(member != null && member.IsAdmin)
+            IEnumerable<Pool> publicPools = await this._poolService.GetPublicPoolsNotJoinedAsync(user.Id);
+            IEnumerable<PoolMember> userPools = await this._poolService.GetUserMembershipsAsync(user.Id);
+
+            // Get user pools and unjoined pools
+            ListPoolsViewModel vm = new ListPoolsViewModel
             {
-                return View(member.Pool);
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
+                PublicPools = publicPools.ToList(),
+                UserPools = userPools.ToList()
+            };
 
-        // POST: Pools/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Delete(int id, IFormCollection collection)
-        {
-            // Check if user is an administrator
-            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
-            PoolMember member = await this._poolService.GetUserPoolProfileAsync(user.Id, id);
-
-            if(member != null && member.IsAdmin)
-            {
-                try
-                {
-                    if (ModelState.IsValid)
-                    {
-                        // Delete pool
-                        await this._poolService.DeletePoolAsync(id);
-
-                        TempData.Put("UserMessage", new UserMessageViewModel
-                        {
-                            CssClassName = "alert-success",
-                            Title = "Success!",
-                            Message = $"Pool deleted successfully."
-                        });
-
-                        return RedirectToAction(nameof(Index));
-                    }
-                    else
-                    {
-                        TempData.Put("UserMessage", new UserMessageViewModel
-                        {
-                            CssClassName = "alert-warning",
-                            Title = "Warning",
-                            Message = $"One or more fields failed to validate. Please check them and try again."
-                        });
-
-                        return View(member.Pool);
-                    }
-                }
-                catch(Exception ex)
-                {
-                    TempData.Put("UserMessage", new UserMessageViewModel
-                    {
-                        CssClassName = "alert-danger",
-                        Title = "Error",
-                        Message = $"Failed to delete pool: {ex.Message}."
-                    });
-                    return View(member.Pool);
-                }
-            }
-            else
-            {
-                return Unauthorized();
-            }
+            return View(vm);
         }
 
         // GET: Pools/Join/5

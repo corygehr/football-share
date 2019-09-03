@@ -46,7 +46,7 @@ namespace FootballShare.Entities.League
         /// <summary>
         /// Date/Time of <see cref="WeekEvent"/>
         /// </summary>
-        public DateTime Time { get; set; }
+        public DateTimeOffset Time { get; set; }
 
         /// <summary>
         /// Away <see cref="Team"/> details

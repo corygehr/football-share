@@ -152,21 +152,22 @@ namespace FootballShare.DAL.Repositories
             return await this.GetAsync(entity.Id.ToString(), cancellationToken);
         }
 
-        public async Task<IEnumerable<WeekEvent>> GetWeekEventsAsync(SeasonWeek week, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<WeekEvent>> GetWeekEventsAsync(string weekId, CancellationToken cancellationToken = default)
         {
-            if (week == null)
-            {
-                throw new ArgumentNullException(nameof(week));
-            }
-
             string query = $@"SELECT *
                               FROM [dbo].[WeekEvents]
-                              WHERE [SeasonWeekId] = @{nameof(SeasonWeek.Id)}
+                              WHERE [SeasonWeekId] = @id
                               ORDER BY [Time]";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QueryAsync<WeekEvent>(query, week);
+                return await connection.QueryAsync<WeekEvent>(
+                    query,
+                    new
+                    {
+                        id = weekId
+                    }
+                );
             }
         }
 

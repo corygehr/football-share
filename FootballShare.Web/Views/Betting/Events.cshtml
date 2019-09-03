@@ -1,0 +1,30 @@
+﻿@model FootballShare.Web.Models.SeasonWeekEventsViewModel
+
+@{
+    ViewData["Title"] = Model.EventSpreads[0].Event.Week.Name;
+}
+
+<h1>@Model.EventSpreads[0].Event.Week.Name</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Event</th>
+            <th>Time</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.EventSpreads) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelName => item.Event.AwayTeam.Name) (@Html.DisplayFor(modelName => item.AwaySpread)) @@ @Html.DisplayFor(modelName => item.Event.HomeTeam.Name) (@Html.DisplayFor(modelItem => item.HomeSpread))
+            </td>
+            <td>@Html.DisplayFor(modelName => item.Event.Time)</td>
+            <td>
+                @Html.ActionLink("Place Bet", "Bet", new { id=item.Id })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

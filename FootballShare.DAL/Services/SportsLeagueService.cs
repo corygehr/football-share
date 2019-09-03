@@ -58,7 +58,7 @@ namespace FootballShare.DAL.Services
 
         public async Task<Season> GetLeagueCurrentSeasonAsync(string leagueId, CancellationToken cancellationToken = default)
         {
-            Season current = await this._seasonRepo.GetCurrentForLeagueAsync(leagueId.ToString(), cancellationToken);
+            Season current = await this._seasonRepo.GetCurrentLeagueSeasonAsync(leagueId.ToString(), cancellationToken);
 
             if(current != null)
             {

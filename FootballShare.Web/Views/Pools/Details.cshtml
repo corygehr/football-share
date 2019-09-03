@@ -13,13 +13,25 @@
     </p>
 }
 <hr />
-<h5>Upcoming Events</h5>
+<h5>Current Week</h5>
 <table class="table">
     <thead>
-
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CurrentSeasonWeek.Name)
+            </th>
+            <th></th>
+        </tr>
     </thead>
     <tbody>
-
+        <tr>
+            <td>
+                @Html.DisplayFor(model => model.CurrentSeasonWeek.Name)
+            </td>
+            <td>
+                @Html.ActionLink("Place Bets", "Events", "Betting", new { id = Model.CurrentSeasonWeek.Id })
+            </td>
+        </tr>
     </tbody>
 </table>
 <h5>Standings</h5>
