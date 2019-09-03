@@ -1,7 +1,7 @@
 ﻿@model FootballShare.Web.Models.SeasonWeekEventsViewModel
 
 @{
-    ViewData["Title"] = Model.EventSpreads[0].Event.Week.Name;
+    ViewData["Title"] = Model.EventSpreads[0].Event.Week.Season.Name + ": " + Model.EventSpreads[0].Event.Week.Name;
 }
 
 <h1>@Model.EventSpreads[0].Event.Week.Name</h1>
