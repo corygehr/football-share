@@ -195,6 +195,7 @@ namespace FootballShare.DAL.Services
                     Wager wager = wagers.ElementAt(i);
                     wager.Event = await this.GetWeekEventAsync(wager.WeekEventId, cancellationToken);
                     wager.Pool = await this._poolRepo.GetAsync(wager.PoolId.ToString(), cancellationToken);
+                    wager.SelectedTeam = await this._teamRepo.GetAsync(wager.SelectedTeamId, cancellationToken);
                     fullWagers.Add(wager);
                 }
             }
@@ -214,6 +215,7 @@ namespace FootballShare.DAL.Services
                     Wager wager = wagers.ElementAt(i);
                     wager.Event = await this.GetWeekEventAsync(wager.WeekEventId, cancellationToken);
                     wager.Pool = await this._poolRepo.GetAsync(wager.PoolId.ToString(), cancellationToken);
+                    wager.SelectedTeam = await this._teamRepo.GetAsync(wager.SelectedTeamId, cancellationToken);
                     fullWagers.Add(wager);
                 }
             }
@@ -274,6 +276,10 @@ namespace FootballShare.DAL.Services
             if(bettor == null)
             {
                 throw new ArgumentNullException(nameof(bettor));
+            }
+            else
+            {
+                bettor.Pool = await this._poolRepo.GetAsync(bettor.PoolId.ToString(), cancellationToken);
             }
 
             WeekEvent weekEvent = await this.GetWeekEventAsync(wager.WeekEventId, cancellationToken);

@@ -1,6 +1,8 @@
 ﻿using FootballShare.Entities.Betting;
 using FootballShare.Entities.League;
 using FootballShare.Entities.Pools;
+
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace FootballShare.Web.Models
@@ -31,6 +33,7 @@ namespace FootballShare.Web.Models
         /// Amount to wager
         /// </summary>
         [Display(Name="Wager", Description="Amount to bet.", Prompt="Enter an amount in $100 denoninations.")]
+        [Range(1, Int32.MaxValue)]
         public decimal WagerAmount { get; set; }
         /// <summary>
         /// <see cref="WeekEvent"/> ID

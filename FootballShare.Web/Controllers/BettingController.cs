@@ -347,7 +347,7 @@ namespace FootballShare.Web.Controllers
                     Message = $"Successfully placed bet!"
                 });
 
-                return RedirectToAction(nameof(Events), new { id = eventSpread.Event.SeasonWeekId });
+                return RedirectToAction(nameof(Events), new { seasonWeekId = eventSpread.Event.SeasonWeekId, poolId = submission.PoolId });
             }
             catch (NotEnoughFundsException ex)
             {
