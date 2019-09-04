@@ -1,0 +1,47 @@
+﻿@model FootballShare.Web.Models.PlaceBetViewModel
+
+@{
+    ViewData["Title"] = "Place Bet";
+    var parameters = new Dictionary<string, string>
+    {
+        { "id", Model.Spread.Event.SeasonWeekId }
+    };
+}
+
+<h1>@Model.Spread.Event.ToString()</h1>
+<h4>@Model.Spread.Event.Week.Season.Name</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="PlaceBet">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <label asp-for="SelectedTeamId" class="control-label"></label>
+            <div class="form-check">
+                <label class="form-check-label" for="away-team">
+                    @Html.RadioButtonFor(model => model.SelectedTeamId, Model.Spread.Event.AwayTeamId, new { id = "away-team", @class = "form-check-input" })@Html.Label($"{Model.Spread.Event.AwayTeam.Name} ({Model.Spread.AwaySpread})")
+                </label>
+            </div>
+            <div class="form-check">
+                <label class="form-check-label" for="home-team">
+                    @Html.RadioButtonFor(model => model.SelectedTeamId, Model.Spread.Event.HomeTeamId, new { id = "home-team", @class = "form-check-input" })@Html.Label($"{Model.Spread.Event.HomeTeam.Name} ({Model.Spread.HomeSpread})")
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="WagerAmount" class="control-label"></label>
+                <input asp-for="WagerAmount" class="form-control" />
+                <span asp-validation-for="WagerAmount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Place Bet" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Events" asp-all-route-data="parameters">Back to Event List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

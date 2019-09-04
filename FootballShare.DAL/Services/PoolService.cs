@@ -76,19 +76,6 @@ namespace FootballShare.DAL.Services
             await this._poolRepo.DeleteAsync(poolId.ToString(), cancellationToken);
         }
 
-        public async Task<PoolMember> GetPoolMemberAsync(int poolMemberId, CancellationToken cancellationToken = default)
-        {
-            PoolMember member = await this._poolMemberRepo.GetAsync(poolMemberId.ToString(), cancellationToken);
-
-            if(member != null)
-            {
-                member.Pool = await this.GetPoolAsync(member.PoolId, cancellationToken);
-                member.User = await this._userRepo.GetAsync(member.SiteUserId.ToString());
-            }
-
-            return member;
-        }
-
         public async Task<IEnumerable<PoolMember>> GetMembersAsync(int poolId, CancellationToken cancellationToken = default)
         {
             Pool pool = await this._poolRepo.GetAsync(poolId.ToString(), cancellationToken);
@@ -104,6 +91,32 @@ namespace FootballShare.DAL.Services
             }
 
             return fullMembers.ToList();
+        }
+
+        public async Task<PoolMember> GetPoolMemberAsync(int poolMemberId, CancellationToken cancellationToken = default)
+        {
+            PoolMember member = await this._poolMemberRepo.GetAsync(poolMemberId.ToString(), cancellationToken);
+
+            if (member != null)
+            {
+                member.Pool = await this.GetPoolAsync(member.PoolId, cancellationToken);
+                member.User = await this._userRepo.GetAsync(member.SiteUserId.ToString());
+            }
+
+            return member;
+        }
+
+        public async Task<PoolMember> GetPoolMemberAsync(int poolId, Guid userId, CancellationToken cancellationToken = default)
+        {
+            PoolMember member = await this._poolMemberRepo.GetMembershipAsync(userId, poolId, cancellationToken);
+
+            if (member != null)
+            {
+                member.Pool = await this.GetPoolAsync(member.PoolId, cancellationToken);
+                member.User = await this._userRepo.GetAsync(member.SiteUserId.ToString());
+            }
+
+            return member;
         }
 
         public async Task<Pool> GetPoolAsync(int poolId, CancellationToken cancellationToken = default)
@@ -172,14 +185,14 @@ namespace FootballShare.DAL.Services
             return await this.GetPoolMemberAsync(membership.Id, cancellationToken);
         }
 
-        public async Task<Pool> UpdatePoolAsync(Pool pool, CancellationToken cancellationToken = default)
-        {
-            return await this._poolRepo.UpdateAsync(pool, cancellationToken);
-        }
-
         public async Task RemovePoolMemberAsync(int poolMemberId, CancellationToken cancellationToken = default)
         {
             await this._poolMemberRepo.DeleteAsync(poolMemberId.ToString(), cancellationToken);
+        }
+
+        public async Task<Pool> UpdatePoolAsync(Pool pool, CancellationToken cancellationToken = default)
+        {
+            return await this._poolRepo.UpdateAsync(pool, cancellationToken);
         }
     }
 }

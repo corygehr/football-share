@@ -29,7 +29,7 @@
                 @Html.DisplayFor(model => model.CurrentSeasonWeek.Name)
             </td>
             <td>
-                @Html.ActionLink("Place Bets", "Events", "Betting", new { id = Model.CurrentSeasonWeek.Id })
+                @Html.ActionLink("Place Bets", "Events", "Betting", new { seasonWeekId = Model.CurrentSeasonWeek.Id, poolId = Model.Pool.Id })
             </td>
         </tr>
     </tbody>

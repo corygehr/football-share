@@ -63,5 +63,17 @@ namespace FootballShare.Entities.League
         /// <see cref="SeasonWeek"/> details
         /// </summary>
         public SeasonWeek Week = null;
+
+        public override string ToString()
+        {
+            if(this.AwayTeam != null && this.HomeTeam != null)
+            {
+                return $"{AwayTeam.Name} @ {HomeTeam.Name}";
+            }
+            else
+            {
+                return Id.ToString();
+            }
+        }
     }
 }

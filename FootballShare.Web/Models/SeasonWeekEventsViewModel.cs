@@ -1,5 +1,6 @@
 ﻿using FootballShare.Entities.Betting;
 using FootballShare.Entities.League;
+using FootballShare.Entities.Pools;
 
 using System.Collections.Generic;
 
@@ -11,5 +12,9 @@ namespace FootballShare.Web.Models
         /// <see cref="SeasonWeek"/> events
         /// </summary>
         public List<Spread> EventSpreads { get; set; }
+        /// <summary>
+        /// <see cref="SiteUser"/> <see cref="PoolMember"/> instance
+        /// </summary>
+        public PoolMember PoolMembership { get; set; }
     }
 }
