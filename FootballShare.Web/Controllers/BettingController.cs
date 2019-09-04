@@ -215,108 +215,172 @@ namespace FootballShare.Web.Controllers
             PlaceBetViewModel vm = new PlaceBetViewModel
             {
                 PoolId = poolId,
+                PoolMembership = userMembership,
                 Spread = eventSpread,
                 WeekEventId = eventId
             };
             return View(vm);
         }
 
-        // POST: Betting/Place/2/1
+        // POST: Betting/Place
         [HttpPost("Betting/Place/{eventId:int}/{poolId:int}")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Place(int eventId, int poolId, PlaceBetViewModel submission)
+        public async Task<ActionResult> Place(PlaceBetViewModel submission)
         {
+            // Check if user is part of pool
+            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+            PoolMember userMembership = await this._poolService.GetUserPoolProfileAsync(user.Id, submission.PoolId);
+
+            if (userMembership == null)
+            {
+                return NotFound();
+            }
+
             Spread eventSpread = await this._bettingService.GetSpreadForEventAsync(submission.WeekEventId);
 
-            if(eventSpread != null)
+            if (eventSpread == null)
             {
-                SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+                return NotFound();
+            }
 
-                double targetSpread = 0.0;
+            // Check if bet can no longer be submitted
+            if (eventSpread.Event.Time <= DateTimeOffset.Now)
+            {
+                TempData.Put("UserMessage", new UserMessageViewModel
+                {
+                    CssClassName = "alert-warning",
+                    Title = "Deadline passed",
+                    Message = $"Betting deadline for this event has already passed."
+                });
 
-                if(eventSpread.Event.AwayTeamId == submission.SelectedTeamId)
-                {
-                    targetSpread = eventSpread.AwaySpread;
-                }
-                else
-                {
-                    targetSpread = eventSpread.HomeSpread;
-                }
-
-                Wager wager = new Wager
-                {
-                    Amount = submission.WagerAmount,
-                    PoolId = poolId,
-                    SelectedTeamId = submission.SelectedTeamId,
-                    SelectedTeamSpread = targetSpread,
-                    SiteUserId = user.Id,
-                    WeekEventId = submission.WeekEventId
-                };
-
-                if (eventSpread.Event.Time < DateTimeOffset.Now)
-                {
-                    try
+                return RedirectToAction(
+                    nameof(Events),
+                    new
                     {
-                        await this._bettingService.PlaceWagerAsync(wager);
-
-                        TempData.Put("UserMessage", new UserMessageViewModel
-                        {
-                            CssClassName = "alert-success",
-                            Title = "Success!",
-                            Message = $"Successfully placed bet!"
-                        });
-
-                        return RedirectToAction(nameof(Events), new { id = eventSpread.Event.SeasonWeekId });
+                        seasonWeekId = eventSpread.Event.SeasonWeekId,
+                        poolId = submission.PoolId
                     }
-                    catch (NotEnoughFundsException ex)
-                    {
-                        TempData.Put("UserMessage", new UserMessageViewModel
-                        {
-                            CssClassName = "alert-warning",
-                            Title = "Warning",
-                            Message = ex.Message
-                        });
+                );
+            }
 
-                        return RedirectToAction(nameof(Place), new { id = eventSpread.WeekEventId });
-                    }
-                    catch (MaxBetsPlacedForWeekException ex)
-                    {
-                        TempData.Put("UserMessage", new UserMessageViewModel
-                        {
-                            CssClassName = "alert-warning",
-                            Title = "Warning",
-                            Message = ex.Message
-                        });
+            // Check if user has already submitted their bet limit for the week
+            IEnumerable<Wager> wagersForWeek = await this._bettingService
+                .GetUserWagersForWeekByPoolAsync(
+                    user.Id,
+                    eventSpread.Event.SeasonWeekId,
+                    submission.PoolId
+                );
 
-                        return RedirectToAction(nameof(Place), new { id = eventSpread.WeekEventId });
-                    }
-                    catch (Exception)
-                    {
-                        TempData.Put("UserMessage", new UserMessageViewModel
-                        {
-                            CssClassName = "alert-danger",
-                            Title = "Error",
-                            Message = $"Failed to place wager. Please try again."
-                        });
-
-                        return RedirectToAction(nameof(Place), new { id = eventSpread.WeekEventId });
-                    }
-                }
-                else
+            if (wagersForWeek.Count() >= userMembership.Pool.WagersPerWeek)
+            {
+                TempData.Put("UserMessage", new UserMessageViewModel
                 {
-                    TempData.Put("UserMessage", new UserMessageViewModel
-                    {
-                        CssClassName = "alert-warning",
-                        Title = "Deadline passed",
-                        Message = $"Betting deadline for this event has already passed."
-                    });
+                    CssClassName = "alert-warning",
+                    Title = "Too Many Bets",
+                    Message = $"You have already submitted all of your bets for this week. Cancel one to place another."
+                });
 
-                    return RedirectToAction(nameof(Events), new { id = eventSpread.Event.SeasonWeekId });
-                }
+                return RedirectToAction(
+                    nameof(Events),
+                    new
+                    {
+                        seasonWeekId = eventSpread.Event.SeasonWeekId,
+                        poolId = submission.PoolId
+                    }
+                );
+            }
+
+            // Check if user has already submitted a bet for this Event
+            Wager existingWager = wagersForWeek
+                .Where(w => w.WeekEventId == submission.WeekEventId)
+                .FirstOrDefault();
+
+            if (existingWager != null)
+            {
+                TempData.Put("UserMessage", new UserMessageViewModel
+                {
+                    CssClassName = "alert-warning",
+                    Title = "Bet Exists",
+                    Message = $"You have already submitted a ${existingWager.Amount} bet for {existingWager.Event.ToString()}. Please cancel first before changing it."
+                });
+
+                return RedirectToAction(
+                    nameof(Events),
+                    new
+                    {
+                        seasonWeekId = eventSpread.Event.SeasonWeekId,
+                        poolId = submission.PoolId
+                    }
+                );
+            }
+
+            // Get target spread
+            double targetSpread = 0.0;
+
+            if(eventSpread.Event.AwayTeamId == submission.SelectedTeamId)
+            {
+                targetSpread = eventSpread.AwaySpread;
             }
             else
             {
-                return NotFound();
+                targetSpread = eventSpread.HomeSpread;
+            }
+
+            Wager wager = new Wager
+            {
+                Amount = submission.WagerAmount,
+                PoolId = submission.PoolId,
+                SelectedTeamId = submission.SelectedTeamId,
+                SelectedTeamSpread = targetSpread,
+                SiteUserId = user.Id,
+                WeekEventId = submission.WeekEventId
+            };
+
+            try
+            {
+                await this._bettingService.PlaceWagerAsync(wager);
+
+                TempData.Put("UserMessage", new UserMessageViewModel
+                {
+                    CssClassName = "alert-success",
+                    Title = "Success!",
+                    Message = $"Successfully placed bet!"
+                });
+
+                return RedirectToAction(nameof(Events), new { id = eventSpread.Event.SeasonWeekId });
+            }
+            catch (NotEnoughFundsException ex)
+            {
+                TempData.Put("UserMessage", new UserMessageViewModel
+                {
+                    CssClassName = "alert-warning",
+                    Title = "Warning",
+                    Message = ex.Message
+                });
+
+                return RedirectToAction(nameof(Place), new { eventId = submission.WeekEventId, poolId = submission.PoolId });
+            }
+            catch (MaxBetsPlacedForWeekException ex)
+            {
+                TempData.Put("UserMessage", new UserMessageViewModel
+                {
+                    CssClassName = "alert-warning",
+                    Title = "Warning",
+                    Message = ex.Message
+                });
+
+                return RedirectToAction(nameof(Place), new { eventId = submission.WeekEventId, poolId = submission.PoolId });
+            }
+            catch (Exception)
+            {
+                TempData.Put("UserMessage", new UserMessageViewModel
+                {
+                    CssClassName = "alert-danger",
+                    Title = "Error",
+                    Message = $"Failed to place wager. Please try again."
+                });
+
+                return RedirectToAction(nameof(Place), new { eventId = submission.WeekEventId, poolId = submission.PoolId });
             }
         }
     }

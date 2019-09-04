@@ -6,21 +6,22 @@
     {
         { "id", Model.Spread.Event.SeasonWeekId }
     };
-    var submitParameters = new Dictionary<string, string>
-    {
-        { "eventId", Model.Spread.WeekEventId.ToString() },
-        { "poolId", Model.PoolId.ToString() }
-    };
 }
 
 <h1>@Model.Spread.Event.ToString()</h1>
 <h4>@Model.Spread.Event.Week.Season.Name</h4>
 <hr />
+<p>
+    You have <b>$@Model.PoolMembership.Balance</b>.
+</p>
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Place" asp-all-route-data="submitParameters">
+        <form asp-action="Place">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <label asp-for="SelectedTeamId" class="control-label"></label>
+            @Html.HiddenFor(modelItem => modelItem.WeekEventId)
+            @Html.HiddenFor(modelItem => modelItem.PoolId)
+            <input type="hidden" name="WeekEventId" value="@Model.Spread.WeekEventId" />
             <div class="form-check">
                 <label class="form-check-label" for="away-team">
                     @Html.RadioButtonFor(model => model.SelectedTeamId, Model.Spread.Event.AwayTeamId, new { id = "away-team", @class = "form-check-input" })@Html.Label("away-team", $"{Model.Spread.Event.AwayTeam.Name} ({Model.Spread.AwaySpread})", false)

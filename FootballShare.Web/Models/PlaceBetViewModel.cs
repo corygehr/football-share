@@ -1,6 +1,6 @@
 ﻿using FootballShare.Entities.Betting;
 using FootballShare.Entities.League;
-
+using FootballShare.Entities.Pools;
 using System.ComponentModel.DataAnnotations;
 
 namespace FootballShare.Web.Models
@@ -11,11 +11,15 @@ namespace FootballShare.Web.Models
     public class PlaceBetViewModel
     {
         /// <summary>
+        /// <see cref="PoolMember"/> object for this <see cref="SiteUser"/>
+        /// </summary>
+        public PoolMember PoolMembership { get; set; }
+        /// <summary>
         /// Target Event <see cref="Spread"/>
         /// </summary>
         public Spread Spread { get; set; }
         /// <summary>
-        /// Current <see cref="SiteUser"/> <see cref="Pool"/> ID
+        /// <see cref="Pool"/> ID
         /// </summary>
         public int PoolId { get; set; }
         /// <summary>
