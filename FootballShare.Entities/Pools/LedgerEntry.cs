@@ -13,6 +13,10 @@ namespace FootballShare.Entities.Pools
         /// </summary>
         public int Id { get; set; }
         /// <summary>
+        /// Transaction description
+        /// </summary>
+        public string Description { get; set; }
+        /// <summary>
         /// <see cref="Pool"/> ID
         /// </summary>
         public int PoolId { get; set; }
