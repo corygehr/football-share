@@ -17,7 +17,7 @@ namespace FootballShare.Web.Models
         /// <summary>
         /// Selected <see cref="Team"/> ID
         /// </summary>
-        [Display(Name="Pick a team")]
+        [Display(Name="Team")]
         public int SelectedTeamId { get; set; }
         /// <summary>
         /// Amount to wager
