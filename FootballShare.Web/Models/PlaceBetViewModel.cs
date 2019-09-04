@@ -15,10 +15,14 @@ namespace FootballShare.Web.Models
         /// </summary>
         public Spread Spread { get; set; }
         /// <summary>
+        /// Current <see cref="SiteUser"/> <see cref="Pool"/> ID
+        /// </summary>
+        public int PoolId { get; set; }
+        /// <summary>
         /// Selected <see cref="Team"/> ID
         /// </summary>
         [Display(Name="Team")]
-        public int SelectedTeamId { get; set; }
+        public string SelectedTeamId { get; set; }
         /// <summary>
         /// Amount to wager
         /// </summary>

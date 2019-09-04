@@ -36,21 +36,21 @@ namespace FootballShare.DAL.Repositories
             }
 
             string query = $@"INSERT INTO [dbo].[Wagers] (
-                                [Amount],
-                                [AwaySpread],
-                                [HomeSpread],
+                                [PoolId],
                                 [SiteUserId],
-                                [Target],
                                 [WeekEventId],
+                                [SelectedTeamId],
+                                [Amount],
+                                [SelectedTeamSpread],
                                 [WhenCreated]
                               )
                               VALUES (
-                                @{nameof(Wager.Amount)},
-                                @{nameof(Wager.AwaySpread)},
-                                @{nameof(Wager.HomeSpread)},
+                                @{nameof(Wager.PoolId)},
                                 @{nameof(Wager.SiteUserId)},
-                                @{nameof(Wager.Target)},
                                 @{nameof(Wager.WeekEventId)},
+                                @{nameof(Wager.SelectedTeamId)},
+                                @{nameof(Wager.Amount)},
+                                @{nameof(Wager.SelectedTeamSpread)},
                                 CURRENT_TIMESTAMP
                               );
                               SELECT TOP 1 *
@@ -65,43 +65,29 @@ namespace FootballShare.DAL.Repositories
 
         public async Task DeleteAsync(Wager entity, CancellationToken cancellationToken = default)
         {
-            if(entity == null)
+            // Use overload
+            await this.DeleteAsync(entity.Id.ToString(), cancellationToken);
+        }
+
+        public async Task DeleteAsync(string entityId, CancellationToken cancellationToken = default)
+        {
+            if (String.IsNullOrEmpty(entityId))
             {
-                throw new ArgumentNullException(nameof(entity));
+                throw new ArgumentNullException(nameof(entityId));
             }
 
             string query = $@"DELETE FROM [dbo].[Wagers]
-                              WHERE [SiteUserId] = @{nameof(Wager.SiteUserId)}
-                              AND [WeekEventId] = @{nameof(Wager.WeekEventId)}";
+                              WHERE [Id] = @id";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                await connection.ExecuteAsync(query, entity);
-            }
-        }
-
-        public Task DeleteAsync(string entityId, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<Wager> FindByIdAsync(string id, CancellationToken cancellationToken = default)
-        {
-            if(String.IsNullOrEmpty(id))
-            {
-                throw new ArgumentNullException(nameof(id));
-            }
-
-            string query = $@"SELECT TOP 1 *
-                              FROM [dbo].[Wagers]
-                              WHERE [Id] = @id";
-
-            using(var connection = this._connectionFactory.CreateConnection())
-            {
-                return await connection.QuerySingleAsync<Wager>(query, new
-                {
-                    id = id
-                });
+                await connection.ExecuteAsync(
+                    query,
+                    new
+                    {
+                        id = entityId
+                    }
+                );
             }
         }
 
@@ -199,41 +185,10 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public Task<Wager> GetAsync(Wager entity, CancellationToken cancellationToken = default)
+        public async Task<Wager> GetAsync(Wager entity, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
-        }
-
-        public async Task InsertWagerAsync(Wager wager, CancellationToken cancellationToken = default)
-        {
-            if(wager == null)
-            {
-                throw new ArgumentNullException(nameof(wager));
-            }
-
-            string query = $@"INSERT INTO [dbo].[Wagers] (
-                                [Amount],
-                                [AwaySpread],
-                                [HomeSpread],
-                                [SiteUserId],
-                                [Target],
-                                [WeekEventId],
-                                [WhenCreated]
-                              )
-                              VALUES (
-                                @{nameof(Wager.Amount)},
-                                @{nameof(Wager.AwaySpread)},
-                                @{nameof(Wager.HomeSpread)},
-                                @{nameof(Wager.SiteUserId)},
-                                @{nameof(Wager.Target)},
-                                @{nameof(Wager.WeekEventId)},
-                                CURRENT_TIMESTAMP
-                              )";
-
-            using (var connection = this._connectionFactory.CreateConnection())
-            {
-                await connection.ExecuteAsync(query, wager);
-            }
+            // Use overload
+            return await this.GetAsync(entity.Id.ToString(), cancellationToken);
         }
 
         public Task<Wager> UpdateAsync(Wager entity, CancellationToken cancellationToken = default)

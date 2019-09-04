@@ -21,31 +21,23 @@ namespace FootballShare.Entities.Betting
         /// <summary>
         /// <see cref="Wager"/> amount
         /// </summary>
-        [Display(Name="Bet Amount", ShortName="Amount", Description="Wager amount, to the nearest $100.")]
         public double Amount { get; set; }
-        /// <summary>
-        /// Away Team <see cref="Spread"/> at time of wager
-        /// </summary>
-        [Display(Name="Away Team Spread")]
-        public double AwaySpread { get; set; }
-        /// <summary>
-        /// Home Team <see cref="Spread"/> at time of wager
-        /// </summary>
-        [Display(Name="Home Team Spread")]
-        public double HomeSpread { get; set; }
         /// <summary>
         /// <see cref="Pool"/> bet is placed in
         /// </summary>
         public int PoolId { get; set; }
         /// <summary>
+        /// Selected <see cref="Team"/> ID
+        /// </summary>
+        public string SelectedTeamId { get; set; }
+        /// <summary>
+        /// Spread for selected <see cref="Team"/>
+        /// </summary>
+        public double SelectedTeamSpread { get; set; }
+        /// <summary>
         /// <see cref="SiteUser"/> placing bet
         /// </summary>
         public Guid SiteUserId { get; set; }
-        /// <summary>
-        /// Team selected (Home/Away)
-        /// </summary>
-        [Display(Name="Selected Team")]
-        public WagerTarget Target { get; set; }
         /// <summary>
         /// <see cref="WeekEvent"/> of bet
         /// </summary>
@@ -59,6 +51,10 @@ namespace FootballShare.Entities.Betting
         /// <see cref="Pool"/> details
         /// </summary>
         public Pool Pool { get; set; }
+        /// <summary>
+        /// <see cref="Team"/> details
+        /// </summary>
+        public Team SelectedTeam { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> details
         /// </summary>

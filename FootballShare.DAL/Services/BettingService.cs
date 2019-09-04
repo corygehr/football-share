@@ -166,7 +166,7 @@ namespace FootballShare.DAL.Services
 
         public async Task<Spread> GetSpreadForEventAsync(int eventId, CancellationToken cancellationToken = default)
         {
-            Spread spread = await this._spreadRepo.GetByWeekEventAsync(eventId.ToString(), cancellationToken);
+            Spread spread = await this._spreadRepo.GetByWeekEventAsync(eventId, cancellationToken);
             spread.Event = await this.GetWeekEventAsync(eventId, cancellationToken);
             return spread;
         }

@@ -128,13 +128,8 @@ namespace FootballShare.DAL.Repositories
             return await this.GetAsync(entity.Id.ToString(), cancellationToken);
         }
 
-        public async Task<Spread> GetByWeekEventAsync(string weekEventId, CancellationToken cancellationToken = default)
+        public async Task<Spread> GetByWeekEventAsync(int weekEventId, CancellationToken cancellationToken = default)
         {
-            if(String.IsNullOrEmpty(weekEventId))
-            {
-                throw new ArgumentNullException(nameof(weekEventId));
-            }
-
             string query = $@"SELECT TOP 1 *
                               FROM [dbo].[Spreads]
                               WHERE [WeekEventId] = @id";

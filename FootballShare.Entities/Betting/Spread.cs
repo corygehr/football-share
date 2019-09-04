@@ -25,7 +25,7 @@ namespace FootballShare.Entities.Betting
         /// <summary>
         /// <see cref="WeekEvent"/> for this <see cref="Spread"/>
         /// </summary>
-        public string WeekEventId { get; set; }
+        public int WeekEventId { get; set; }
 
         /// <summary>
         /// <see cref="WeekEvent"/> details

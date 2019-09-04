@@ -16,5 +16,9 @@ namespace FootballShare.Web.Models
         /// <see cref="SiteUser"/> <see cref="PoolMember"/> instance
         /// </summary>
         public PoolMember PoolMembership { get; set; }
+        /// <summary>
+        /// <see cref="Wager"/> objects for user in the <see cref="SeasonWeek"/>
+        /// </summary>
+        public List<Wager> WeekWagers { get; set; } = new List<Wager>();
     }
 }

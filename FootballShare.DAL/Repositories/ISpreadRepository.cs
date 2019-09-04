@@ -16,6 +16,6 @@ namespace FootballShare.DAL.Repositories
         /// <param name="weekEventId"><see cref="WeekEvent"</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns><see cref="Spread"/> for specified <see cref="WeekEvent"/></returns>
-        Task<Spread> GetByWeekEventAsync(string weekEventId, CancellationToken cancellationToken = default);
+        Task<Spread> GetByWeekEventAsync(int weekEventId, CancellationToken cancellationToken = default);
     }
 }

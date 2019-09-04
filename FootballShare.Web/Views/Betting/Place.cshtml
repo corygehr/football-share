@@ -2,9 +2,14 @@
 
 @{
     ViewData["Title"] = "Place Bet";
-    var parameters = new Dictionary<string, string>
+    var backParameters = new Dictionary<string, string>
     {
         { "id", Model.Spread.Event.SeasonWeekId }
+    };
+    var submitParameters = new Dictionary<string, string>
+    {
+        { "eventId", Model.Spread.WeekEventId.ToString() },
+        { "poolId", Model.PoolId.ToString() }
     };
 }
 
@@ -13,7 +18,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="PlaceBet">
+        <form asp-action="Place" asp-all-route-data="submitParameters">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <label asp-for="SelectedTeamId" class="control-label"></label>
             <div class="form-check">
@@ -39,7 +44,7 @@
 </div>
 
 <div>
-    <a asp-action="Events" asp-all-route-data="parameters">Back to Event List</a>
+    <a asp-action="Events" asp-all-route-data="backParameters">Back to Event List</a>
 </div>
 
 @section Scripts {

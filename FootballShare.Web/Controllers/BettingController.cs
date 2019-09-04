@@ -115,12 +115,14 @@ namespace FootballShare.Web.Controllers
             if (userMembership != null)
             {
                 IEnumerable<Spread> events = await this._bettingService.GetWeekSpreads(seasonWeekId);
+                IEnumerable<Wager> weekWagers = await this._bettingService.GetUserWagersForWeekByPoolAsync(user.Id, seasonWeekId, poolId);
 
                 // Get SeasonWeek details
                 SeasonWeekEventsViewModel vm = new SeasonWeekEventsViewModel
                 {
                     EventSpreads = events.ToList(),
-                    PoolMembership = userMembership
+                    PoolMembership = userMembership,
+                    WeekWagers = weekWagers.ToList()
                 };
 
                 return View(vm);
@@ -212,6 +214,7 @@ namespace FootballShare.Web.Controllers
             // Checks pass, return ViewModel
             PlaceBetViewModel vm = new PlaceBetViewModel
             {
+                PoolId = poolId,
                 Spread = eventSpread,
                 WeekEventId = eventId
             };
@@ -229,11 +232,23 @@ namespace FootballShare.Web.Controllers
             {
                 SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
 
+                double targetSpread = 0.0;
+
+                if(eventSpread.Event.AwayTeamId == submission.SelectedTeamId)
+                {
+                    targetSpread = eventSpread.AwaySpread;
+                }
+                else
+                {
+                    targetSpread = eventSpread.HomeSpread;
+                }
+
                 Wager wager = new Wager
                 {
                     Amount = submission.WagerAmount,
-                    AwaySpread = eventSpread.AwaySpread,
-                    HomeSpread = eventSpread.HomeSpread,
+                    PoolId = poolId,
+                    SelectedTeamId = submission.SelectedTeamId,
+                    SelectedTeamSpread = targetSpread,
                     SiteUserId = user.Id,
                     WeekEventId = submission.WeekEventId
                 };

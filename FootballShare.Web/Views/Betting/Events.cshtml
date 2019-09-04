@@ -15,25 +15,50 @@
         <tr>
             <th>Event</th>
             <th>Time</th>
+            <th>Wager</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model.EventSpreads) {
+    var eventWager = Model.WeekWagers.Where(w => w.WeekEventId == item.WeekEventId).FirstOrDefault();
         <tr>
             <td>
                 @Html.DisplayFor(modelName => item.Event.AwayTeam.Name) (@Html.DisplayFor(modelName => item.AwaySpread)) @@ @Html.DisplayFor(modelName => item.Event.HomeTeam.Name) (@Html.DisplayFor(modelItem => item.HomeSpread))
             </td>
-            <td>@Html.DisplayFor(modelName => item.Event.Time)</td>
-            @if(item.Event.Time > DateTimeOffset.Now) {
             <td>
-                @Html.ActionLink("Place Bet", "Place", new { eventId=item.Id, poolId=Model.PoolMembership.PoolId })
+                @Html.DisplayFor(modelName => item.Event.Time)
             </td>
+            @if(eventWager != null)
+            {
+                <td>
+                    @eventWager.SelectedTeam.Name (@eventWager.SelectedTeamSpread): $@eventWager.Amount
+                </td>
             }
-            else {
-            <td>
-                (Bets closed)
-            </td>
+            else
+            {
+                <td>
+                    N/A
+                </td>
+            }
+
+            @if (item.Event.Time <= DateTimeOffset.Now)
+            {
+                <td>
+                    (Bets closed)
+                </td>
+            }
+            else if (eventWager != null)
+            {
+                <td>
+                    @Html.ActionLink("Cancel Bet", "Cancel", new { id = eventWager.Id })
+                </td>
+            }
+            else
+            {
+                <td>
+                    @Html.ActionLink("Place Bet", "Place", new { eventId = item.Id, poolId = Model.PoolMembership.PoolId })
+                </td>
             }
         </tr>
 }
