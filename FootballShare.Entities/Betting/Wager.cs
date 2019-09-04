@@ -21,7 +21,7 @@ namespace FootballShare.Entities.Betting
         /// <summary>
         /// <see cref="Wager"/> amount
         /// </summary>
-        public double Amount { get; set; }
+        public decimal Amount { get; set; }
         /// <summary>
         /// <see cref="Pool"/> bet is placed in
         /// </summary>

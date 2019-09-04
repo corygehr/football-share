@@ -12,7 +12,7 @@ namespace FootballShare.DAL.Exceptions
         /// </summary>
         /// <param name="requiredAmount">Required funds for transaction</param>
         /// <param name="userFunds">Current user funds</param>
-        public NotEnoughFundsException(double requiredAmount, double userFunds)
+        public NotEnoughFundsException(decimal requiredAmount, decimal userFunds)
             : base($"Not enough funds to make transaction (need at least ${requiredAmount}); user has ${userFunds}.")
         {
 

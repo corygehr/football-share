@@ -1,6 +1,8 @@
 ﻿using FootballShare.Entities.Betting;
 using FootballShare.Entities.Users;
 
+using System;
+
 namespace FootballShare.Entities.Pools
 {
     /// <summary>
@@ -23,7 +25,7 @@ namespace FootballShare.Entities.Pools
         /// <summary>
         /// <see cref="SiteUser"/> ID
         /// </summary>
-        public int SiteUserId { get; set; }
+        public Guid SiteUserId { get; set; }
         /// <summary>
         /// <see cref="Wager"/> ID
         /// </summary>

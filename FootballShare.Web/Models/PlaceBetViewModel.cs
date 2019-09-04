@@ -31,7 +31,7 @@ namespace FootballShare.Web.Models
         /// Amount to wager
         /// </summary>
         [Display(Name="Wager", Description="Amount to bet.", Prompt="Enter an amount in $100 denoninations.")]
-        public double WagerAmount { get; set; }
+        public decimal WagerAmount { get; set; }
         /// <summary>
         /// <see cref="WeekEvent"/> ID
         /// </summary>

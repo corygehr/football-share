@@ -1,4 +1,5 @@
-﻿using FootballShare.DAL.Repositories;
+﻿using FootballShare.DAL.Exceptions;
+using FootballShare.DAL.Repositories;
 using FootballShare.Entities.Betting;
 using FootballShare.Entities.League;
 using FootballShare.Entities.Pools;
@@ -21,6 +22,10 @@ namespace FootballShare.DAL.Services
         /// <see cref="WeekEvent"/> repository
         /// </summary>
         private readonly IWeekEventRepository _eventRepo;
+        /// <summary>
+        /// <see cref="LedgerEntry"/> repository
+        /// </summary>
+        private readonly ILedgerEntryRepository _ledgerRepo;
         /// <summary>
         /// <see cref="Pool"/> repository
         /// </summary>
@@ -58,6 +63,7 @@ namespace FootballShare.DAL.Services
         /// Creates a new <see cref="BettingService"/> instance
         /// </summary>
         /// <param name="eventRepo"><see cref="WeekEvent"/> repository</param>
+        /// <param name="ledgerRepo"><see cref="LedgerEntry"/> repository</param>
         /// <param name="poolRepo"><see cref="Pool"/> repository</param>
         /// <param name="poolMemberRepo"><see cref="PoolMember"/> repository</param>
         /// <param name="seasonRepo"><see cref="Season"/> repository</param>
@@ -66,12 +72,13 @@ namespace FootballShare.DAL.Services
         /// <param name="userRepo"><see cref="SiteUser"/> repository</param>
         /// <param name="wagerRepo"><see cref="Wager"/> repository</param>
         /// <param name="weekEventRepo"><see cref="WeekEvent"/> repository</param>
-        public BettingService(IWeekEventRepository eventRepo, IPoolRepository poolRepo, 
+        public BettingService(IWeekEventRepository eventRepo, ILedgerEntryRepository ledgerRepo, IPoolRepository poolRepo, 
             IPoolMemberRepository poolMemberRepo, ISeasonRepository seasonRepo, ISeasonWeekRepository seasonWeekRepo, 
             ISpreadRepository spreadRepo, ITeamRepository teamRepo, ISiteUserRepository userRepo,
             IWagerRepository wagerRepo, IWeekEventRepository weekEventRepo)
         {
             this._eventRepo = eventRepo;
+            this._ledgerRepo = ledgerRepo;
             this._poolRepo = poolRepo;
             this._poolMemberRepo = poolMemberRepo;
             this._seasonRepo = seasonRepo;
@@ -214,9 +221,18 @@ namespace FootballShare.DAL.Services
             return fullWagers;
         }
 
-        public Task<Wager> GetWagerAsync(string id, CancellationToken cancellationToken = default)
+        public async Task<Wager> GetWagerAsync(string id, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            Wager wager = await this._wagerRepo.GetAsync(id, cancellationToken);
+            
+            if(wager != null)
+            {
+                wager.Event = await this.GetWeekEventAsync(wager.WeekEventId, cancellationToken);
+                wager.Pool = await this._poolRepo.GetAsync(wager.PoolId.ToString(), cancellationToken);
+                wager.SelectedTeam = await this._teamRepo.GetAsync(wager.SelectedTeamId.ToString(), cancellationToken);
+            }
+
+            return wager;
         }
 
         public async Task<WeekEvent> GetWeekEventAsync(int eventId, CancellationToken cancellationToken = default)
@@ -247,12 +263,69 @@ namespace FootballShare.DAL.Services
             return spreads;
         }
 
-        public Task PlaceWagerAsync(Wager wager, CancellationToken cancellationToken = default)
+        public async Task PlaceWagerAsync(Wager wager, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            // Get PoolMember
+            PoolMember bettor = await this._poolMemberRepo.GetMembershipAsync(
+                wager.SiteUserId,
+                wager.PoolId,
+                cancellationToken);
+
+            if(bettor == null)
+            {
+                throw new ArgumentNullException(nameof(bettor));
+            }
+
+            WeekEvent weekEvent = await this.GetWeekEventAsync(wager.WeekEventId, cancellationToken);
+
+            if(weekEvent == null)
+            {
+                throw new ArgumentNullException(nameof(weekEvent));
+            }
+
+            // Check valididty of wager options
+            if(weekEvent.HomeTeamId != wager.SelectedTeamId && weekEvent.AwayTeamId != wager.SelectedTeamId)
+            {
+                throw new ArgumentException("Chosen team is not involved in the selected event.");
+            }
+
+            // Get user wagers for validation
+            IEnumerable<Wager> wagers = await this.GetUserWagersForWeekByPoolAsync(
+                bettor.SiteUserId,
+                weekEvent.SeasonWeekId,
+                wager.PoolId
+            );
+
+            if(wagers.Count() >= bettor.Pool.WagersPerWeek)
+            {
+                throw new MaxBetsPlacedForWeekException(bettor.Pool.WagersPerWeek);
+            }
+
+            // Check if user has enough funds
+            if (wager.Amount > bettor.Balance)
+            {
+                throw new NotEnoughFundsException(wager.Amount, bettor.Balance);
+            }
+
+            // Place bet, add ledger entry, update account
+            Wager newWager = await this._wagerRepo.CreateAsync(wager);
+            LedgerEntry ledger = new LedgerEntry
+            {
+                Description = $"Placed ${wager.Amount} on {wager.SelectedTeamId} ({wager.SelectedTeamSpread}).",
+                NewBalance = (bettor.Balance - wager.Amount),
+                PoolId = bettor.PoolId,
+                SiteUserId = bettor.SiteUserId,
+                StartingBalance = bettor.Balance,
+                TransactionAmount = wager.Amount,
+                WagerId = newWager.Id,
+            };
+            await this._ledgerRepo.CreateAsync(ledger);
+
+            bettor.Balance = ledger.NewBalance;
+            await this._poolMemberRepo.UpdateAsync(bettor);
         }
 
-        public Task RemoveWagerAsync(Wager wager, CancellationToken cancellationToken = default)
+        public async Task RemoveWagerAsync(Wager wager, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

@@ -31,6 +31,7 @@ namespace FootballShare.Web
             ));
 
             // Add data repositories
+            services.AddTransient<ILedgerEntryRepository, SqlLedgerEntryRepository>();
             services.AddTransient<IPoolRepository, SqlPoolRepository>();
             services.AddTransient<IPoolMemberRepository, SqlPoolMemberRepository>();
             services.AddTransient<ISeasonRepository, SqlSeasonRepository>();
