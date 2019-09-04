@@ -118,7 +118,7 @@ namespace FootballShare.DAL.Services
             return null;
         }
 
-        public async Task<IEnumerable<Wager>> GetPoolWagersForWeekAsync(int poolId, int weekId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Wager>> GetPoolWagersForWeekAsync(int poolId, string weekId, CancellationToken cancellationToken = default)
         {
             // Get all users in selected group
             IEnumerable<PoolMember> members = await this._poolMemberRepo
@@ -176,14 +176,42 @@ namespace FootballShare.DAL.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Wager>> GetUserWagersForWeekAsync(Guid userId, int weekId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Wager>> GetUserWagersForWeekAsync(Guid userId, string weekId, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            IEnumerable<Wager> wagers = await this._wagerRepo.FindByWeekAndUserAsync(weekId, userId, cancellationToken);
+            List<Wager> fullWagers = new List<Wager>();
+
+            if(wagers != null)
+            {
+                for(int i=0; i<wagers.Count(); i++)
+                {
+                    Wager wager = wagers.ElementAt(i);
+                    wager.Event = await this.GetWeekEventAsync(wager.WeekEventId, cancellationToken);
+                    wager.Pool = await this._poolRepo.GetAsync(wager.PoolId.ToString(), cancellationToken);
+                    fullWagers.Add(wager);
+                }
+            }
+
+            return fullWagers;
         }
 
-        public Task<IEnumerable<Wager>> GetUserWagersForWeekByPoolAsync(Guid userId, int weekId, int poolId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Wager>> GetUserWagersForWeekByPoolAsync(Guid userId, string weekId, int poolId, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            IEnumerable<Wager> wagers = await this._wagerRepo.FindByWeekUserAndPoolAsync(poolId, weekId, userId, cancellationToken);
+            List<Wager> fullWagers = new List<Wager>();
+
+            if (wagers != null)
+            {
+                for (int i = 0; i < wagers.Count(); i++)
+                {
+                    Wager wager = wagers.ElementAt(i);
+                    wager.Event = await this.GetWeekEventAsync(wager.WeekEventId, cancellationToken);
+                    wager.Pool = await this._poolRepo.GetAsync(wager.PoolId.ToString(), cancellationToken);
+                    fullWagers.Add(wager);
+                }
+            }
+
+            return fullWagers;
         }
 
         public Task<Wager> GetWagerAsync(string id, CancellationToken cancellationToken = default)

@@ -36,7 +36,7 @@ namespace FootballShare.DAL.Services
         /// <param name="weekId"><see cref="SeasonWeek"/> ID</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Collection of <see cref="Wager"/> objects, or null if not found</returns>
-        Task<IEnumerable<Wager>> GetPoolWagersForWeekAsync(int poolId, int weekId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Wager>> GetPoolWagersForWeekAsync(int poolId, string weekId, CancellationToken cancellationToken = default);
         /// <summary>
         /// Gets the previous <see cref="SeasonWeek"/> objects for the specified <see cref="Season"/>
         /// </summary>
@@ -81,7 +81,7 @@ namespace FootballShare.DAL.Services
         /// <param name="poolId"><see cref="Pool"/> ID</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Collection of <see cref="Wager"/> objects, or null if not found</returns>
-        Task<IEnumerable<Wager>> GetUserWagersForWeekByPoolAsync(Guid userId, int weekId, int poolId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Wager>> GetUserWagersForWeekByPoolAsync(Guid userId, string weekId, int poolId, CancellationToken cancellationToken = default);
         /// <summary>
         /// Retrieves a specific <see cref="Wager"/> object
         /// </summary>

@@ -105,11 +105,11 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public async Task<IEnumerable<Wager>> FindByWeekAndUser(SeasonWeek weekEvent, Guid userId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Wager>> FindByWeekAndUserAsync(string weekId, Guid userId, CancellationToken cancellationToken = default)
         {
-            if(weekEvent == null)
+            if(String.IsNullOrEmpty(weekId))
             {
-                throw new ArgumentNullException(nameof(weekEvent));
+                throw new ArgumentNullException(nameof(weekId));
             }
 
             if(userId == null)
@@ -117,17 +117,50 @@ namespace FootballShare.DAL.Repositories
                 throw new ArgumentNullException(nameof(userId));
             }
 
-            string query = $@"SELECT *
-                              FROM [dbo].[Wagers]
-                              WHERE [SiteUserId] = @userId
-                              AND [WeekEventId] = @eventId";
+            string query = $@"SELECT [w].*
+                              FROM [dbo].[Wagers] [w]
+                              INNER JOIN [dbo].[WeekEvents] [we]
+                                [w].[WeekEventId] = [we].[Id]
+                              WHERE [w].[SiteUserId] = @userId
+                              AND [we].[SeasonWeekId] = @weekId";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
                 return await connection.QueryAsync<Wager>(query, new
                 {
-                    eventId = weekEvent.Id,
-                    userId = userId
+                    userId = userId,
+                    weekId = weekId
+                });
+            }
+        }
+
+        public async Task<IEnumerable<Wager>> FindByWeekUserAndPoolAsync(int poolId, string weekId, Guid userId, CancellationToken cancellationToken = default)
+        {
+            if (String.IsNullOrEmpty(weekId))
+            {
+                throw new ArgumentNullException(nameof(weekId));
+            }
+
+            if (userId == null)
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
+
+            string query = $@"SELECT [w].*
+                              FROM [dbo].[Wagers] [w]
+                              INNER JOIN [dbo].[WeekEvents] [we]
+                                ON [w].[WeekEventId] = [we].[Id]
+                              WHERE [w].[PoolId] = @poolId 
+                              AND [w].[SiteUserId] = @userId
+                              AND [we].[SeasonWeekId] = @weekId";
+
+            using (var connection = this._connectionFactory.CreateConnection())
+            {
+                return await connection.QueryAsync<Wager>(query, new
+                {
+                    poolId = poolId,
+                    userId = userId,
+                    weekId = weekId
                 });
             }
         }

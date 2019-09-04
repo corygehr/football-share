@@ -165,14 +165,57 @@ namespace FootballShare.Web.Controllers
                 );
             }
 
-            // Check if user has already submitted their 
-                // Return ViewModel
-                PlaceBetViewModel vm = new PlaceBetViewModel
+            // Check if user has already submitted their bet limit for the week
+            IEnumerable<Wager> wagersForWeek = await this._bettingService
+                .GetUserWagersForWeekByPoolAsync(user.Id, eventSpread.Event.SeasonWeekId, poolId);
+
+            if(wagersForWeek.Count() >= userMembership.Pool.WagersPerWeek)
+            {
+                TempData.Put("UserMessage", new UserMessageViewModel
                 {
-                    Spread = eventSpread,
-                    WeekEventId = eventId
-                };
-                return View(vm);
+                    CssClassName = "alert-warning",
+                    Title = "Too Many Bets",
+                    Message = $"You have already submitted all of your bets for this week. Cancel one to place another."
+                });
+
+                return RedirectToAction(
+                    nameof(Events),
+                    new
+                    {
+                        seasonWeekId = eventSpread.Event.SeasonWeekId,
+                        poolId = poolId
+                    }
+                );
+            }
+
+            // Check if user has already submitted a bet for this Event
+            Wager existingWager = wagersForWeek.Where(w => w.WeekEventId == eventId).FirstOrDefault();
+            if (existingWager != null)
+            {
+                TempData.Put("UserMessage", new UserMessageViewModel
+                {
+                    CssClassName = "alert-warning",
+                    Title = "Bet Exists",
+                    Message = $"You have already submitted a ${existingWager.Amount} bet for {existingWager.Event.ToString()}. Please cancel first before changing it."
+                });
+
+                return RedirectToAction(
+                    nameof(Events),
+                    new
+                    {
+                        seasonWeekId = eventSpread.Event.SeasonWeekId,
+                        poolId = poolId
+                    }
+                );
+            }
+
+            // Checks pass, return ViewModel
+            PlaceBetViewModel vm = new PlaceBetViewModel
+            {
+                Spread = eventSpread,
+                WeekEventId = eventId
+            };
+            return View(vm);
         }
 
         // POST: Betting/Place/2/1
