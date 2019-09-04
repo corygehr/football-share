@@ -26,5 +26,11 @@ namespace FootballShare.Web.Models
         [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         [Required]
         public decimal StartingBalance { get; set; } = 10000m;
+        /// <summary>
+        /// Wagers allowed per week
+        /// </summary>
+        [Display(Name="Wagers per Week", Description="Numbers of wagers each user can submit per week.")]
+        [Required]
+        public int WagersPerWeek { get; set; } = 4;
     }
 }

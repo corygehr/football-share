@@ -37,6 +37,10 @@ namespace FootballShare.Entities.Pools
         [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         [Required]
         public decimal StartingBalance { get; set; }
+        /// <summary>
+        /// Numbers of <see cref="Wager"/> objects allowed per <see cref="SeasonWeek"/>
+        /// </summary>
+        public int WagersPerWeek { get; set; }
 
         /// <summary>
         /// <see cref="Season"/> details

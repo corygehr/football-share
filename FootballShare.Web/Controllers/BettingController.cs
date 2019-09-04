@@ -139,43 +139,40 @@ namespace FootballShare.Web.Controllers
             SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
             PoolMember userMembership = await this._poolService.GetUserPoolProfileAsync(user.Id, poolId);
 
-            if(userMembership != null)
-            {
-                // Check if betting is open for the event
-                Spread eventSpread = await this._bettingService.GetSpreadForEventAsync(eventId);
-                if (eventSpread.Event.Time > DateTimeOffset.Now)
-                {
-                    // Return ViewModel
-                    PlaceBetViewModel vm = new PlaceBetViewModel
-                    {
-                        Spread = eventSpread,
-                        WeekEventId = eventId
-                    };
-                    return View(vm);
-                }
-                else
-                {
-                    TempData.Put("UserMessage", new UserMessageViewModel
-                    {
-                        CssClassName = "alert-warning",
-                        Title = "Deadline passed",
-                        Message = $"Betting deadline for this event has already passed."
-                    });
-
-                    return RedirectToAction(
-                        nameof(Events),
-                        new
-                        {
-                            seasonWeekId = eventSpread.Event.SeasonWeekId,
-                            poolId = poolId
-                        }
-                    );
-                }
-            }
-            else
+            if (userMembership == null)
             {
                 return NotFound();
             }
+
+            // Check if betting is open for the event
+            Spread eventSpread = await this._bettingService.GetSpreadForEventAsync(eventId);
+            if (eventSpread.Event.Time <= DateTimeOffset.Now)
+            {
+                TempData.Put("UserMessage", new UserMessageViewModel
+                {
+                    CssClassName = "alert-warning",
+                    Title = "Deadline passed",
+                    Message = $"Betting deadline for this event has already passed."
+                });
+
+                return RedirectToAction(
+                    nameof(Events),
+                    new
+                    {
+                        seasonWeekId = eventSpread.Event.SeasonWeekId,
+                        poolId = poolId
+                    }
+                );
+            }
+
+            // Check if user has already submitted their 
+                // Return ViewModel
+                PlaceBetViewModel vm = new PlaceBetViewModel
+                {
+                    Spread = eventSpread,
+                    WeekEventId = eventId
+                };
+                return View(vm);
         }
 
         // POST: Betting/Place/2/1

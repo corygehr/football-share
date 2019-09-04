@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -87,7 +88,8 @@ namespace FootballShare.Web.Controllers
                         IsPublic = true,
                         Name = toBuild.PoolName,
                         SeasonId = toBuild.SeasonId,
-                        StartingBalance = toBuild.StartingBalance
+                        StartingBalance = toBuild.StartingBalance,
+                        WagersPerWeek = toBuild.WagersPerWeek
                     };
 
                     // Get current user ID

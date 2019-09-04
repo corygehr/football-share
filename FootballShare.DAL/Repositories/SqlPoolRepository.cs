@@ -39,6 +39,7 @@ namespace FootballShare.DAL.Repositories
                                 [Name],
                                 [IsPublic],
                                 [StartingBalance],
+                                [WagersPerWeek],
                                 [WhenCreated],
                                 [WhenUpdated]
                               )
@@ -47,6 +48,7 @@ namespace FootballShare.DAL.Repositories
                                 @{nameof(Pool.Name)},
                                 @{nameof(Pool.IsPublic)},
                                 @{nameof(Pool.StartingBalance)},
+                                @{nameof(Pool.WagersPerWeek)},
                                 CURRENT_TIMESTAMP,
                                 CURRENT_TIMESTAMP
                               );
@@ -151,6 +153,7 @@ namespace FootballShare.DAL.Repositories
                               SET [Name] = @{nameof(Pool.Name)},
                                   [IsPublic] = @{nameof(Pool.IsPublic)},
                                   [StartingBalance] = @{nameof(Pool.StartingBalance)},
+                                  [WagersPerWeek] = @{nameof(Pool.WagersPerWeek)},
                                   [WhenUpdated] = CURRENT_TIMESTAMP
                               WHERE [Id] = @{nameof(Pool.Id)};
                               SELECT TOP 1 *
