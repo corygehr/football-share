@@ -4,7 +4,8 @@
     ViewData["Title"] = "Place Bet";
     var backParameters = new Dictionary<string, string>
     {
-        { "id", Model.Spread.Event.SeasonWeekId }
+        { "seasonWeekId", Model.Spread.Event.SeasonWeekId },
+        { "poolId", Model.PoolId.ToString() }
     };
 }
 

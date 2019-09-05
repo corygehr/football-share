@@ -57,7 +57,7 @@
             else
             {
                 <td>
-                    @Html.ActionLink("Place Bet", "Place", new { eventId = item.Id, poolId = Model.PoolMembership.PoolId })
+                    @Html.ActionLink("Place Bet", "Place", new { eventId = item.WeekEventId, poolId = Model.PoolMembership.PoolId })
                 </td>
             }
         </tr>

@@ -112,8 +112,8 @@ namespace FootballShare.DAL.Services
         /// <summary>
         /// Removes a <see cref="Wager"/>
         /// </summary>
-        /// <param name="wager"><see cref="Wager"/> to remove</param>
+        /// <param name="wagerId"><see cref="Wager"/> ID</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        Task RemoveWagerAsync(Wager wager, CancellationToken cancellationToken = default);
+        Task RemoveWagerAsync(int wagerId, CancellationToken cancellationToken = default);
     }
 }

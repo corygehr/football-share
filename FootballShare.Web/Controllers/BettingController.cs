@@ -44,9 +44,9 @@ namespace FootballShare.Web.Controllers
             this._userManager = userManager;
         }
 
-        // GET: Betting/CancelBet/5
+        // GET: Betting/Cancel/5
         [HttpGet("Betting/Cancel/{id:int}")]
-        public async Task<ActionResult> CancelBet(int id)
+        public async Task<ActionResult> Cancel(int id)
         {
             // Confirm current user owns the bet
             SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
@@ -58,14 +58,14 @@ namespace FootballShare.Web.Controllers
             }
             else
             {
-                return Unauthorized();
+                return NotFound();
             }
         }
 
-        // POST: Betting/CancelBet/5
+        // POST: Betting/Cancel/5
         [HttpPost("Betting/Cancel/{id:int}")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CancelBet(int id, IFormCollection collection)
+        public async Task<ActionResult> Cancel(int id, IFormCollection collection)
         {
             // Confirm current user owns the bet
             SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
@@ -75,7 +75,7 @@ namespace FootballShare.Web.Controllers
             {
                 try
                 {
-                    await this._bettingService.RemoveWagerAsync(wager);
+                    await this._bettingService.RemoveWagerAsync(wager.Id);
 
                     TempData.Put("UserMessage", new UserMessageViewModel
                     {
@@ -84,7 +84,7 @@ namespace FootballShare.Web.Controllers
                         Message = $"Bet cancelled successfully."
                     });
 
-                    return RedirectToAction(nameof(Events), new { id = wager.Event.SeasonWeekId });
+                    return RedirectToAction(nameof(Events), new { seasonWeekId = wager.Event.SeasonWeekId, poolId = wager.PoolId });
                 }
                 catch
                 {
@@ -100,7 +100,7 @@ namespace FootballShare.Web.Controllers
             }
             else
             {
-                return Unauthorized();
+                return NotFound();
             }
         }
 

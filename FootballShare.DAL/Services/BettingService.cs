@@ -174,7 +174,7 @@ namespace FootballShare.DAL.Services
         public async Task<Spread> GetSpreadForEventAsync(int eventId, CancellationToken cancellationToken = default)
         {
             Spread spread = await this._spreadRepo.GetByWeekEventAsync(eventId, cancellationToken);
-            spread.Event = await this.GetWeekEventAsync(eventId, cancellationToken);
+            spread.Event = await this.GetWeekEventAsync(spread.WeekEventId, cancellationToken);
             return spread;
         }
 
@@ -248,8 +248,6 @@ namespace FootballShare.DAL.Services
 
         public async Task<IEnumerable<Spread>> GetWeekSpreads(string weekId, CancellationToken cancellationToken = default)
         {
-            SeasonWeek week = await this._seasonWeekRepo.GetAsync(weekId, cancellationToken);
-
             // Get events for the specified week
             IEnumerable<WeekEvent> events = await this._weekEventRepo.GetWeekEventsAsync(weekId, cancellationToken);
             List<Spread> spreads = new List<Spread>();
@@ -322,7 +320,7 @@ namespace FootballShare.DAL.Services
                 PoolId = bettor.PoolId,
                 SiteUserId = bettor.SiteUserId,
                 StartingBalance = bettor.Balance,
-                TransactionAmount = wager.Amount,
+                TransactionAmount = -(wager.Amount),
                 WagerId = newWager.Id,
             };
             await this._ledgerRepo.CreateAsync(ledger);
@@ -331,9 +329,41 @@ namespace FootballShare.DAL.Services
             await this._poolMemberRepo.UpdateAsync(bettor);
         }
 
-        public async Task RemoveWagerAsync(Wager wager, CancellationToken cancellationToken = default)
+        public async Task RemoveWagerAsync(int wagerId, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            // Get wager
+            Wager toRemove = await this._wagerRepo.GetAsync(wagerId.ToString(), cancellationToken);
+
+            if(toRemove == null)
+            {
+                throw new ArgumentException("Invalid Wager ID.");
+            }
+
+            // Get PoolMember
+            PoolMember user = await this._poolMemberRepo.GetMembershipAsync(
+                toRemove.SiteUserId,
+                toRemove.PoolId,
+                cancellationToken
+            );
+
+            // Roll-back wager
+            await this._wagerRepo.DeleteAsync(toRemove, cancellationToken);
+
+            // Place bet, add ledger entry, update account
+            LedgerEntry ledger = new LedgerEntry
+            {
+                Description = $"Cancelled ${toRemove.Amount} on {toRemove.SelectedTeamId} ({toRemove.SelectedTeamSpread}).",
+                NewBalance = (user.Balance + toRemove.Amount),
+                PoolId = toRemove.PoolId,
+                SiteUserId = toRemove.SiteUserId,
+                StartingBalance = user.Balance,
+                TransactionAmount = toRemove.Amount,
+                WagerId = toRemove.Id,
+            };
+            await this._ledgerRepo.CreateAsync(ledger);
+
+            user.Balance = ledger.NewBalance;
+            await this._poolMemberRepo.UpdateAsync(user);
         }
     }
 }
