@@ -3,6 +3,7 @@ using FootballShare.Entities.League;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,11 +46,22 @@ namespace FootballShare.DAL.Repositories
 
         public async Task<IEnumerable<SportsLeague>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            string query = @"SELECT * FROM [dbo].[SportsLeagues]";
+            string query = @"SELECT [sl].*, [s].*
+                             FROM [dbo].[SportsLeagues] [sl]
+                             INNER JOIN [dbo].[Sports] [s]
+                              ON [sl].[SportId] = [s].[Id]";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QueryAsync<SportsLeague>(query);
+                return await connection.QueryAsync<SportsLeague, Sport, SportsLeague>(
+                    query,
+                    map: (sportsLeague, sport) =>
+                    {
+                        sportsLeague.Sport = sport;
+                        return sportsLeague;
+                    },
+                    splitOn: "SportId"
+                );
             }
         }
 
@@ -60,16 +72,30 @@ namespace FootballShare.DAL.Repositories
                 throw new ArgumentNullException(nameof(entityId));
             }
 
-            string query = $@"SELECT TOP 1 *
-                              FROM [dbo].[SportsLeagues]
-                              WHERE [Id] = @id";
+            string query = $@"SELECT [sl].*, [s].*
+                              FROM [dbo].[SportsLeagues] [sl]
+                              INNER JOIN [dbo].[Sports] [s]
+                                ON [sl].[SportId] = [s].[Id]
+                              WHERE [sl].[Id] = @id";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QuerySingleAsync<SportsLeague>(query, new
-                {
-                    id = entityId
-                });
+                IEnumerable<SportsLeague> results = await connection
+                    .QueryAsync<SportsLeague, Sport, SportsLeague>(
+                        query,
+                        (sportsLeague, sport) =>
+                        {
+                            sportsLeague.Sport = sport;
+                            return sportsLeague;
+                        },
+                        new
+                        {
+                            id = entityId
+                        },
+                        splitOn: "SportId"
+                   );
+
+                return results.FirstOrDefault();
             }
         }
 
