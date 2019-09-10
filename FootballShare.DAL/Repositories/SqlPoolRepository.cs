@@ -1,8 +1,10 @@
 ﻿using Dapper;
+using FootballShare.Entities.Leagues;
 using FootballShare.Entities.Pools;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -92,24 +94,62 @@ namespace FootballShare.DAL.Repositories
 
         public async Task<IEnumerable<Pool>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            string query = $@"SELECT *
-                              FROM [dbo].[Pools]";
+            string query = $@"SELECT
+                                [p].*,
+                                [s].*,
+                                [s_l].*,
+                                [s_l_s].*
+                              FROM [dbo].[Pools] [p]
+                              INNER JOIN [dbo].[Seasons] [s]
+                                ON [p].[SeasonId] = [s].[Id]
+                              INNER JOIN [dbo].[SportsLeagues] [s_l]
+                                ON [s].[SportsLeagueId] = [s_l].[Id]
+                              INNER JOIN [dbo].[Sports] [s_l_s]
+                                ON [s_l].[SportId] = [s_l_s].[Id]";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QueryAsync<Pool>(query);
+                return await connection.QueryAsync<Pool, Season, SportsLeague, Sport, Pool>(
+                    query,
+                    (pool, season, league, sport) =>
+                    {
+                        pool.Season = season;
+                        pool.Season.League = league;
+                        pool.Season.League.Sport = sport;
+                        return pool;
+                    }
+                );
             }
         }
 
         public async Task<IEnumerable<Pool>> GetAllPublicAsync(CancellationToken cancellationToken = default)
         {
-            string query = $@"SELECT *
-                              FROM [dbo].[Pools]
-                              WHERE [IsPublic] = 1";
+            string query = $@"SELECT
+                                [p].*,
+                                [s].*,
+                                [s_l].*,
+                                [s_l_s].*
+                              FROM [dbo].[Pools] [p]
+                              INNER JOIN [dbo].[Seasons] [s]
+                                ON [p].[SeasonId] = [s].[Id]
+                              INNER JOIN [dbo].[SportsLeagues] [s_l]
+                                ON [s].[SportsLeagueId] = [s_l].[Id]
+                              INNER JOIN [dbo].[Sports] [s_l_s]
+                                ON [s_l].[SportId] = [s_l_s].[Id]
+                              WHERE [p].[IsPublic] = 1";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QueryAsync<Pool>(query);
+                return await connection.QueryAsync<Pool, Season, SportsLeague, Sport, Pool>(
+                    query,
+                    (pool, season, league, sport) =>
+                    {
+                        pool.Season = season;
+                        pool.Season.League = league;
+                        pool.Season.League.Sport = sport;
+                        return pool;
+                    }
+                );
             }
         }
 
@@ -120,19 +160,38 @@ namespace FootballShare.DAL.Repositories
                 throw new ArgumentNullException(nameof(entityId));
             }
 
-            string query = $@"SELECT TOP 1 *
-                              FROM [dbo].[Pools]
-                              WHERE [Id] = @id";
+            string query = $@"SELECT
+                                TOP 1 [p].*,
+                                [s].*,
+                                [s_l].*,
+                                [s_l_s].*
+                              FROM [dbo].[Pools] [p]
+                              INNER JOIN [dbo].[Seasons] [s]
+                                ON [p].[SeasonId] = [s].[Id]
+                              INNER JOIN [dbo].[SportsLeagues] [s_l]
+                                ON [s].[SportsLeagueId] = [s_l].[Id]
+                              INNER JOIN [dbo].[Sports] [s_l_s]
+                                ON [s_l].[SportId] = [s_l_s].[Id]
+                              WHERE [p].[Id] = @id";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QuerySingleAsync<Pool>(
+                IEnumerable<Pool> result = await connection.QueryAsync<Pool, Season, SportsLeague, Sport, Pool>(
                     query,
+                    (pool, season, league, sport) =>
+                    {
+                        pool.Season = season;
+                        pool.Season.League = league;
+                        pool.Season.League.Sport = sport;
+                        return pool;
+                    },
                     new
                     {
                         id = entityId
                     }
                 );
+
+                return result.FirstOrDefault();
             }
         }
 

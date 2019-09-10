@@ -1,9 +1,12 @@
 ﻿using Dapper;
 using FootballShare.Entities.Betting;
-using FootballShare.Entities.League;
+using FootballShare.Entities.Leagues;
+using FootballShare.Entities.Pools;
+using FootballShare.Entities.Users;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -91,6 +94,69 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
+        public async Task<IEnumerable<Wager>> FindBySeasonUserAndPoolAsync(int poolId, string seasonId, string userId, CancellationToken cancellationToken = default)
+        {
+            if(String.IsNullOrEmpty(seasonId))
+            {
+                throw new ArgumentNullException(nameof(seasonId));
+            }
+
+            if(String.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentNullException(userId);
+            }
+
+            string query = $@"SELECT
+                                [w].*,
+                                [we].*,
+                                [we_at].*,
+                                [we_ht].*,
+                                [p].*,
+                                [t].*,
+                                [su].*
+                              FROM [dbo].[Wagers] [w]
+                              INNER JOIN [dbo].[WeekEvents] [we]
+                                ON [w].[WeekEventId] = [we].[Id]
+                              INNER JOIN [dbo].[Teams] [we_at]
+                                ON [we].[AwayTeamId] = [we_at].[Id]
+                              INNER JOIN [dbo].[Teams] [we_ht]
+                                ON [we].[HomeTeamId] = [we_ht].[Id]
+                              INNER JOIN [dbo].[Pools] [p]
+                                ON [w].[PoolId] = [p].[Id]
+                              INNER JOIN [dbo].[Teams] [t]
+                                ON [w].[SelectedTeamId] = [t].[Id]
+                              INNER JOIN [dbo].[SiteUsers] [su]
+                                ON [w].[SiteUserId] = [su].[Id]
+                              WHERE [w].[SeasonId] = @seasonId
+                              AND [w].[PoolId] = @poolId
+                              AND [w].[SiteUserId] = @userId
+                              ORDER BY [we].[Time]";
+
+            using (var connection = this._connectionFactory.CreateConnection())
+            {
+                return await connection.QueryAsync<Wager, WeekEvent, Team, Team, Pool, Team, SiteUser, Wager>(
+                    query,
+                    (wager, weekEvent, awayTeam, homeTeam, pool, team, siteUser) =>
+                    {
+                        wager.Event = weekEvent;
+                        wager.Event.AwayTeam = awayTeam;
+                        wager.Event.HomeTeam = homeTeam;
+                        wager.Pool = pool;
+                        wager.SelectedTeam = team;
+                        wager.User = siteUser;
+
+                        return wager;
+                    },
+                    new
+                    {
+                        seasonId = seasonId,
+                        poolId = poolId,
+                        userId = userId
+                    }
+                );
+            }
+        }
+
         public async Task<IEnumerable<Wager>> FindByWeekAndUserAsync(string weekId, Guid userId, CancellationToken cancellationToken = default)
         {
             if(String.IsNullOrEmpty(weekId))
@@ -103,20 +169,39 @@ namespace FootballShare.DAL.Repositories
                 throw new ArgumentNullException(nameof(userId));
             }
 
-            string query = $@"SELECT [w].*
+            string query = $@"SELECT [w].*, [we].*, [p].*, [t].*, [su].*
                               FROM [dbo].[Wagers] [w]
                               INNER JOIN [dbo].[WeekEvents] [we]
-                                [w].[WeekEventId] = [we].[Id]
+                                ON [w].[WeekEventId] = [we].[Id]
+                              INNER JOIN [dbo].[Pools] [p]
+                                ON [w].[PoolId] = [p].[Id]
+                              INNER JOIN [dbo].[Teams] [t]
+                                ON [w].[SelectedTeamId] = [t].[Id]
+                              INNER JOIN [dbo].[SiteUsers] [su]
+                                ON [w].[SiteUserId] = [su].[Id]
                               WHERE [w].[SiteUserId] = @userId
-                              AND [we].[SeasonWeekId] = @weekId";
+                              AND [we].[SeasonWeekId] = @weekId
+                              ORDER BY [we].[Time]";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QueryAsync<Wager>(query, new
-                {
-                    userId = userId,
-                    weekId = weekId
-                });
+                return await connection.QueryAsync<Wager, WeekEvent, Pool, Team, SiteUser, Wager>(
+                    query,
+                    (wager, weekEvent, pool, team, siteUser) =>
+                    {
+                        wager.Event = weekEvent;
+                        wager.Pool = pool;
+                        wager.SelectedTeam = team;
+                        wager.User = siteUser;
+
+                        return wager;
+                    },
+                    new
+                    {
+                        userId = userId,
+                        weekId = weekId
+                    }
+                );
             }
         }
 
@@ -132,33 +217,97 @@ namespace FootballShare.DAL.Repositories
                 throw new ArgumentNullException(nameof(userId));
             }
 
-            string query = $@"SELECT [w].*
+            string query = $@"SELECT
+                                [w].*,
+                                [we].*,
+                                [we_at].*,
+                                [we_ht].*,
+                                [p].*,
+                                [t].*,
+                                [su].*
                               FROM [dbo].[Wagers] [w]
                               INNER JOIN [dbo].[WeekEvents] [we]
                                 ON [w].[WeekEventId] = [we].[Id]
+                              INNER JOIN [dbo].[Teams] [we_at]
+                                ON [we].[AwayTeamId] = [we_at].[Id]
+                              INNER JOIN [dbo].[Teams] [we_ht]
+                                ON [we].[HomeTeamId] = [we_ht].[Id]
+                              INNER JOIN [dbo].[Pools] [p]
+                                ON [w].[PoolId] = [p].[Id]
+                              INNER JOIN [dbo].[Teams] [t]
+                                ON [w].[SelectedTeamId] = [t].[Id]
+                              INNER JOIN [dbo].[SiteUsers] [su]
+                                ON [w].[SiteUserId] = [su].[Id]
                               WHERE [w].[PoolId] = @poolId 
                               AND [w].[SiteUserId] = @userId
-                              AND [we].[SeasonWeekId] = @weekId";
+                              AND [we].[SeasonWeekId] = @weekId
+                              ORDER BY [we].[Time]";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QueryAsync<Wager>(query, new
-                {
-                    poolId = poolId,
-                    userId = userId,
-                    weekId = weekId
-                });
+                return await connection.QueryAsync<Wager, WeekEvent, Team, Team, Pool, Team, SiteUser, Wager>(
+                    query,
+                    (wager, weekEvent, awayTeam, homeTeam, pool, team, siteUser) =>
+                    {
+                        wager.Event = weekEvent;
+                        wager.Event.AwayTeam = awayTeam;
+                        wager.Event.HomeTeam = homeTeam;
+                        wager.Pool = pool;
+                        wager.SelectedTeam = team;
+                        wager.User = siteUser;
+
+                        return wager;
+                    },
+                    new
+                    {
+                        poolId = poolId,
+                        userId = userId,
+                        weekId = weekId
+                    }
+                );
             }
         }
 
         public async Task<IEnumerable<Wager>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            string query = $@"SELECT *
-                              FROM [dbo].[Wagers]";
+            string query = $@"SELECT
+                                [w].*,
+                                [we].*,
+                                [we_at].*,
+                                [we_ht].*,
+                                [p].*,
+                                [t].*,
+                                [su].*
+                              FROM [dbo].[Wagers] [w]
+                              INNER JOIN [dbo].[WeekEvents] [we]
+                                ON [w].[WeekEventId] = [we].[Id]
+                              INNER JOIN [dbo].[Teams] [we_at]
+                                ON [we].[AwayTeamId] = [we_at].[Id]
+                              INNER JOIN [dbo].[Teams] [we_ht]
+                                ON [we].[HomeTeamId] = [we_ht].[Id]
+                              INNER JOIN [dbo].[Pools] [p]
+                                ON [w].[PoolId] = [p].[Id]
+                              INNER JOIN [dbo].[Teams] [t]
+                                ON [w].[SelectedTeamId] = [t].[Id]
+                              INNER JOIN [dbo].[SiteUsers] [su]
+                                ON [w].[SiteUserId] = [su].[Id]";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QueryAsync<Wager>(query);
+                return await connection.QueryAsync<Wager, WeekEvent, Team, Team, Pool, Team, SiteUser, Wager>(
+                    query,
+                    (wager, weekEvent, awayTeam, homeTeam, pool, team, siteUser) =>
+                    {
+                        wager.Event = weekEvent;
+                        wager.Event.AwayTeam = awayTeam;
+                        wager.Event.HomeTeam = homeTeam;
+                        wager.Pool = pool;
+                        wager.SelectedTeam = team;
+                        wager.User = siteUser;
+
+                        return wager;
+                    }
+                );
             }
         }
 
@@ -169,19 +318,47 @@ namespace FootballShare.DAL.Repositories
                 throw new ArgumentNullException(nameof(entityId));
             }
 
-            string query = $@"SELECT TOP 1 *
-                              FROM [dbo].[Wagers]
-                              WHERE [Id] = @id";
+            string query = $@"SELECT
+                                TOP 1 [w].*,
+                                [we].*,
+                                [we_at].*,
+                                [we_ht].*,
+                                [p].*,
+                                [t].*,
+                                [su].*
+                              FROM [dbo].[Wagers] [w]
+                              INNER JOIN [dbo].[WeekEvents] [we]
+                                ON [w].[WeekEventId] = [we].[Id]
+                              INNER JOIN [dbo].[Teams] [we_at]
+                                ON [we].[AwayTeamId] = [we_at].[Id]
+                              INNER JOIN [dbo].[Teams] [we_ht]
+                                ON [we].[HomeTeamId] = [we_ht].[Id]
+                              INNER JOIN [dbo].[Pools] [p]
+                                ON [w].[PoolId] = [p].[Id]
+                              INNER JOIN [dbo].[Teams] [t]
+                                ON [w].[SelectedTeamId] = [t].[Id]
+                              INNER JOIN [dbo].[SiteUsers] [su]
+                                ON [w].[SiteUserId] = [su].[Id]
+                              WHERE [w].[Id] = @id";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QuerySingleAsync<Wager>(
+                IEnumerable<Wager> result = await connection.QueryAsync<Wager, WeekEvent, Team, Team, Pool, Team, SiteUser, Wager>(
                     query,
-                    new
+                    (wager, weekEvent, awayTeam, homeTeam, pool, team, siteUser) =>
                     {
-                        id = entityId
+                        wager.Event = weekEvent;
+                        wager.Event.AwayTeam = awayTeam;
+                        wager.Event.HomeTeam = homeTeam;
+                        wager.Pool = pool;
+                        wager.SelectedTeam = team;
+                        wager.User = siteUser;
+
+                        return wager;
                     }
                 );
+
+                return result.FirstOrDefault();
             }
         }
 

@@ -1,8 +1,9 @@
 ﻿using Dapper;
-using FootballShare.Entities.League;
+using FootballShare.Entities.Leagues;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -44,12 +45,31 @@ namespace FootballShare.DAL.Repositories
 
         public async Task<IEnumerable<SeasonWeek>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            string query = $@"SELECT *
-                              FROM [dbo].[SeasonWeeks]";
-
+            string query = $@"SELECT
+                                [sw].*,
+                                [s].*,
+                                [s_l].*,
+                                [s_l_s].*
+                              FROM [dbo].[SeasonWeeks] [sw]
+                              INNER JOIN [dbo].[Seasons] [s]
+                                ON [sw].[SeasonId] = [s].[Id]
+                              INNER JOIN [dbo].[SportsLeagues] [s_l]
+                                ON [s].[SportsLeagueId] = [s_l].[Id]
+                              INNER JOIN [dbo].[Sports] [s_l_s]
+                                ON [s_l].[SportId] = [s_l_s].[Id]";
+            
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QueryAsync<SeasonWeek>(query);
+                return await connection.QueryAsync<SeasonWeek, Season, SportsLeague, Sport, SeasonWeek>(
+                    query,
+                    (seasonWeek, season, league, sport) =>
+                    {
+                        seasonWeek.Season = season;
+                        seasonWeek.Season.League = league;
+                        seasonWeek.Season.League.Sport = sport;
+                        return seasonWeek;
+                    }
+                );
             }
         }
 
@@ -60,15 +80,32 @@ namespace FootballShare.DAL.Repositories
                 throw new ArgumentNullException(nameof(seasonId));
             }
 
-            string query = $@"SELECT *
-                              FROM [dbo].[SeasonWeeks]
-                              WHERE [SeasonId] = @seasonId 
-                              ORDER BY [Sequence]";
+            string query = $@"SELECT
+                                [sw].*,
+                                [s].*,
+                                [s_l].*,
+                                [s_l_s].*
+                              FROM [dbo].[SeasonWeeks] [sw]
+                              INNER JOIN [dbo].[Seasons] [s]
+                                ON [sw].[SeasonId] = [s].[Id]
+                              INNER JOIN [dbo].[SportsLeagues] [s_l]
+                                ON [s].[SportsLeagueId] = [s_l].[Id]
+                              INNER JOIN [dbo].[Sports] [s_l_s]
+                                ON [s_l].[SportId] = [s_l_s].[Id]
+                              WHERE [sw].[SeasonId] = @seasonId 
+                              ORDER BY [sw].[Sequence]";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QueryAsync<SeasonWeek>(
+                return await connection.QueryAsync<SeasonWeek, Season, SportsLeague, Sport, SeasonWeek>(
                     query,
+                    (seasonWeek, season, league, sport) =>
+                    {
+                        seasonWeek.Season = season;
+                        seasonWeek.Season.League = league;
+                        seasonWeek.Season.League.Sport = sport;
+                        return seasonWeek;
+                    },
                     new
                     {
                         seasonId = seasonId
@@ -84,18 +121,38 @@ namespace FootballShare.DAL.Repositories
                 throw new ArgumentNullException(nameof(entityId));
             }
 
-            string query = $@"SELECT TOP 1 *
-                              FROM [dbo].[SeasonWeeks]
-                              WHERE [Id] = @id";
+            string query = $@"SELECT
+                                TOP 1 [sw].*,
+                                [s].*,
+                                [s_l].*,
+                                [s_l_s].*
+                              FROM [dbo].[SeasonWeeks] [sw]
+                              INNER JOIN [dbo].[Seasons] [s]
+                                ON [sw].[SeasonId] = [s].[Id]
+                              INNER JOIN [dbo].[SportsLeagues] [s_l]
+                                ON [s].[SportsLeagueId] = [s_l].[Id]
+                              INNER JOIN [dbo].[Sports] [s_l_s]
+                                ON [s_l].[SportId] = [s_l_s].[Id]
+                              WHERE [sw].[Id] = @id";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QuerySingleAsync<SeasonWeek>(
+                IEnumerable<SeasonWeek> result = await connection.QueryAsync<SeasonWeek, Season, SportsLeague, Sport, SeasonWeek>(
                     query,
-                    new {
+                    (seasonWeek, season, league, sport) =>
+                    {
+                        seasonWeek.Season = season;
+                        seasonWeek.Season.League = league;
+                        seasonWeek.Season.League.Sport = sport;
+                        return seasonWeek;
+                    },
+                    new
+                    {
                         id = entityId
-                   }
+                    }
                 );
+
+                return result.FirstOrDefault();
             }
         }
 
@@ -112,21 +169,40 @@ namespace FootballShare.DAL.Repositories
                 throw new ArgumentNullException(nameof(seasonId));
             }
 
-            string query = $@"SELECT TOP 1 *
-                              FROM [dbo].[SeasonWeeks]
-                              WHERE [SeasonId] = @seasonId 
-                              AND [EndDate] > GETDATE() 
-                              ORDER BY [StartDate]";
+            string query = $@"SELECT
+                                TOP 1 [sw].*,
+                                [s].*,
+                                [s_l].*,
+                                [s_l_s].*
+                              FROM [dbo].[SeasonWeeks] [sw]
+                              INNER JOIN [dbo].[Seasons] [s]
+                                ON [sw].[SeasonId] = [s].[Id]
+                              INNER JOIN [dbo].[SportsLeagues] [s_l]
+                                ON [s].[SportsLeagueId] = [s_l].[Id]
+                              INNER JOIN [dbo].[Sports] [s_l_s]
+                                ON [s_l].[SportId] = [s_l_s].[Id]
+                              WHERE [sw].[SeasonId] = @seasonId 
+                              AND [sw].[EndDate] > GETDATE() 
+                              ORDER BY [sw].[StartDate]";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QuerySingleOrDefaultAsync<SeasonWeek>(
+                IEnumerable<SeasonWeek> result = await connection.QueryAsync<SeasonWeek, Season, SportsLeague, Sport, SeasonWeek>(
                     query,
+                    (seasonWeek, season, league, sport) =>
+                    {
+                        seasonWeek.Season = season;
+                        seasonWeek.Season.League = league;
+                        seasonWeek.Season.League.Sport = sport;
+                        return seasonWeek;
+                    },
                     new
                     {
                         seasonId = seasonId
                     }
                 );
+
+                return result.FirstOrDefault();
             }
         }
 
@@ -137,16 +213,33 @@ namespace FootballShare.DAL.Repositories
                 throw new ArgumentNullException(nameof(seasonId));
             }
 
-            string query = $@"SELECT *
-                              FROM [dbo].[SeasonWeeks]
-                              WHERE [SeasonId] = @seasonId
-                              AND [EndDate] < GETDATE()
-                              ORDER BY [EndDate]";
+            string query = $@"SELECT
+                                TOP 1 [sw].*,
+                                [s].*,
+                                [s_l].*,
+                                [s_l_s].*
+                              FROM [dbo].[SeasonWeeks] [sw]
+                              INNER JOIN [dbo].[Seasons] [s]
+                                ON [sw].[SeasonId] = [s].[Id]
+                              INNER JOIN [dbo].[SportsLeagues] [s_l]
+                                ON [s].[SportsLeagueId] = [s_l].[Id]
+                              INNER JOIN [dbo].[Sports] [s_l_s]
+                                ON [s_l].[SportId] = [s_l_s].[Id]
+                              WHERE [sw].[SeasonId] = @seasonId
+                              AND [sw].[EndDate] < GETDATE()
+                              ORDER BY [sw].[EndDate]";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QueryAsync<SeasonWeek>(
+                return await connection.QueryAsync<SeasonWeek, Season, SportsLeague, Sport, SeasonWeek>(
                     query,
+                    (seasonWeek, season, league, sport) =>
+                    {
+                        seasonWeek.Season = season;
+                        seasonWeek.Season.League = league;
+                        seasonWeek.Season.League.Sport = sport;
+                        return seasonWeek;
+                    },
                     new
                     {
                         seasonId = seasonId

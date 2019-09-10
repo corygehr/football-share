@@ -16,10 +16,6 @@ namespace FootballShare.DAL.Services
     public class PoolService : IPoolService
     {
         /// <summary>
-        /// <see cref="SportsLeague"/> service object
-        /// </summary>
-        private readonly ISportsLeagueService _leagueService;
-        /// <summary>
         /// <see cref="PoolMember"/> repository
         /// </summary>
         private readonly IPoolMemberRepository _poolMemberRepo;
@@ -35,14 +31,11 @@ namespace FootballShare.DAL.Services
         /// <summary>
         /// Creates a new <see cref="PoolService"/> instance
         /// </summary>
-        /// <param name="leagueService"><see cref="SportsLeague"/> service object</param>
         /// <param name="poolMemberRepo"><see cref="PoolMember"/> repository</param>
         /// <param name="poolRepo"><see cref="Pool"/> repository</param>
         /// <param name="userRepo"><see cref="SiteUser"/> repository</param>
-        public PoolService(IPoolRepository poolRepo, IPoolMemberRepository poolMemberRepo, ISiteUserRepository userRepo,
-            ISportsLeagueService leagueService)
+        public PoolService(IPoolRepository poolRepo, IPoolMemberRepository poolMemberRepo, ISiteUserRepository userRepo)
         {
-            this._leagueService = leagueService;
             this._poolMemberRepo = poolMemberRepo;
             this._poolRepo = poolRepo;
             this._userRepo = userRepo;
@@ -78,73 +71,27 @@ namespace FootballShare.DAL.Services
 
         public async Task<IEnumerable<PoolMember>> GetMembersAsync(int poolId, CancellationToken cancellationToken = default)
         {
-            Pool pool = await this._poolRepo.GetAsync(poolId.ToString(), cancellationToken);
-            IEnumerable<PoolMember> members = await this._poolMemberRepo.GetPoolMembersAsync(poolId, cancellationToken);
-
-            // Get User objects for each member
-            PoolMember[] fullMembers = new PoolMember[members.Count()];
-
-            for (int i = 0; i < members.Count(); i++)
-            {
-                PoolMember member = members.ElementAt(i);
-                fullMembers[i] = await this.GetPoolMemberAsync(member.Id, cancellationToken);
-            }
-
-            return fullMembers.ToList();
+            return await this._poolMemberRepo.GetPoolMembersAsync(poolId, cancellationToken);
         }
 
         public async Task<PoolMember> GetPoolMemberAsync(int poolMemberId, CancellationToken cancellationToken = default)
         {
-            PoolMember member = await this._poolMemberRepo.GetAsync(poolMemberId.ToString(), cancellationToken);
-
-            if (member != null)
-            {
-                member.Pool = await this.GetPoolAsync(member.PoolId, cancellationToken);
-                member.User = await this._userRepo.GetAsync(member.SiteUserId.ToString());
-            }
-
-            return member;
+            return await this._poolMemberRepo.GetAsync(poolMemberId.ToString(), cancellationToken);
         }
 
         public async Task<PoolMember> GetPoolMemberAsync(int poolId, Guid userId, CancellationToken cancellationToken = default)
         {
-            PoolMember member = await this._poolMemberRepo.GetMembershipAsync(userId, poolId, cancellationToken);
-
-            if (member != null)
-            {
-                member.Pool = await this.GetPoolAsync(member.PoolId, cancellationToken);
-                member.User = await this._userRepo.GetAsync(member.SiteUserId.ToString());
-            }
-
-            return member;
+            return await this._poolMemberRepo.GetMembershipAsync(userId, poolId, cancellationToken);
         }
 
         public async Task<Pool> GetPoolAsync(int poolId, CancellationToken cancellationToken = default)
         {
-            Pool pool = await this._poolRepo.GetAsync(poolId.ToString(), cancellationToken);
-
-            if(pool != null)
-            {
-                // Pull Pool details
-                pool.Season = await this._leagueService.GetSeasonAsync(pool.SeasonId, cancellationToken);
-            }
-
-            return pool;
+            return await this._poolRepo.GetAsync(poolId.ToString(), cancellationToken);
         }
 
         public async Task<IEnumerable<Pool>> GetPublicPoolsAsync(CancellationToken cancellationToken = default)
         {
-            IEnumerable<Pool> pools = await this._poolRepo.GetAllPublicAsync(cancellationToken);
-            Pool[] populated = new Pool[pools.Count()];
-
-            for(int i=0; i<pools.Count(); i++)
-            {
-                Pool pool = pools.ElementAt(i);
-                pool.Season = await this._leagueService.GetSeasonAsync(pool.SeasonId, cancellationToken);
-                populated[i] = pool;
-            }
-
-            return populated;
+            return await this._poolRepo.GetAllPublicAsync(cancellationToken);
         }
 
         public async Task<IEnumerable<Pool>> GetPublicPoolsNotJoinedAsync(Guid userId, CancellationToken cancellationToken = default)
@@ -160,29 +107,12 @@ namespace FootballShare.DAL.Services
 
         public async Task<IEnumerable<PoolMember>> GetUserMembershipsAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            IEnumerable<PoolMember> memberships = await this._poolMemberRepo.GetUserMembershipsAsync(userId, cancellationToken);
-
-            // Populate full details
-            PoolMember[] populatedMemberships = new PoolMember[memberships.Count()];
-
-            for(int i=0; i<memberships.Count(); i++)
-            {
-                PoolMember member = memberships.ElementAt(i);
-                member.Pool = await this.GetPoolAsync(member.PoolId, cancellationToken);
-                member.User = await this._userRepo.GetAsync(member.SiteUserId.ToString(), cancellationToken);
-                // Push populated member data
-                populatedMemberships[i] = member;
-            }
-
-            return populatedMemberships.ToList();
+            return await this._poolMemberRepo.GetUserMembershipsAsync(userId, cancellationToken);
         }
 
         public async Task<PoolMember> GetUserPoolProfileAsync(Guid userId, int poolId, CancellationToken cancellationToken = default)
         {
-            // Get PoolMember
-            PoolMember membership = await this._poolMemberRepo.GetMembershipAsync(userId, poolId, cancellationToken);
-
-            return await this.GetPoolMemberAsync(membership.Id, cancellationToken);
+            return await this._poolMemberRepo.GetMembershipAsync(userId, poolId, cancellationToken);
         }
 
         public async Task RemovePoolMemberAsync(int poolMemberId, CancellationToken cancellationToken = default)

@@ -1,5 +1,5 @@
 ﻿using FootballShare.DAL.Services;
-using FootballShare.Entities.League;
+using FootballShare.Entities.Leagues;
 using FootballShare.Entities.Pools;
 using FootballShare.Entities.Users;
 using FootballShare.Web.Extensions;

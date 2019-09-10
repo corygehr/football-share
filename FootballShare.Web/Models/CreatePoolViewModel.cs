@@ -1,4 +1,4 @@
-﻿using FootballShare.Entities.League;
+﻿using FootballShare.Entities.Leagues;
 using FootballShare.Entities.Pools;
 using Microsoft.AspNetCore.Mvc.Rendering;
 

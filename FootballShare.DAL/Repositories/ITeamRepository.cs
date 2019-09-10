@@ -1,4 +1,4 @@
-﻿using FootballShare.Entities.League;
+﻿using FootballShare.Entities.Leagues;
 
 namespace FootballShare.DAL.Repositories
 {

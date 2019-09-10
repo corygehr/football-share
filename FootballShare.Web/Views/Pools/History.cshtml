@@ -1,0 +1,61 @@
+﻿@model FootballShare.Web.Models.PoolDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Pool.Name;
+}
+
+<h1>@Html.DisplayFor(model => model.Pool.Name)</h1>
+<h4>@Html.DisplayFor(model => model.Pool.Season.Name)</h4>
+<hr />
+<h5>Season Betting History</h5>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CurrentSeasonWeek.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                @Html.DisplayFor(model => model.CurrentSeasonWeek.Name)
+            </td>
+            <td>
+                @Html.ActionLink("Place Bets", "Events", "Betting", new { seasonWeekId = Model.CurrentSeasonWeek.Id, poolId = Model.Pool.Id })
+            </td>
+        </tr>
+    </tbody>
+</table>
+<h5>Standings</h5>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Members[0].User.DisplayName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Members[0].Balance)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Members)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User.DisplayName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Balance)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div>
+    <a asp-action="Index">Back to Pool List</a> | 
+    @Html.ActionLink("Leave Pool", "Leave", new { id = Model.Pool.Id })
+</div>

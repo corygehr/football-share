@@ -1,7 +1,7 @@
 ﻿using FootballShare.DAL.Exceptions;
 using FootballShare.DAL.Repositories;
 using FootballShare.Entities.Betting;
-using FootballShare.Entities.League;
+using FootballShare.Entities.Leagues;
 using FootballShare.Entities.Pools;
 using FootballShare.Entities.Users;
 
@@ -19,10 +19,6 @@ namespace FootballShare.DAL.Services
     public class BettingService : IBettingService
     {
         /// <summary>
-        /// <see cref="WeekEvent"/> repository
-        /// </summary>
-        private readonly IWeekEventRepository _eventRepo;
-        /// <summary>
         /// <see cref="LedgerEntry"/> repository
         /// </summary>
         private readonly ILedgerEntryRepository _ledgerRepo;
@@ -34,10 +30,6 @@ namespace FootballShare.DAL.Services
         /// <see cref="PoolMember"/> repository
         /// </summary>
         private readonly IPoolMemberRepository _poolMemberRepo;
-        /// <summary>
-        /// <see cref="Season"/> repository
-        /// </summary>
-        private readonly ISeasonRepository _seasonRepo;
         /// <summary>
         /// <see cref="SeasonWeek"/> repository
         /// </summary>
@@ -62,7 +54,6 @@ namespace FootballShare.DAL.Services
         /// <summary>
         /// Creates a new <see cref="BettingService"/> instance
         /// </summary>
-        /// <param name="eventRepo"><see cref="WeekEvent"/> repository</param>
         /// <param name="ledgerRepo"><see cref="LedgerEntry"/> repository</param>
         /// <param name="poolRepo"><see cref="Pool"/> repository</param>
         /// <param name="poolMemberRepo"><see cref="PoolMember"/> repository</param>
@@ -71,17 +62,14 @@ namespace FootballShare.DAL.Services
         /// <param name="teamRepo"><see cref="Team"/> repository</param>
         /// <param name="userRepo"><see cref="SiteUser"/> repository</param>
         /// <param name="wagerRepo"><see cref="Wager"/> repository</param>
-        /// <param name="weekEventRepo"><see cref="WeekEvent"/> repository</param>
-        public BettingService(IWeekEventRepository eventRepo, ILedgerEntryRepository ledgerRepo, IPoolRepository poolRepo, 
+        public BettingService(ILedgerEntryRepository ledgerRepo, IPoolRepository poolRepo, 
             IPoolMemberRepository poolMemberRepo, ISeasonRepository seasonRepo, ISeasonWeekRepository seasonWeekRepo, 
             ISpreadRepository spreadRepo, ITeamRepository teamRepo, ISiteUserRepository userRepo,
             IWagerRepository wagerRepo, IWeekEventRepository weekEventRepo)
         {
-            this._eventRepo = eventRepo;
             this._ledgerRepo = ledgerRepo;
             this._poolRepo = poolRepo;
             this._poolMemberRepo = poolMemberRepo;
-            this._seasonRepo = seasonRepo;
             this._seasonWeekRepo = seasonWeekRepo;
             this._spreadRepo = spreadRepo;
             this._teamRepo = teamRepo;
@@ -166,9 +154,7 @@ namespace FootballShare.DAL.Services
 
         public async Task<SeasonWeek> GetSeasonWeekAsync(string seasonWeekId, CancellationToken cancellationToken = default)
         {
-            SeasonWeek seasonWeek = await this._seasonWeekRepo.GetAsync(seasonWeekId, cancellationToken);
-            seasonWeek.Season = await this._seasonRepo.GetAsync(seasonWeek.SeasonId, cancellationToken);
-            return seasonWeek;
+            return await this._seasonWeekRepo.GetAsync(seasonWeekId, cancellationToken);
         }
 
         public async Task<Spread> GetSpreadForEventAsync(int eventId, CancellationToken cancellationToken = default)
@@ -185,56 +171,17 @@ namespace FootballShare.DAL.Services
 
         public async Task<IEnumerable<Wager>> GetUserWagersForWeekAsync(Guid userId, string weekId, CancellationToken cancellationToken = default)
         {
-            IEnumerable<Wager> wagers = await this._wagerRepo.FindByWeekAndUserAsync(weekId, userId, cancellationToken);
-            List<Wager> fullWagers = new List<Wager>();
-
-            if(wagers != null)
-            {
-                for(int i=0; i<wagers.Count(); i++)
-                {
-                    Wager wager = wagers.ElementAt(i);
-                    wager.Event = await this.GetWeekEventAsync(wager.WeekEventId, cancellationToken);
-                    wager.Pool = await this._poolRepo.GetAsync(wager.PoolId.ToString(), cancellationToken);
-                    wager.SelectedTeam = await this._teamRepo.GetAsync(wager.SelectedTeamId, cancellationToken);
-                    fullWagers.Add(wager);
-                }
-            }
-
-            return fullWagers;
+            return await this._wagerRepo.FindByWeekAndUserAsync(weekId, userId, cancellationToken);
         }
 
         public async Task<IEnumerable<Wager>> GetUserWagersForWeekByPoolAsync(Guid userId, string weekId, int poolId, CancellationToken cancellationToken = default)
         {
-            IEnumerable<Wager> wagers = await this._wagerRepo.FindByWeekUserAndPoolAsync(poolId, weekId, userId, cancellationToken);
-            List<Wager> fullWagers = new List<Wager>();
-
-            if (wagers != null)
-            {
-                for (int i = 0; i < wagers.Count(); i++)
-                {
-                    Wager wager = wagers.ElementAt(i);
-                    wager.Event = await this.GetWeekEventAsync(wager.WeekEventId, cancellationToken);
-                    wager.Pool = await this._poolRepo.GetAsync(wager.PoolId.ToString(), cancellationToken);
-                    wager.SelectedTeam = await this._teamRepo.GetAsync(wager.SelectedTeamId, cancellationToken);
-                    fullWagers.Add(wager);
-                }
-            }
-
-            return fullWagers;
+            return await this._wagerRepo.FindByWeekUserAndPoolAsync(poolId, weekId, userId, cancellationToken);
         }
 
         public async Task<Wager> GetWagerAsync(string id, CancellationToken cancellationToken = default)
         {
-            Wager wager = await this._wagerRepo.GetAsync(id, cancellationToken);
-            
-            if(wager != null)
-            {
-                wager.Event = await this.GetWeekEventAsync(wager.WeekEventId, cancellationToken);
-                wager.Pool = await this._poolRepo.GetAsync(wager.PoolId.ToString(), cancellationToken);
-                wager.SelectedTeam = await this._teamRepo.GetAsync(wager.SelectedTeamId.ToString(), cancellationToken);
-            }
-
-            return wager;
+            return await this._wagerRepo.GetAsync(id, cancellationToken);
         }
 
         public async Task<WeekEvent> GetWeekEventAsync(int eventId, CancellationToken cancellationToken = default)

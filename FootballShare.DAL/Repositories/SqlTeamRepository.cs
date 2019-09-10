@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using FootballShare.Entities.League;
+using FootballShare.Entities.Leagues;
 
 using System;
 using System.Collections.Generic;

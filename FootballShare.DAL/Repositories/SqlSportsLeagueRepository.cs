@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using FootballShare.Entities.League;
+using FootballShare.Entities.Leagues;
 
 using System;
 using System.Collections.Generic;
@@ -59,8 +59,7 @@ namespace FootballShare.DAL.Repositories
                     {
                         sportsLeague.Sport = sport;
                         return sportsLeague;
-                    },
-                    splitOn: "SportId"
+                    }
                 );
             }
         }
@@ -91,8 +90,7 @@ namespace FootballShare.DAL.Repositories
                         new
                         {
                             id = entityId
-                        },
-                        splitOn: "SportId"
+                        }
                    );
 
                 return results.FirstOrDefault();

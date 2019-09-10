@@ -1,5 +1,5 @@
 ﻿using Dapper.Contrib.Extensions;
-using FootballShare.Entities.League;
+using FootballShare.Entities.Leagues;
 
 using System.ComponentModel.DataAnnotations;
 

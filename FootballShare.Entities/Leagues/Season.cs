@@ -3,7 +3,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace FootballShare.Entities.League
+namespace FootballShare.Entities.Leagues
 {
     /// <summary>
     /// Base <see cref="League"/> <see cref="Season"/> class
