@@ -115,7 +115,7 @@ namespace FootballShare.DAL.Repositories
             string query = $@"SELECT TOP 1 *
                               FROM [dbo].[SeasonWeeks]
                               WHERE [SeasonId] = @seasonId 
-                              AND [EndDate] >= GETDATE() 
+                              AND [EndDate] > GETDATE() 
                               ORDER BY [StartDate]";
 
             using (var connection = this._connectionFactory.CreateConnection())

@@ -20,7 +20,7 @@ namespace FootballShare.Entities.League
         /// </summary>
         [Display(Name = "Season End Date", ShortName = "End Date", Description = "Date season ends.")]
         [Required]
-        public DateTime EndDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
         /// <summary>
         /// <see cref="Season"/> name
         /// </summary>
@@ -36,7 +36,7 @@ namespace FootballShare.Entities.League
         /// </summary>
         [Display(Name = "Season End Date", ShortName = "Start Date", Description = "Date season begins.")]
         [Required]
-        public DateTime StartDate { get; set; }
+        public DateTimeOffset StartDate { get; set; }
 
         /// <summary>
         /// <see cref="SportsLeague"/> details

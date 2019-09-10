@@ -28,7 +28,7 @@ namespace FootballShare.Entities.League
         /// <summary>
         /// <see cref="SeasonWeek"/> end date
         /// </summary>
-        public DateTime EndDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
         /// <summary>
         /// <see cref="SeasonWeek"/> name
         /// </summary>
@@ -44,7 +44,7 @@ namespace FootballShare.Entities.League
         /// <summary>
         /// <see cref="SeasonWeek"/> start date
         /// </summary>
-        public DateTime StartDate { get; set; }
+        public DateTimeOffset StartDate { get; set; }
 
         /// <summary>
         /// <see cref="Season"/> details
