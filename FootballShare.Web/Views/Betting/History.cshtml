@@ -22,10 +22,10 @@
                 Selected Team
             </th>
             <th>
-                Amount
+                Spread
             </th>
             <th>
-                Spread
+                Amount
             </th>
             <th>
                 Result
@@ -35,23 +35,23 @@
     <tbody>
         @foreach (var item in Model.Wagers)
         {
-            <tr>
-                <td>
-                    @item.User.DisplayName
-                </td>
-                <td>
-                    @item.SelectedTeam.Name
-                </td>
-                <td>
-                    $@item.Amount
-                </td>
-                <td>
-                    @item.SelectedTeamSpread
-                </td>
-                <td>
-                    <b>@item.Result</b>
-                </td>
-            </tr>
+        <tr>
+            <td>
+                @item.User.DisplayName
+            </td>
+            <td>
+                @item.SelectedTeam.Name
+            </td>
+            <td>
+                @item.SelectedTeamSpread
+            </td>
+            <td>
+                $@item.Amount
+            </td>
+            <td>
+                <b>@item.Result</b>
+            </td>
+        </tr>
         }
     </tbody>
 </table>

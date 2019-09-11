@@ -135,9 +135,7 @@ namespace FootballShare.DAL.Services
 
         public async Task<Spread> GetSpreadForEventAsync(int eventId, CancellationToken cancellationToken = default)
         {
-            Spread spread = await this._spreadRepo.GetByWeekEventAsync(eventId, cancellationToken);
-            spread.Event = await this.GetWeekEventAsync(spread.WeekEventId, cancellationToken);
-            return spread;
+            return await this._spreadRepo.GetByWeekEventAsync(eventId, cancellationToken);
         }
 
         public Task<IEnumerable<Wager>> GetUserWagersForSeasonAsync(Guid userId, string seasonId, CancellationToken cancellationToken = default)
@@ -162,11 +160,7 @@ namespace FootballShare.DAL.Services
 
         public async Task<WeekEvent> GetWeekEventAsync(int eventId, CancellationToken cancellationToken = default)
         {
-            WeekEvent weekEvent = await this._weekEventRepo.GetAsync(eventId.ToString(), cancellationToken);
-            weekEvent.Week = await this.GetSeasonWeekAsync(weekEvent.SeasonWeekId.ToString(), cancellationToken);
-            weekEvent.AwayTeam = await this._teamRepo.GetAsync(weekEvent.AwayTeamId, cancellationToken);
-            weekEvent.HomeTeam = await this._teamRepo.GetAsync(weekEvent.HomeTeamId, cancellationToken);
-            return weekEvent;
+            return await this._weekEventRepo.GetAsync(eventId.ToString());
         }
 
         public async Task<IEnumerable<Spread>> GetWeekSpreads(string weekId, CancellationToken cancellationToken = default)
@@ -178,8 +172,7 @@ namespace FootballShare.DAL.Services
             foreach(WeekEvent weekEvent in events)
             {
                 Spread eventSpread = await this.GetSpreadForEventAsync(weekEvent.Id, cancellationToken);
-                WeekEvent fullEvent = await this.GetWeekEventAsync(weekEvent.Id, cancellationToken);
-                eventSpread.Event = fullEvent;
+                eventSpread.Event = weekEvent;
                 spreads.Add(eventSpread);
             }
 

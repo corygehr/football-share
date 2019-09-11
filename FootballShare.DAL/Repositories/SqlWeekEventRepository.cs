@@ -4,6 +4,7 @@ using FootballShare.Entities.Leagues;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -99,27 +100,78 @@ namespace FootballShare.DAL.Repositories
                 throw new ArgumentNullException(nameof(id));
             }
 
-            string query = $@"SELECT TOP 1 *
-                              FROM [dbo].[WeekEvents]
-                              WHERE [Id] = @id";
+            string query = $@"SELECT
+                                [we].*,
+                                [t_a].*,
+                                [t_h].*,
+                                [sw].*,
+                                [sw_s].*
+                              FROM [dbo].[WeekEvents] [we]
+                              INNER JOIN [dbo].[Teams] [t_a]
+                                ON [we].[AwayTeamId] = [t_a].[Id]
+                              INNER JOIN [dbo].[Teams] [t_h]
+                                ON [we].[HomeTeamId] = [t_h].[Id]
+                              INNER JOIN [dbo].[SeasonWeeks] [sw]
+                                ON [we].[SeasonWeekId] = [sw].[Id]
+                              INNER JOIN [dbo].[Seasons] [sw_s]
+                                ON [sw].[SeasonId] = [sw_s].[Id]
+                              WHERE [we].[Id] = @id";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QuerySingleAsync<WeekEvent>(query, new
-                {
-                    id = id
-                });
+                IEnumerable<WeekEvent> result = await connection.QueryAsync<WeekEvent, Team, Team, SeasonWeek, Season, WeekEvent>(
+                    query,
+                    (weekEvent, awayTeam, homeTeam, seasonWeek, season) =>
+                    {
+                        weekEvent.AwayTeam = awayTeam;
+                        weekEvent.HomeTeam = homeTeam;
+                        weekEvent.Week = seasonWeek;
+                        weekEvent.Week.Season = season;
+
+                        return weekEvent;
+                    },
+                    new
+                    {
+                        id = id
+                    }
+                );
+
+                return result.FirstOrDefault();
             }
         }
 
         public async Task<IEnumerable<WeekEvent>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            string query = $@"SELECT *
-                              FROM [dbo].[WeekEvents]";
+            string query = $@"SELECT
+                                [we].*,
+                                [t_a].*,
+                                [t_h].*,
+                                [sw].*,
+                                [sw_s].*
+                              FROM [dbo].[WeekEvents] [we]
+                              INNER JOIN [dbo].[Teams] [t_a]
+                                ON [we].[AwayTeamId] = [t_a].[Id]
+                              INNER JOIN [dbo].[Teams] [t_h]
+                                ON [we].[HomeTeamId] = [t_h].[Id]
+                              INNER JOIN [dbo].[SeasonWeeks] [sw]
+                                ON [we].[SeasonWeekId] = [sw].[Id]
+                              INNER JOIN [dbo].[Seasons] [sw_s]
+                                ON [sw].[SeasonId] = [sw_s].[Id]";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QueryAsync<WeekEvent>(query);
+                return await connection.QueryAsync<WeekEvent, Team, Team, SeasonWeek, Season, WeekEvent>(
+                    query,
+                    (weekEvent, awayTeam, homeTeam, seasonWeek, season) =>
+                    {
+                        weekEvent.AwayTeam = awayTeam;
+                        weekEvent.HomeTeam = homeTeam;
+                        weekEvent.Week = seasonWeek;
+                        weekEvent.Week.Season = season;
+
+                        return weekEvent;
+                    }
+                );
             }
         }
 
@@ -130,19 +182,43 @@ namespace FootballShare.DAL.Repositories
                 throw new ArgumentNullException(nameof(entityId));
             }
 
-            string query = $@"SELECT *
-                              FROM [dbo].[WeekEvents]
-                              WHERE [Id] = @id";
+            string query = $@"SELECT 
+                                TOP 1 [we].*,
+                                [t_a].*,
+                                [t_h].*,
+                                [sw].*,
+                                [sw_s].*
+                              FROM [dbo].[WeekEvents] [we]
+                              INNER JOIN [dbo].[Teams] [t_a]
+                                ON [we].[AwayTeamId] = [t_a].[Id]
+                              INNER JOIN [dbo].[Teams] [t_h]
+                                ON [we].[HomeTeamId] = [t_h].[Id]
+                              INNER JOIN [dbo].[SeasonWeeks] [sw]
+                                ON [we].[SeasonWeekId] = [sw].[Id]
+                              INNER JOIN [dbo].[Seasons] [sw_s]
+                                ON [sw].[SeasonId] = [sw_s].[Id]
+                              WHERE [we].[Id] = @id";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QuerySingleAsync<WeekEvent>(
+                IEnumerable<WeekEvent> result = await connection.QueryAsync<WeekEvent, Team, Team, SeasonWeek, Season, WeekEvent>(
                     query,
+                    (weekEvent, awayTeam, homeTeam, seasonWeek, season) =>
+                    {
+                        weekEvent.AwayTeam = awayTeam;
+                        weekEvent.HomeTeam = homeTeam;
+                        weekEvent.Week = seasonWeek;
+                        weekEvent.Week.Season = season;
+
+                        return weekEvent;
+                    },
                     new
                     {
                         id = entityId
                     }
                 );
+
+                return result.FirstOrDefault();
             }
         }
 
@@ -154,15 +230,37 @@ namespace FootballShare.DAL.Repositories
 
         public async Task<IEnumerable<WeekEvent>> GetWeekEventsAsync(string weekId, CancellationToken cancellationToken = default)
         {
-            string query = $@"SELECT *
-                              FROM [dbo].[WeekEvents]
-                              WHERE [SeasonWeekId] = @id
-                              ORDER BY [Time]";
+            string query = $@"SELECT
+                                [we].*,
+                                [t_a].*,
+                                [t_h].*,
+                                [sw].*,
+                                [sw_s].*
+                              FROM [dbo].[WeekEvents] [we]
+                              INNER JOIN [dbo].[Teams] [t_a]
+                                ON [we].[AwayTeamId] = [t_a].[Id]
+                              INNER JOIN [dbo].[Teams] [t_h]
+                                ON [we].[HomeTeamId] = [t_h].[Id]
+                              INNER JOIN [dbo].[SeasonWeeks] [sw]
+                                ON [we].[SeasonWeekId] = [sw].[Id]
+                              INNER JOIN [dbo].[Seasons] [sw_s]
+                                ON [sw].[SeasonId] = [sw_s].[Id]
+                              WHERE [we].[SeasonWeekId] = @id
+                              ORDER BY [we].[Time]";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QueryAsync<WeekEvent>(
+                return await connection.QueryAsync<WeekEvent, Team, Team, SeasonWeek, Season, WeekEvent>(
                     query,
+                    (weekEvent, awayTeam, homeTeam, seasonWeek, season) =>
+                    {
+                        weekEvent.AwayTeam = awayTeam;
+                        weekEvent.HomeTeam = homeTeam;
+                        weekEvent.Week = seasonWeek;
+                        weekEvent.Week.Season = season;
+
+                        return weekEvent;
+                    },
                     new
                     {
                         id = weekId

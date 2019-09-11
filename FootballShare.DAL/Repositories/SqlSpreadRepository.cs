@@ -1,9 +1,10 @@
 ﻿using Dapper;
 using FootballShare.Entities.Betting;
-
+using FootballShare.Entities.Leagues;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -106,19 +107,43 @@ namespace FootballShare.DAL.Repositories
                 throw new ArgumentNullException(nameof(entityId));
             }
 
-            string query = $@"SELECT TOP 1 *
-                              FROM [dbo].[Spreads]
-                              WHERE [Id] = @id";
+            string query = $@"SELECT
+                                TOP 1 [s].*,
+                                [we].*,
+                                [we_at].*,
+                                [we_ht].*,
+                                [we_sw].*
+                              FROM [dbo].[Spreads] [s]
+                              INNER JOIN [dbo].[WeekEvents] [we]
+                                ON [s].[WeekEventId] = [we].[Id]
+                              INNER JOIN [dbo].[Teams] [we_at]
+                                ON [we].[AwayTeamId] = [we_at].[Id]
+                              INNER JOIN [dbo].[Teams] [we_ht]
+                                ON [we].[HomeTeamId] = [we_ht].[Id]
+                              INNER JOIN [dbo].[SeasonWeeks] [we_sw]
+                                ON [we].[SeasonWeekId] = [we_sw].[Id]
+                              WHERE [s].[Id] = @id";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QuerySingleAsync<Spread>(
+                IEnumerable<Spread> result = await connection.QueryAsync<Spread, WeekEvent, Team, Team, SeasonWeek, Spread>(
                     query,
+                    (spread, weekEvent, awayTeam, homeTeam, seasonWeek) =>
+                    {
+                        spread.Event = weekEvent;
+                        spread.Event.AwayTeam = awayTeam;
+                        spread.Event.HomeTeam = homeTeam;
+                        spread.Event.Week = seasonWeek;
+
+                        return spread;
+                    },
                     new
                     {
                         id = entityId
                     }
                 );
+
+                return result.FirstOrDefault();
             }
         }
 
@@ -130,19 +155,43 @@ namespace FootballShare.DAL.Repositories
 
         public async Task<Spread> GetByWeekEventAsync(int weekEventId, CancellationToken cancellationToken = default)
         {
-            string query = $@"SELECT TOP 1 *
-                              FROM [dbo].[Spreads]
-                              WHERE [WeekEventId] = @id";
+            string query = $@"SELECT
+                                TOP 1 [s].*,
+                                [we].*,
+                                [we_at].*,
+                                [we_ht].*,
+                                [we_sw].*
+                              FROM [dbo].[Spreads] [s]
+                              INNER JOIN [dbo].[WeekEvents] [we]
+                                ON [s].[WeekEventId] = [we].[Id]
+                              INNER JOIN [dbo].[Teams] [we_at]
+                                ON [we].[AwayTeamId] = [we_at].[Id]
+                              INNER JOIN [dbo].[Teams] [we_ht]
+                                ON [we].[HomeTeamId] = [we_ht].[Id]
+                              INNER JOIN [dbo].[SeasonWeeks] [we_sw]
+                                ON [we].[SeasonWeekId] = [we_sw].[Id]
+                              WHERE [s].[WeekEventId] = @id";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QuerySingleOrDefaultAsync<Spread>(
+                IEnumerable<Spread> result = await connection.QueryAsync<Spread, WeekEvent, Team, Team, SeasonWeek, Spread>(
                     query,
+                    (spread, weekEvent, awayTeam, homeTeam, seasonWeek) =>
+                    {
+                        spread.Event = weekEvent;
+                        spread.Event.AwayTeam = awayTeam;
+                        spread.Event.HomeTeam = homeTeam;
+                        spread.Event.Week = seasonWeek;
+
+                        return spread;
+                    },
                     new
                     {
                         id = weekEventId
                     }
                 );
+
+                return result.FirstOrDefault();
             }
         }
 
