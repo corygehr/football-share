@@ -1,4 +1,5 @@
 ﻿using FootballShare.Entities.Betting;
+using FootballShare.Entities.Leagues;
 using FootballShare.Entities.Pools;
 
 using System.Collections.Generic;
@@ -18,5 +19,9 @@ namespace FootballShare.Web.Models
         /// <see cref="Wager"/> objects for the <see cref="SeasonWeek"/>
         /// </summary>
         public List<Wager> Wagers { get; set; } = new List<Wager>();
+        /// <summary>
+        /// Displayed <see cref="SeasonWeek"/>
+        /// </summary>
+        public SeasonWeek Week { get; set; }
     }
 }

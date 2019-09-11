@@ -115,31 +115,7 @@ namespace FootballShare.DAL.Services
 
         public async Task<IEnumerable<Wager>> GetPoolWagersForWeekAsync(int poolId, string weekId, CancellationToken cancellationToken = default)
         {
-            // Get all users in selected group
-            IEnumerable<PoolMember> members = await this._poolMemberRepo
-                .GetPoolMembersAsync(poolId, cancellationToken);
-
-            if (members.Count() > 0)
-            {
-                // Aggregate users
-                List<Wager> wagers = new List<Wager>();
-
-                foreach (PoolMember member in members)
-                {
-                    // Get user
-
-                    IEnumerable<Wager> userWagers = await this.GetUserWagersForWeekAsync(member.SiteUserId, weekId, cancellationToken);
-
-                    if (userWagers != null)
-                    {
-                        wagers.AddRange(userWagers);
-                    }
-                }
-
-                return wagers;
-            }
-
-            return null;
+            return await this._wagerRepo.GetForPoolByWeekAsync(poolId, weekId, cancellationToken);
         }
 
         public async Task<IEnumerable<SeasonWeek>> GetPreviousSeasonWeeksAsync(string seasonId, CancellationToken cancellationToken = default)

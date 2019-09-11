@@ -148,7 +148,8 @@ namespace FootballShare.Web.Controllers
                 BettingHistoryViewModel vm = new BettingHistoryViewModel
                 {
                     Pool = userMembership.Pool,
-                    Wagers = wagers.ToList()
+                    Wagers = wagers.ToList(),
+                    Week = await this._bettingService.GetSeasonWeekAsync(seasonWeekId)
                 };
 
                 return View(vm);

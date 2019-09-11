@@ -18,15 +18,7 @@
 }
 <hr />
 <h5>Current Week</h5>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CurrentSeasonWeek.Name)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
+<table class="table table-striped">
     <tbody>
         <tr>
             <td>
@@ -39,7 +31,7 @@
     </tbody>
 </table>
 <h5>Standings</h5>
-<table class="table">
+<table class="table table-striped">
     <thead>
         <tr>
             <th>
@@ -48,7 +40,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.Members[0].Balance)
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -66,15 +57,7 @@
     </tbody>
 </table>
 <h5>History</h5>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.PreviousSeasonWeeks[0].Name)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
+<table class="table table-striped">
     <tbody>
         @foreach (var item in Model.PreviousSeasonWeeks)
         {

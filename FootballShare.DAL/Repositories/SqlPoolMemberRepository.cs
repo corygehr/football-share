@@ -260,7 +260,8 @@ namespace FootballShare.DAL.Repositories
                                 ON [p_s_l].[SportId] = [p_s_l_s].[Id]
                               INNER JOIN [dbo].[SiteUsers] [su]
                                 ON [pm].[SiteUserId] = [su].[Id]
-                              WHERE [pm].[PoolId] = @id";
+                              WHERE [pm].[PoolId] = @id
+                              ORDER BY [pm].[Balance] DESC";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {

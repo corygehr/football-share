@@ -27,6 +27,10 @@ namespace FootballShare.Entities.Betting
         /// </summary>
         public int PoolId { get; set; }
         /// <summary>
+        /// Result of this <see cref="Wager"/>
+        /// </summary>
+        public WagerResult Result { get; set; }
+        /// <summary>
         /// Selected <see cref="Team"/> ID
         /// </summary>
         public string SelectedTeamId { get; set; }

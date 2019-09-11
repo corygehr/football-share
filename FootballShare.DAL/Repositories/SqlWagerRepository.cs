@@ -224,7 +224,7 @@ namespace FootballShare.DAL.Repositories
                                 ON [w].[SiteUserId] = [su].[Id]
                               WHERE [w].[PoolId] = @poolId
                               AND [we].[SeasonWeekId] = @weekId
-                              ORDER BY [su].[Id], [w].[WhenCreated]";
+                              ORDER BY [su].[DisplayName], [t].[Name]";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {

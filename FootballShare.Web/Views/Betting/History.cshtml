@@ -1,0 +1,57 @@
+﻿@model FootballShare.Web.Models.BettingHistoryViewModel
+
+@{
+    ViewData["Title"] = Model.Pool.Name;
+    var parameters = new Dictionary<string, string>
+    {
+        { "id", Model.Pool.Id.ToString() }
+    };
+}
+
+<h1>@Model.Pool.Name: @Model.Week.Name</h1>
+<a asp-action="Details" asp-controller="Pools" asp-all-route-data="parameters">Back to Pool</a>
+<hr />
+<h5>Bets Placed</h5>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                Person
+            </th>
+            <th>
+                Selected Team
+            </th>
+            <th>
+                Amount
+            </th>
+            <th>
+                Spread
+            </th>
+            <th>
+                Result
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Wagers)
+        {
+            <tr>
+                <td>
+                    @item.User.DisplayName
+                </td>
+                <td>
+                    @item.SelectedTeam.Name
+                </td>
+                <td>
+                    $@item.Amount
+                </td>
+                <td>
+                    @item.SelectedTeamSpread
+                </td>
+                <td>
+                    <b>@item.Result</b>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
