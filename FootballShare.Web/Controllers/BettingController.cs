@@ -133,6 +133,32 @@ namespace FootballShare.Web.Controllers
             }
         }
 
+        // GET: Betting/History/nfl-2019-1/3
+        [HttpGet("Betting/History/{seasonWeekId}/{poolId:int}")]
+        public async Task<ActionResult> History(string seasonWeekId, int poolId)
+        {
+            // Confirm user belongs to pool
+            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+            PoolMember userMembership = await this._poolService.GetPoolMemberAsync(poolId, user.Id);
+
+            if (userMembership != null)
+            {
+                // Get all wagers from the previous week
+                IEnumerable<Wager> wagers = await this._bettingService.GetPoolWagersForWeekAsync(poolId, seasonWeekId);
+                BettingHistoryViewModel vm = new BettingHistoryViewModel
+                {
+                    Pool = userMembership.Pool,
+                    Wagers = wagers.ToList()
+                };
+
+                return View(vm);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
         // GET: Betting/Place/2/1
         [HttpGet("Betting/Place/{eventId:int}/{poolId:int}")]
         public async Task<ActionResult> Place(int eventId, int poolId)

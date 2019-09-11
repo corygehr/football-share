@@ -171,12 +171,12 @@ namespace FootballShare.DAL.Services
 
         public async Task<IEnumerable<Wager>> GetUserWagersForWeekAsync(Guid userId, string weekId, CancellationToken cancellationToken = default)
         {
-            return await this._wagerRepo.FindByWeekAndUserAsync(weekId, userId, cancellationToken);
+            return await this._wagerRepo.GetForUserByWeekAsync(userId, weekId, cancellationToken);
         }
 
         public async Task<IEnumerable<Wager>> GetUserWagersForWeekByPoolAsync(Guid userId, string weekId, int poolId, CancellationToken cancellationToken = default)
         {
-            return await this._wagerRepo.FindByWeekUserAndPoolAsync(poolId, weekId, userId, cancellationToken);
+            return await this._wagerRepo.GetForUserByPoolAndWeekAsync(userId, poolId, weekId, cancellationToken);
         }
 
         public async Task<Wager> GetWagerAsync(string id, CancellationToken cancellationToken = default)

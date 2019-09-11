@@ -69,13 +69,24 @@
 <table class="table">
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PreviousSeasonWeeks[0].Name)
+            </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <td></td>
-        </tr>
+        @foreach (var item in Model.PreviousSeasonWeeks)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.ActionLink("View Bets", "History", "Betting", new { seasonWeekId = item.Id, poolId = Model.Pool.Id })
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 <div>

@@ -222,13 +222,14 @@ namespace FootballShare.Web.Controllers
 
             if (userProfile != null)
             {
-                // Get pool data
+                // Get pool information
+                SeasonWeek currentWeek = await this._bettingService.GetCurrentSeasonWeekAsync(userProfile.Pool.SeasonId);
                 IEnumerable<PoolMember> members = await this._poolService.GetMembersAsync(userProfile.PoolId);
-                IEnumerable<SeasonWeek> previousWeeks = await this._bettingService.GetPreviousSeasonWeeksAsync(userProfile.PoolId.ToString());
+                IEnumerable<SeasonWeek> previousWeeks = await this._bettingService.GetPreviousSeasonWeeksAsync(userProfile.Pool.SeasonId);
 
                 PoolDetailsViewModel vm = new PoolDetailsViewModel
                 {
-                    CurrentSeasonWeek = await this._bettingService.GetCurrentSeasonWeekAsync(userProfile.Pool.SeasonId),
+                    CurrentSeasonWeek = currentWeek,
                     CurrentUserMembership = userProfile,
                     Members = members.ToList(),
                     Pool = userProfile.Pool,

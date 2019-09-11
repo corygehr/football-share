@@ -226,7 +226,7 @@ namespace FootballShare.DAL.Repositories
                               INNER JOIN [dbo].[Sports] [s_l_s]
                                 ON [s_l].[SportId] = [s_l_s].[Id]
                               WHERE [sw].[SeasonId] = @seasonId
-                              AND [sw].[EndDate] < GETDATE()
+                              AND [sw].[EndDate] <= GETDATE()
                               ORDER BY [sw].[EndDate]";
 
             using (var connection = this._connectionFactory.CreateConnection())
