@@ -16,6 +16,10 @@ namespace FootballShare.DAL.Services
     public class PoolService : IPoolService
     {
         /// <summary>
+        /// <see cref="LedgerEntry"/> repository
+        /// </summary>
+        private readonly ILedgerEntryRepository _ledgerRepo;
+        /// <summary>
         /// <see cref="PoolMember"/> repository
         /// </summary>
         private readonly IPoolMemberRepository _poolMemberRepo;
@@ -31,11 +35,13 @@ namespace FootballShare.DAL.Services
         /// <summary>
         /// Creates a new <see cref="PoolService"/> instance
         /// </summary>
+        /// <param name="ledgerRepo"><see cref="LedgerEntry"/> repository</param>
         /// <param name="poolMemberRepo"><see cref="PoolMember"/> repository</param>
         /// <param name="poolRepo"><see cref="Pool"/> repository</param>
         /// <param name="userRepo"><see cref="SiteUser"/> repository</param>
-        public PoolService(IPoolRepository poolRepo, IPoolMemberRepository poolMemberRepo, ISiteUserRepository userRepo)
+        public PoolService(ILedgerEntryRepository ledgerRepo, IPoolRepository poolRepo, IPoolMemberRepository poolMemberRepo, ISiteUserRepository userRepo)
         {
+            this._ledgerRepo = ledgerRepo;
             this._poolMemberRepo = poolMemberRepo;
             this._poolRepo = poolRepo;
             this._userRepo = userRepo;
@@ -72,6 +78,11 @@ namespace FootballShare.DAL.Services
         public async Task<IEnumerable<PoolMember>> GetMembersAsync(int poolId, CancellationToken cancellationToken = default)
         {
             return await this._poolMemberRepo.GetPoolMembersAsync(poolId, cancellationToken);
+        }
+
+        public async Task<IEnumerable<LedgerEntry>> GetPoolLedgerAsync(int poolId, CancellationToken cancellationToken = default)
+        {
+            return await this._ledgerRepo.GetEntriesForPoolAsync(poolId, cancellationToken);
         }
 
         public async Task<PoolMember> GetPoolMemberAsync(int poolMemberId, CancellationToken cancellationToken = default)

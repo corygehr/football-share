@@ -1,0 +1,41 @@
+﻿@model FootballShare.Web.Models.PoolLedgerViewModel
+@using FootballShare.Entities.Pools
+
+@{
+    ViewData["Title"] = Model.Pool.Name;
+    var parameters = new Dictionary<string, string>
+    {
+        { "id", Model.Pool.Id.ToString() }
+    };
+}
+
+<h1>@Html.DisplayFor(model => model.Pool.Name)</h1>
+<h4>Transaction Ledger</h4>
+<a asp-action="Details" asp-all-route-data="parameters">Back to Pool</a>
+<hr />
+<h5>Recent Transactions</h5>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Transaction Date</th>
+            <th>Person</th>
+            <th>Description</th>
+            <th>Starting Balance</th>
+            <th>Amount</th>
+            <th>New Balance</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (LedgerEntry item in Model.Ledger)
+        {
+            <tr>
+                <td>@item.WhenCreated</td>
+                <td>@item.User.DisplayName</td>
+                <td>@item.Description</td>
+                <td>$@item.StartingBalance</td>
+                <td>$@item.TransactionAmount</td>
+                <td>$@item.NewBalance</td>
+            </tr>
+        }
+    </tbody>
+</table>

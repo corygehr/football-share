@@ -425,5 +425,29 @@ namespace FootballShare.Web.Controllers
                 return Unauthorized();
             }
         }
+
+        // GET: Pools/Ledger/5
+        public async Task<ActionResult> Ledger(int id)
+        {
+            // Get ledger for pool if user is a member
+            SiteUser user = await this._userManager.GetUserAsync(HttpContext.User);
+            PoolMember member = await this._poolService.GetUserPoolProfileAsync(user.Id, id);
+
+            if (member != null)
+            {
+                // Create View Model
+                IEnumerable<LedgerEntry> ledger = await this._poolService.GetPoolLedgerAsync(id);
+
+                return View(new PoolLedgerViewModel
+                {
+                    Ledger = ledger.ToList(),
+                    Pool = member.Pool
+                });
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@
 using FootballShare.Entities.Users;
 
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace FootballShare.Entities.Pools
 {
@@ -33,14 +34,17 @@ namespace FootballShare.Entities.Pools
         /// <summary>
         /// <see cref="SiteUser"/> balance before transaction
         /// </summary>
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal StartingBalance { get; set; }
         /// <summary>
         /// Amount of Transaction
         /// </summary>
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal TransactionAmount { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> balance post-transaction
         /// </summary>
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal NewBalance { get; set; }
 
         /// <summary>

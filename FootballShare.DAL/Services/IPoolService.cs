@@ -36,6 +36,13 @@ namespace FootballShare.DAL.Services
         /// <param name="cancellationToken">Cancellation token</param>
         Task DeletePoolAsync(int poolId, CancellationToken cancellationToken = default);
         /// <summary>
+        /// Gets all <see cref="LedgerEntry"/> objects for the specified <see cref="Pool"/>
+        /// </summary>
+        /// <param name="poolId"><see cref="Pool"/> ID</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Collection of <see cref="LedgerEntry"/> objects</returns>
+        Task<IEnumerable<LedgerEntry>> GetPoolLedgerAsync(int poolId, CancellationToken cancellationToken = default);
+        /// <summary>
         /// Retrieves all members of the specified <see cref="Pool"/>
         /// </summary>
         /// <param name="poolId"><see cref="Pool"/> ID</param>

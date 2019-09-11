@@ -1,8 +1,11 @@
 ﻿using Dapper;
+using FootballShare.Entities.Betting;
+using FootballShare.Entities.Leagues;
 using FootballShare.Entities.Pools;
-
+using FootballShare.Entities.Users;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -77,12 +80,38 @@ namespace FootballShare.DAL.Repositories
 
         public async Task<IEnumerable<LedgerEntry>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            string query = $@"SELECT *
-                              FROM [dbo].[Ledger]";
-
+            string query = $@"SELECT
+                                [l].*,
+                                [p].*,
+                                [su].*,
+                                [w].*,
+                                [w_we].*
+                              FROM [dbo].[Ledger] [l]
+                              INNER JOIN [dbo].[Pools] [p]
+                                ON [l].[PoolId] = [p].[Id]
+                              INNER JOIN [dbo].[SiteUsers] [su]
+                                ON [l].[SiteUserId] = [su].[Id]
+                              INNER JOIN [dbo].[Wagers] [w]
+                                ON [l].[WagerId] = [w].[Id]
+                              INNER JOIN [dbo].[WeekEvents] [w_we]
+                                ON [w].[WeekEventId] = [w_we].[Id]
+                              INNER JOIN [dbo].[Teams] [w_t]
+                                ON [w].[SelectedTeamId] = [w_t].[Id]";
+            
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QueryAsync<LedgerEntry>(query);
+                return await connection.QueryAsync<LedgerEntry, Pool, SiteUser, Wager, WeekEvent, Team, LedgerEntry>(
+                    query,
+                    (entry, pool, user, wager, weekEvent, selectedTeam) =>
+                    {
+                        entry.Pool = pool;
+                        entry.User = user;
+                        entry.Wager = wager;
+                        entry.Wager.Event = weekEvent;
+                        entry.Wager.SelectedTeam = selectedTeam;
+                        return entry;
+                    }
+                );
             }
         }
 
@@ -93,18 +122,44 @@ namespace FootballShare.DAL.Repositories
                 throw new ArgumentNullException(nameof(entityId));
             }
 
-            string query = $@"SELECT TOP 1 *
-                              FROM [dbo].[Ledger]
-                              WHERE [Id] = @id";
+            string query = $@"SELECT
+                                TOP 1 [l].*,
+                                [p].*,
+                                [su].*,
+                                [w].*,
+                                [w_we].*
+                              FROM [dbo].[Ledger] [l]
+                              INNER JOIN [dbo].[Pools] [p]
+                                ON [l].[PoolId] = [p].[Id]
+                              INNER JOIN [dbo].[SiteUsers] [su]
+                                ON [l].[SiteUserId] = [su].[Id]
+                              INNER JOIN [dbo].[Wagers] [w]
+                                ON [l].[WagerId] = [w].[Id]
+                              INNER JOIN [dbo].[WeekEvents] [w_we]
+                                ON [w].[WeekEventId] = [w_we].[Id]
+                              INNER JOIN [dbo].[Teams] [w_t]
+                                ON [w].[SelectedTeamId] = [w_t].[Id]
+                              WHERE [l].[Id] = @id";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QuerySingleAsync<LedgerEntry>(
+                IEnumerable<LedgerEntry> result = await connection.QueryAsync<LedgerEntry, Pool, SiteUser, Wager, WeekEvent, Team, LedgerEntry>(
                     query,
+                    (entry, pool, user, wager, weekEvent, selectedTeam) =>
+                    {
+                        entry.Pool = pool;
+                        entry.User = user;
+                        entry.Wager = wager;
+                        entry.Wager.Event = weekEvent;
+                        entry.Wager.SelectedTeam = selectedTeam;
+                        return entry;
+                    },
                     new
                     {
                         id = entityId
                     });
+
+                return result.FirstOrDefault();
             }
         }
 
@@ -116,15 +171,40 @@ namespace FootballShare.DAL.Repositories
 
         public async Task<IEnumerable<LedgerEntry>> GetEntriesForPoolAsync(int poolId, CancellationToken cancellationToken)
         {
-            string query = $@"SELECT *
-                              FROM [dbo].[Ledger]
-                              WHERE [PoolId] = @poolId 
-                              ORDER BY [WhenCreated]";
+            string query = $@"SELECT
+                                [l].*,
+                                [p].*,
+                                [su].*,
+                                [w].*,
+                                [w_we].*,
+                                [w_t].*
+                              FROM [dbo].[Ledger] [l]
+                              INNER JOIN [dbo].[Pools] [p]
+                                ON [l].[PoolId] = [p].[Id]
+                              INNER JOIN [dbo].[SiteUsers] [su]
+                                ON [l].[SiteUserId] = [su].[Id]
+                              INNER JOIN [dbo].[Wagers] [w]
+                                ON [l].[WagerId] = [w].[Id]
+                              INNER JOIN [dbo].[WeekEvents] [w_we]
+                                ON [w].[WeekEventId] = [w_we].[Id]
+                              INNER JOIN [dbo].[Teams] [w_t]
+                                ON [w].[SelectedTeamId] = [w_t].[Id]
+                              WHERE [l].[PoolId] = @poolId 
+                              ORDER BY [l].[WhenCreated] DESC";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QueryAsync<LedgerEntry>(
+                return await connection.QueryAsync<LedgerEntry, Pool, SiteUser, Wager, WeekEvent, Team, LedgerEntry>(
                     query,
+                    (entry, pool, user, wager, weekEvent, selectedTeam) =>
+                    {
+                        entry.Pool = pool;
+                        entry.User = user;
+                        entry.Wager = wager;
+                        entry.Wager.Event = weekEvent;
+                        entry.Wager.SelectedTeam = selectedTeam;
+                        return entry;
+                    },
                     new
                     {
                         poolId = poolId

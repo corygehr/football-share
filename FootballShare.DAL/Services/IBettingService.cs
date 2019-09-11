@@ -1,5 +1,6 @@
 ﻿using FootballShare.Entities.Betting;
 using FootballShare.Entities.Leagues;
+using FootballShare.Entities.Pools;
 using FootballShare.Entities.Users;
 
 using System;

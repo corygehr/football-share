@@ -2,6 +2,10 @@
 
 @{
     ViewData["Title"] = Model.Pool.Name;
+    var parameters = new Dictionary<string, string>
+    {
+        { "id", Model.Pool.Id.ToString() }
+    };
 }
 
 <h1>@Html.DisplayFor(model => model.Pool.Name)</h1>
@@ -61,7 +65,21 @@
         }
     </tbody>
 </table>
+<h5>History</h5>
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
 <div>
     <a asp-action="Index">Back to Pool List</a> | 
+    <a asp-action="Ledger" asp-all-route-data="parameters">View Transaction Ledger</a> | 
     @Html.ActionLink("Leave Pool", "Leave", new { id = Model.Pool.Id })
 </div>
