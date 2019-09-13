@@ -13,6 +13,10 @@ namespace FootballShare.Web.Models
     public class PlaceBetViewModel
     {
         /// <summary>
+        /// Target <see cref="WeekEvent"/>
+        /// </summary>
+        public WeekEvent Event { get; set; }
+        /// <summary>
         /// <see cref="PoolMember"/> object for this <see cref="SiteUser"/>
         /// </summary>
         public PoolMember PoolMembership { get; set; }

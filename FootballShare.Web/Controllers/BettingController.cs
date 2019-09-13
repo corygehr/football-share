@@ -1,6 +1,7 @@
 ﻿using FootballShare.DAL.Exceptions;
 using FootballShare.DAL.Services;
 using FootballShare.Entities.Betting;
+using FootballShare.Entities.Leagues;
 using FootballShare.Entities.Pools;
 using FootballShare.Entities.Users;
 using FootballShare.Web.Extensions;
@@ -173,9 +174,11 @@ namespace FootballShare.Web.Controllers
                 return NotFound();
             }
 
-            // Check if betting is open for the event
-            Spread eventSpread = await this._bettingService.GetSpreadForEventAsync(eventId);
-            if (eventSpread.Event.Time <= DateTimeOffset.Now)
+
+            // Get event
+            WeekEvent weekEvent = await this._bettingService.GetWeekEventAsync(eventId);
+
+            if (weekEvent.Time <= DateTimeOffset.Now)
             {
                 TempData.Put("UserMessage", new UserMessageViewModel
                 {
@@ -188,7 +191,7 @@ namespace FootballShare.Web.Controllers
                     nameof(Events),
                     new
                     {
-                        seasonWeekId = eventSpread.Event.SeasonWeekId,
+                        seasonWeekId = weekEvent.SeasonWeekId,
                         poolId = poolId
                     }
                 );
@@ -196,7 +199,7 @@ namespace FootballShare.Web.Controllers
 
             // Check if user has already submitted their bet limit for the week
             IEnumerable<Wager> wagersForWeek = await this._bettingService
-                .GetUserWagersForWeekByPoolAsync(user.Id, eventSpread.Event.SeasonWeekId, poolId);
+                .GetUserWagersForWeekByPoolAsync(user.Id, weekEvent.SeasonWeekId, poolId);
 
             if(wagersForWeek.Count() >= userMembership.Pool.WagersPerWeek)
             {
@@ -211,7 +214,7 @@ namespace FootballShare.Web.Controllers
                     nameof(Events),
                     new
                     {
-                        seasonWeekId = eventSpread.Event.SeasonWeekId,
+                        seasonWeekId = weekEvent.SeasonWeekId,
                         poolId = poolId
                     }
                 );
@@ -232,15 +235,18 @@ namespace FootballShare.Web.Controllers
                     nameof(Events),
                     new
                     {
-                        seasonWeekId = eventSpread.Event.SeasonWeekId,
+                        seasonWeekId = weekEvent.SeasonWeekId,
                         poolId = poolId
                     }
                 );
             }
 
-            // Checks pass, return ViewModel
+            // Checks pass, get spread and return View Model
+            Spread eventSpread = await this._bettingService.GetSpreadForEventAsync(eventId);
+
             PlaceBetViewModel vm = new PlaceBetViewModel
             {
+                Event = weekEvent,
                 PoolId = poolId,
                 PoolMembership = userMembership,
                 Spread = eventSpread,

@@ -3,10 +3,16 @@
 @{
     ViewData["Title"] = Model.Pool.Name;
     var parameters = new Dictionary<string, string>
-    {
+{
         { "id", Model.Pool.Id.ToString() }
     };
 }
+
+<div class="alert alert-info">
+    <strong>Info</strong>
+    All functionality should be working. If you have issues placing a bet, email it to
+    <a href="mailto:corygehr@outlook.com">corygehr@outlook.com</a>.
+</div>
 
 <h1>@Html.DisplayFor(model => model.Pool.Name)</h1>
 <h4>@Html.DisplayFor(model => model.Pool.Season.Name)</h4>
@@ -73,7 +79,7 @@
     </tbody>
 </table>
 <div>
-    <a asp-action="Index">Back to Pool List</a> | 
-    <a asp-action="Ledger" asp-all-route-data="parameters">View Transaction Ledger</a> | 
+    <a asp-action="Index">Back to Pool List</a> |
+    <a asp-action="Ledger" asp-all-route-data="parameters">View Transaction Ledger</a> |
     @Html.ActionLink("Leave Pool", "Leave", new { id = Model.Pool.Id })
 </div>
