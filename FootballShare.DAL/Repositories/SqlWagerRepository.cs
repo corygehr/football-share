@@ -181,6 +181,10 @@ namespace FootballShare.DAL.Repositories
                         wager.User = siteUser;
 
                         return wager;
+                    },
+                    new
+                    {
+                        id = entityId
                     }
                 );
 

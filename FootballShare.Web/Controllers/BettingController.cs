@@ -55,7 +55,16 @@ namespace FootballShare.Web.Controllers
 
             if (wager.SiteUserId == user.Id)
             {
-                return View(wager);
+                // Get event and return data
+                WeekEvent weekEvent = await this._bettingService.GetWeekEventAsync(wager.WeekEventId);
+
+                BettingCancelViewModel vm = new BettingCancelViewModel
+                {
+                    Event = weekEvent,
+                    Wager = wager
+                };
+
+                return View(vm);
             }
             else
             {
@@ -377,7 +386,7 @@ namespace FootballShare.Web.Controllers
                 {
                     CssClassName = "alert-success",
                     Title = "Success!",
-                    Message = $"Successfully placed bet!"
+                    Message = $"Successfully placed bet."
                 });
 
                 return RedirectToAction(nameof(Events), new { seasonWeekId = eventSpread.Event.SeasonWeekId, poolId = submission.PoolId });

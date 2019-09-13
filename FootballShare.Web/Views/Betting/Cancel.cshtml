@@ -1,11 +1,11 @@
-﻿@model FootballShare.Entities.Betting.Wager
+﻿@model FootballShare.Web.Models.BettingCancelViewModel
 
 @{
     ViewData["Title"] = "Cancel";
     var backParameters = new Dictionary<string, string>
     {
         { "seasonWeekId", Model.Event.SeasonWeekId },
-        { "poolId", Model.PoolId.ToString() }
+        { "poolId", Model.Wager.PoolId.ToString() }
     };
 }
 
@@ -20,19 +20,19 @@
             Wager Amount
         </dt>
         <dd class="col-sm-10">
-            $@Html.DisplayFor(model => model.Amount)
+            $@Html.DisplayFor(model => model.Wager.Amount)
         </dd>
         <dt class="col-sm-2">
             Selection
         </dt>
         <dd class="col-sm-10">
-            @Model.SelectedTeam.Name (@Model.SelectedTeamSpread)
+            @Model.Wager.SelectedTeam.Name (@Model.Wager.SelectedTeamSpread)
         </dd>
         <dt class="col-sm-2">
             Bet Placed
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WhenCreated)
+            @Html.DisplayFor(model => model.Wager.WhenCreated)
         </dd>
     </dl>
 

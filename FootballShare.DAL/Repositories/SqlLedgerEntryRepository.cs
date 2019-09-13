@@ -183,11 +183,11 @@ namespace FootballShare.DAL.Repositories
                                 ON [l].[PoolId] = [p].[Id]
                               INNER JOIN [dbo].[SiteUsers] [su]
                                 ON [l].[SiteUserId] = [su].[Id]
-                              INNER JOIN [dbo].[Wagers] [w]
+                              LEFT OUTER JOIN [dbo].[Wagers] [w]
                                 ON [l].[WagerId] = [w].[Id]
-                              INNER JOIN [dbo].[WeekEvents] [w_we]
+                              LEFT OUTER JOIN [dbo].[WeekEvents] [w_we]
                                 ON [w].[WeekEventId] = [w_we].[Id]
-                              INNER JOIN [dbo].[Teams] [w_t]
+                              LEFT OUTER JOIN [dbo].[Teams] [w_t]
                                 ON [w].[SelectedTeamId] = [w_t].[Id]
                               WHERE [l].[PoolId] = @poolId 
                               ORDER BY [l].[WhenCreated] DESC";
@@ -201,8 +201,13 @@ namespace FootballShare.DAL.Repositories
                         entry.Pool = pool;
                         entry.User = user;
                         entry.Wager = wager;
-                        entry.Wager.Event = weekEvent;
-                        entry.Wager.SelectedTeam = selectedTeam;
+
+                        if(entry.Wager != null)
+                        {
+                            entry.Wager.Event = weekEvent;
+                            entry.Wager.SelectedTeam = selectedTeam;
+                        }
+
                         return entry;
                     },
                     new
