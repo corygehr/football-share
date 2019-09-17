@@ -1,11 +1,13 @@
+using FootballShare.Automation.Parsers;
 using FootballShare.DAL.Repositories;
 using FootballShare.Entities.Leagues;
-using HtmlAgilityPack;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +18,10 @@ namespace FootballShare.Automation.Functions.Activities
     /// </summary>
     public class GetWeekEventsActivity
     {
+        /// <summary>
+        /// Application configuration
+        /// </summary>
+        private readonly IConfiguration _configuration;
         /// <summary>
         /// <see cref="Season"/> repository
         /// </summary>
@@ -28,18 +34,26 @@ namespace FootballShare.Automation.Functions.Activities
         /// <see cref="WeekEvent"/> repository
         /// </summary>
         private readonly IWeekEventRepository _weekEventRepo;
+        /// <summary>
+        /// <see cref="WeekEvent"/> parser
+        /// </summary>
+        private readonly WeekEventsParser _weekEventsParser;
 
         /// <summary>
         /// Creates a new <see cref="GetWeekEventsActivity"/> instance
         /// </summary>
+        /// <param name="configuration">Application configuration</param>
         /// <param name="seasonRepo"><see cref="Season"/> repository</param>
         /// <param name="seasonWeekRepo"><see cref="SeasonWeek"/> repository</param>
         /// <param name="weekEventRepo"><see cref="WeekEvent"/> repository</param>
-        public GetWeekEventsActivity(ISeasonRepository seasonRepo, ISeasonWeekRepository seasonWeekRepo, IWeekEventRepository weekEventRepo)
+        /// <param name="weekEventsParser"><see cref="WeekEvent"/> parser</param>
+        public GetWeekEventsActivity(IConfiguration configuration, ISeasonRepository seasonRepo, ISeasonWeekRepository seasonWeekRepo, IWeekEventRepository weekEventRepo, WeekEventsParser weekEventsParser)
         {
+            this._configuration = configuration;
             this._seasonRepo = seasonRepo;
             this._seasonWeekRepo = seasonWeekRepo;
             this._weekEventRepo = weekEventRepo;
+            this._weekEventsParser = weekEventsParser;
         }
 
         /// <summary>
@@ -47,8 +61,9 @@ namespace FootballShare.Automation.Functions.Activities
         /// </summary>
         /// <param name="myTimer">Invoking timer</param>
         /// <param name="log">Log provider</param>
+        [Disable]
         [FunctionName("GetSeasonEventsActivity")]
-        public async Task Run([TimerTrigger("*/30 * * * * *")]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
+        public async Task Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
         {
             log.LogInformation($"GetSeasonEventsActivity executed at: {DateTime.UtcNow}");
 
@@ -59,21 +74,25 @@ namespace FootballShare.Automation.Functions.Activities
             // Get season weeks
             IEnumerable<SeasonWeek> weeks = await this._seasonWeekRepo.GetAllForSeasonAsync(currentSeason.Id, cancellationToken);
 
-            // Pull data for each week
-            HtmlWeb htmlWeb = new HtmlWeb();
-            string urlTemplate = "http://www.vegasinsider.com/nfl/matchups/matchups.cfm/week/{0}/season/" + currentSeason.StartDate.Year;
-
-            foreach(SeasonWeek week in weeks)
+            // Get possible starting week limiter
+            int startingWeek = 1;
+            if(!String.IsNullOrEmpty(this._configuration["StartingWeek"]))
             {
-                // Parse HTML document
-                string currentUrl = String.Format(urlTemplate, week.Sequence);
-                HtmlDocument htmlDoc = await htmlWeb.LoadFromWebAsync(currentUrl);
+                startingWeek = Int32.Parse(this._configuration["StartingWeek"]);
+            }
 
-                HtmlNode scheduleNode = htmlDoc
-                    .DocumentNode
-                    .SelectSingleNode("//td[@class='main-content-cell']/div[@class='SLTables1' and not(@id)]");
+            // Get all WeekEvents
+            List<WeekEvent> allEvents = new List<WeekEvent>();
 
-                // Within node, begin pulling events
+            foreach(SeasonWeek week in weeks.Where(w => w.Sequence >= startingWeek && w.IsChampionship == false && w.IsPlayoff == false && w.IsPreseason == false))
+            {
+                allEvents.AddRange(await this._weekEventsParser.GetEventsAsync(week, cancellationToken));
+            }
+
+            // Commit all to database
+            foreach(WeekEvent weekEvent in allEvents)
+            {
+                await this._weekEventRepo.CreateAsync(weekEvent, cancellationToken);
             }
         }
     }

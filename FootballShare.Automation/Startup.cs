@@ -1,5 +1,7 @@
-﻿using FootballShare.DAL;
+﻿using FootballShare.Automation.Parsers;
+using FootballShare.DAL;
 using FootballShare.DAL.Repositories;
+using FootballShare.DAL.Services;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,6 +53,13 @@ namespace FootballShare.Automation
             builder.Services.AddTransient<ITeamRepository, SqlTeamRepository>();
             builder.Services.AddTransient<IWagerRepository, SqlWagerRepository>();
             builder.Services.AddTransient<IWeekEventRepository, SqlWeekEventRepository>();
+
+            // Add services
+            builder.Services.AddTransient<IBettingService, BettingService>();
+
+            // Add parsers
+            builder.Services.AddTransient<WeekEventsParser>();
+            builder.Services.AddTransient<SpreadsParser>();
         }
     }
 }

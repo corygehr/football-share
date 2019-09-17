@@ -434,6 +434,50 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
+        public async Task<IEnumerable<Wager>> GetUnresolvedWagersAsync(CancellationToken cancellationToken = default)
+        {
+            string query = $@"SELECT
+                                TOP 1 [w].*,
+                                [we].*,
+                                [we_at].*,
+                                [we_ht].*,
+                                [p].*,
+                                [t].*,
+                                [su].*
+                              FROM [dbo].[Wagers] [w]
+                              INNER JOIN [dbo].[WeekEvents] [we]
+                                ON [w].[WeekEventId] = [we].[Id]
+                              INNER JOIN [dbo].[Teams] [we_at]
+                                ON [we].[AwayTeamId] = [we_at].[Id]
+                              INNER JOIN [dbo].[Teams] [we_ht]
+                                ON [we].[HomeTeamId] = [we_ht].[Id]
+                              INNER JOIN [dbo].[Pools] [p]
+                                ON [w].[PoolId] = [p].[Id]
+                              INNER JOIN [dbo].[Teams] [t]
+                                ON [w].[SelectedTeamId] = [t].[Id]
+                              INNER JOIN [dbo].[SiteUsers] [su]
+                                ON [w].[SiteUserId] = [su].[Id]
+                              WHERE [w].[Result] IS NULL";
+
+            using (var connection = this._connectionFactory.CreateConnection())
+            {
+                return await connection.QueryAsync<Wager, WeekEvent, Team, Team, Pool, Team, SiteUser, Wager>(
+                    query,
+                    (wager, weekEvent, awayTeam, homeTeam, pool, team, siteUser) =>
+                    {
+                        wager.Event = weekEvent;
+                        wager.Event.AwayTeam = awayTeam;
+                        wager.Event.HomeTeam = homeTeam;
+                        wager.Pool = pool;
+                        wager.SelectedTeam = team;
+                        wager.User = siteUser;
+
+                        return wager;
+                    }
+                );
+            }
+        }
+
         public Task<Wager> UpdateAsync(Wager entity, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();

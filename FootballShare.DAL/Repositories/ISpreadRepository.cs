@@ -17,5 +17,11 @@ namespace FootballShare.DAL.Repositories
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns><see cref="Spread"/> for specified <see cref="WeekEvent"/></returns>
         Task<Spread> GetByWeekEventAsync(int weekEventId, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Creates a <see cref="Spread"/> or updates if it already exists in the data repository
+        /// </summary>
+        /// <param name="spread">Target <see cref="Spread"/></param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        Task UpsertAsync(Spread spread, CancellationToken cancellationToken = default);
     }
 }

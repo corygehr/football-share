@@ -50,5 +50,11 @@ namespace FootballShare.DAL.Repositories
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Collection of <see cref="Wager"/> objects</returns>
         Task<IEnumerable<Wager>> GetForUserByWeekAsync(Guid userId, string weekId, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Gets a collection of <see cref="Wager"/> objects which have not been resolved
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Collection of <see cref="Wager"/> objects</returns>
+        Task<IEnumerable<Wager>> GetUnresolvedWagersAsync(CancellationToken cancellationToken = default);
     }
 }

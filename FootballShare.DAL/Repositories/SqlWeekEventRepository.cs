@@ -57,11 +57,41 @@ namespace FootballShare.DAL.Repositories
                                 @{nameof(WeekEvent.SeasonWeekId)},
                                 @{nameof(WeekEvent.Time)},
                                 CURRENT_TIMESTAMP
-                              )";
+                              );
+                              SELECT 
+                                TOP 1 [we].*,
+                                [t_a].*,
+                                [t_h].*,
+                                [sw].*,
+                                [sw_s].*
+                              FROM [dbo].[WeekEvents] [we]
+                              INNER JOIN [dbo].[Teams] [t_a]
+                                ON [we].[AwayTeamId] = [t_a].[Id]
+                              INNER JOIN [dbo].[Teams] [t_h]
+                                ON [we].[HomeTeamId] = [t_h].[Id]
+                              INNER JOIN [dbo].[SeasonWeeks] [sw]
+                                ON [we].[SeasonWeekId] = [sw].[Id]
+                              INNER JOIN [dbo].[Seasons] [sw_s]
+                                ON [sw].[SeasonId] = [sw_s].[Id]
+                              WHERE [we].[Id] = (CAST(SCOPE_IDENTITY() AS INT));";
 
             using (var connection = this._connectionFactory.CreateConnection())
             {
-                return await connection.QuerySingleAsync<WeekEvent>(query, entity);
+                IEnumerable<WeekEvent> result = await connection.QueryAsync<WeekEvent, Team, Team, SeasonWeek, Season, WeekEvent>(
+                    query,
+                    (weekEvent, awayTeam, homeTeam, seasonWeek, season) =>
+                    {
+                        weekEvent.AwayTeam = awayTeam;
+                        weekEvent.HomeTeam = homeTeam;
+                        weekEvent.Week = seasonWeek;
+                        weekEvent.Week.Season = season;
+
+                        return weekEvent;
+                    },
+                    entity
+                );
+
+                return result.FirstOrDefault();
             }
         }
 

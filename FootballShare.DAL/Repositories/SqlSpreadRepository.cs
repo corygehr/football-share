@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using FootballShare.Entities.Betting;
 using FootballShare.Entities.Leagues;
+
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -195,9 +196,51 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public Task<Spread> UpdateAsync(Spread entity, CancellationToken cancellationToken = default)
+        public async Task<Spread> UpdateAsync(Spread entity, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            if(entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
+            string query = $@"UPDATE [dbo].[Spreads]
+                              SET [AwaySpread] = @{nameof(Spread.AwaySpread)},
+                                  [HomeSpread] = @{nameof(Spread.HomeSpread)}
+                              WHERE [Id] = @{nameof(Spread.Id)}";
+
+            using (var connection = this._connectionFactory.CreateConnection())
+            {
+                int result = await connection.ExecuteAsync(query, entity);
+
+                if(result > 0)
+                {
+                    return await this.GetAsync(entity, cancellationToken);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public async Task UpsertAsync(Spread spread, CancellationToken cancellationToken = default)
+        {
+            if(spread == null)
+            {
+                throw new ArgumentNullException(nameof(spread));
+            }
+
+            // Check if a spread exists for the Week Event
+            if(await this.GetByWeekEventAsync(spread.WeekEventId) != null)
+            {
+                // Update
+                await this.UpdateAsync(spread, cancellationToken);
+            }
+            else
+            {
+                // Create
+                await this.CreateAsync(spread, cancellationToken);
+            }
         }
     }
 }
