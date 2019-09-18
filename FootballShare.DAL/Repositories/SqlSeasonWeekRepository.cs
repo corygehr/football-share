@@ -214,7 +214,7 @@ namespace FootballShare.DAL.Repositories
             }
 
             string query = $@"SELECT
-                                TOP 1 [sw].*,
+                                [sw].*,
                                 [s].*,
                                 [s_l].*,
                                 [s_l_s].*
