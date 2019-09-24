@@ -56,6 +56,8 @@ namespace FootballShare.Automation
 
             // Add services
             builder.Services.AddTransient<IBettingService, BettingService>();
+            builder.Services.AddTransient<IPoolService, PoolService>();
+            builder.Services.AddTransient<ISportsLeagueService, SportsLeagueService>();
 
             // Add parsers
             builder.Services.AddTransient<WeekEventsParser>();

@@ -21,16 +21,22 @@ namespace FootballShare.DAL.Services
         /// <see cref="Season"/> repository
         /// </summary>
         private readonly ISeasonRepository _seasonRepo;
+        /// <summary>
+        /// <see cref="WeekEvent"/> repository
+        /// </summary>
+        private readonly IWeekEventRepository _weekEventRepo;
 
         /// <summary>
         /// Creates a new <see cref="SportsLeagueService"/> instance
         /// </summary>
         /// <param name="leagueRepo"><see cref="SportsLeague"/> repository</param>
         /// <param name="seasonRepo"><see cref="Season"/> repository</param>
-        public SportsLeagueService(ISportsLeagueRepository leagueRepo, ISeasonRepository seasonRepo)
+        /// <param name="weekEventRepo"><see cref="WeekEvent"/> repository</param>
+        public SportsLeagueService(ISportsLeagueRepository leagueRepo, ISeasonRepository seasonRepo, IWeekEventRepository weekEventRepo)
         {
             this._leagueRepo = leagueRepo;
             this._seasonRepo = seasonRepo;
+            this._weekEventRepo = weekEventRepo;
         }
 
         public async Task<IEnumerable<Season>> GetAllCurrentSeasonsAsync(CancellationToken cancellationToken = default)
@@ -61,6 +67,11 @@ namespace FootballShare.DAL.Services
         public Task<IEnumerable<SeasonWeek>> GetSeasonWeeksAsync(string seasonId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<WeekEvent> GetWeekEventAsync(int eventId, CancellationToken cancellationToken = default)
+        {
+            return await this._weekEventRepo.GetAsync(eventId.ToString(), cancellationToken);
         }
     }
 }

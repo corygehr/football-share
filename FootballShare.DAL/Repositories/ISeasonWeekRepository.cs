@@ -26,6 +26,13 @@ namespace FootballShare.DAL.Repositories
         /// <returns>Next <see cref="SeasonWeek"/> or null if none</returns>
         Task<SeasonWeek> GetCurrentSeasonWeekAsync(string seasonId, CancellationToken cancellationToken = default);
         /// <summary>
+        /// Retrieves the most recently passed <see cref="SeasonWeek"/> for the specified <see cref="Season"/>
+        /// </summary>
+        /// <param name="seasonId"><see cref="Season"/> ID</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns><see cref="SeasonWeek"/> or null</returns>
+        Task<SeasonWeek> GetPreviousSeasonWeekAsync(string seasonId, CancellationToken cancellationToken = default);
+        /// <summary>
         /// Gets all <see cref="SeasonWeek"/> objects which have already passed for the specified <see cref="Season"/> 
         /// </summary>
         /// <param name="seasonId"><see cref="Season"/> ID</param>

@@ -437,7 +437,7 @@ namespace FootballShare.DAL.Repositories
         public async Task<IEnumerable<Wager>> GetUnresolvedWagersAsync(CancellationToken cancellationToken = default)
         {
             string query = $@"SELECT
-                                TOP 1 [w].*,
+                                [w].*,
                                 [we].*,
                                 [we_at].*,
                                 [we_ht].*,
@@ -478,9 +478,30 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
-        public Task<Wager> UpdateAsync(Wager entity, CancellationToken cancellationToken = default)
+        public async Task<Wager> UpdateAsync(Wager entity, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            if(entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
+            string query = $@"UPDATE [dbo].[Wagers]
+                              SET [SelectedTeamId] = @{nameof(entity.SelectedTeamId)},
+                                  [SelectedTeamSpread] = @{nameof(entity.SelectedTeamSpread)},
+                                  [Amount] = @{nameof(entity.Amount)},
+                                  [Result] = @{nameof(entity.Result)}
+                              WHERE [Id] = @{nameof(entity.Id)};
+                              SELECT TOP 1 *
+                              FROM [dbo].[Wagers]
+                              WHERE [Id] = @{nameof(entity.Id)};";
+
+            using(var connection = this._connectionFactory.CreateConnection())
+            {
+                return await connection.QuerySingleAsync<Wager>(
+                    query,
+                    entity
+                );
+            }
         }
     }
 }

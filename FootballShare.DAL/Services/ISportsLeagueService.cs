@@ -52,5 +52,12 @@ namespace FootballShare.DAL.Services
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Collection of <see cref="SeasonWeek"/> objects</returns>
         Task<IEnumerable<SeasonWeek>> GetSeasonWeeksAsync(string seasonId, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Gets the requested <see cref="WeekEvent"/>
+        /// </summary>
+        /// <param name="eventId"><see cref="WeekEvent"/> ID</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns><see cref="WeekEvent"/> or null if not found</returns>
+        Task<WeekEvent> GetWeekEventAsync(int eventId, CancellationToken cancellationToken = default);
     }
 }

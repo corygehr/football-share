@@ -118,6 +118,11 @@ namespace FootballShare.DAL.Services
             return await this._wagerRepo.GetForPoolByWeekAsync(poolId, weekId, cancellationToken);
         }
 
+        public async Task<SeasonWeek> GetPreviousSeasonWeekAsync(string seasonId, CancellationToken cancellationToken = default)
+        {
+            return await this._seasonWeekRepo.GetPreviousSeasonWeekAsync(seasonId, cancellationToken);
+        }
+
         public async Task<IEnumerable<SeasonWeek>> GetPreviousSeasonWeeksAsync(string seasonId, CancellationToken cancellationToken = default)
         {
             return await this._seasonWeekRepo.GetPreviousSeasonWeeksAsync(seasonId, cancellationToken);
@@ -136,6 +141,11 @@ namespace FootballShare.DAL.Services
         public async Task<Spread> GetSpreadForEventAsync(int eventId, CancellationToken cancellationToken = default)
         {
             return await this._spreadRepo.GetByWeekEventAsync(eventId, cancellationToken);
+        }
+
+        public async Task<IEnumerable<Wager>> GetUnresolvedWagersAsync(CancellationToken cancellationToken = default)
+        {
+            return await this._wagerRepo.GetUnresolvedWagersAsync(cancellationToken);
         }
 
         public Task<IEnumerable<Wager>> GetUserWagersForSeasonAsync(Guid userId, string seasonId, CancellationToken cancellationToken = default)
@@ -163,7 +173,12 @@ namespace FootballShare.DAL.Services
             return await this._weekEventRepo.GetAsync(eventId.ToString());
         }
 
-        public async Task<IEnumerable<Spread>> GetWeekSpreads(string weekId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<WeekEvent>> GetWeekEventsAsync(string weekId, CancellationToken cancellationToken = default)
+        {
+            return await this._weekEventRepo.GetWeekEventsAsync(weekId, cancellationToken);
+        }
+
+        public async Task<IEnumerable<Spread>> GetWeekSpreadsAsync(string weekId, CancellationToken cancellationToken = default)
         {
             // Get events for the specified week
             IEnumerable<WeekEvent> events = await this._weekEventRepo.GetWeekEventsAsync(weekId, cancellationToken);
@@ -177,6 +192,36 @@ namespace FootballShare.DAL.Services
             }
 
             return spreads;
+        }
+
+        public Task<IEnumerable<Wager>> GetWeekWagersAsync(string weekId, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task PayoutWagerAsync(Wager source, decimal amount, CancellationToken cancellationToken = default)
+        {
+            // Get user data
+            PoolMember member = await this._poolMemberRepo
+                .GetMembershipAsync(source.SiteUserId, source.PoolId, cancellationToken);
+
+            // Create ledger entry
+            LedgerEntry transactionRecord = new LedgerEntry
+            {
+                Description = $"{source.Result} (${source.Amount} on {source.SelectedTeamId} @ {source.SelectedTeamSpread})",
+                NewBalance = member.Balance + amount,
+                PoolId = source.PoolId,
+                SiteUserId = member.SiteUserId,
+                StartingBalance = member.Balance,
+                TransactionAmount = amount,
+                WagerId = source.Id
+            };
+
+            // Update member balance
+            member.Balance = transactionRecord.NewBalance;
+
+            await this._ledgerRepo.CreateAsync(transactionRecord, cancellationToken);
+            await this._poolMemberRepo.UpdateAsync(member, cancellationToken);
         }
 
         public async Task PlaceWagerAsync(Wager wager, CancellationToken cancellationToken = default)
@@ -280,6 +325,11 @@ namespace FootballShare.DAL.Services
 
             user.Balance = ledger.NewBalance;
             await this._poolMemberRepo.UpdateAsync(user);
+        }
+
+        public async Task UpdateWagerAsync(Wager wager, CancellationToken cancellationToken = default)
+        {
+            await this._wagerRepo.UpdateAsync(wager, cancellationToken);
         }
     }
 }

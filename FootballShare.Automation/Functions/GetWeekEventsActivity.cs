@@ -61,11 +61,10 @@ namespace FootballShare.Automation.Functions.Activities
         /// </summary>
         /// <param name="myTimer">Invoking timer</param>
         /// <param name="log">Log provider</param>
-        [Disable]
-        [FunctionName("GetSeasonEventsActivity")]
-        public async Task Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
+        [FunctionName("GetWeekEventsActivity")]
+        public async Task Run([TimerTrigger("0 0 0 1 Sep *")]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
         {
-            log.LogInformation($"GetSeasonEventsActivity executed at: {DateTime.UtcNow}");
+            log.LogInformation($"{nameof(GetWeekEventsActivity)} executed at: {DateTime.UtcNow}");
 
             // Get current season
             Season currentSeason = await this._seasonRepo

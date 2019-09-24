@@ -206,6 +206,50 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
+        public async Task<SeasonWeek> GetPreviousSeasonWeekAsync(string seasonId, CancellationToken cancellationToken = default)
+        {
+            if(String.IsNullOrEmpty(seasonId))
+            {
+                throw new ArgumentNullException(nameof(seasonId));
+            }
+
+            string query = $@"SELECT
+                                TOP 1 [sw].*,
+                                [s].*,
+                                [s_l].*,
+                                [s_l_s].*
+                              FROM [dbo].[SeasonWeeks] [sw]
+                              INNER JOIN [dbo].[Seasons] [s]
+                                ON [sw].[SeasonId] = [s].[Id]
+                              INNER JOIN [dbo].[SportsLeagues] [s_l]
+                                ON [s].[SportsLeagueId] = [s_l].[Id]
+                              INNER JOIN [dbo].[Sports] [s_l_s]
+                                ON [s_l].[SportId] = [s_l_s].[Id]
+                              WHERE [sw].[SeasonId] = @seasonId
+                              AND [sw].[EndDate] <= GETDATE()
+                              ORDER BY [sw].[EndDate] DESC";
+
+            using (var connection = this._connectionFactory.CreateConnection())
+            {
+                IEnumerable<SeasonWeek> result = await connection.QueryAsync<SeasonWeek, Season, SportsLeague, Sport, SeasonWeek>(
+                    query,
+                    (seasonWeek, season, league, sport) =>
+                    {
+                        seasonWeek.Season = season;
+                        seasonWeek.Season.League = league;
+                        seasonWeek.Season.League.Sport = sport;
+                        return seasonWeek;
+                    },
+                    new
+                    {
+                        seasonId = seasonId
+                    }
+                );
+
+                return result.FirstOrDefault();
+            }
+        }
+
         public async Task<IEnumerable<SeasonWeek>> GetPreviousSeasonWeeksAsync(string seasonId, CancellationToken cancellationToken = default)
         {
             if(String.IsNullOrEmpty(seasonId))

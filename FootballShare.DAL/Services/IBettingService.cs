@@ -39,6 +39,13 @@ namespace FootballShare.DAL.Services
         /// <returns>Collection of <see cref="Wager"/> objects, or null if not found</returns>
         Task<IEnumerable<Wager>> GetPoolWagersForWeekAsync(int poolId, string weekId, CancellationToken cancellationToken = default);
         /// <summary>
+        /// Gets the previous <see cref="SeasonWeek"/> for the specified <see cref="Season"/>
+        /// </summary>
+        /// <param name="seasonId"><see cref="Season"/> ID</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns><see cref="SeasonWeek"/> object or null</returns>
+        Task<SeasonWeek> GetPreviousSeasonWeekAsync(string seasonId, CancellationToken cancellationToken = default);
+        /// <summary>
         /// Gets the previous <see cref="SeasonWeek"/> objects for the specified <see cref="Season"/>
         /// </summary>
         /// <param name="seasonId"><see cref="Season"/> ID</param>
@@ -66,6 +73,12 @@ namespace FootballShare.DAL.Services
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns><see cref="Spread"/> for provided <see cref="WeekEvent"/></returns>
         Task<Spread> GetSpreadForEventAsync(int eventId, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Gets all unresolved <see cref="Wager"/> objects
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Collection of <see cref="Wager"/> objects</returns>
+        Task<IEnumerable<Wager>> GetUnresolvedWagersAsync(CancellationToken cancellationToken = default);
         /// <summary>
         /// Retrieves all <see cref="SiteUser"/> <see cref="Wager"/> objects for a specific <see cref="Season"/>
         /// </summary>
@@ -98,12 +111,33 @@ namespace FootballShare.DAL.Services
         /// <returns>Requested <see cref="WeekEvent"/></returns>
         Task<WeekEvent> GetWeekEventAsync(int eventId, CancellationToken cancellationToken = default);
         /// <summary>
+        /// Gets a collection of <see cref="WeekEvent"/> objects for a given <see cref="SeasonWeek"/>
+        /// </summary>
+        /// <param name="weekId"><see cref="SeasonWeek"/> ID</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Collection of <see cref="WeekEvent"/> objects</returns>
+        Task<IEnumerable<WeekEvent>> GetWeekEventsAsync(string weekId, CancellationToken cancellationToken = default);
+        /// <summary>
         /// Retrieves the spreads for the specified <see cref="SeasonWeek"/>
         /// </summary>
         /// <param name="weekId"><see cref="SeasonWeek"/> ID</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Collection of <see cref="Spread"/> objects or null if <see cref="SeasonWeek"/> not found</returns>
-        Task<IEnumerable<Spread>> GetWeekSpreads(string weekId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Spread>> GetWeekSpreadsAsync(string weekId, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Retrieves all <see cref="Wager"/> objects created for a specific <see cref="SeasonWeek"/>
+        /// </summary>
+        /// <param name="weekId"><see cref="SeasonWeek"/> ID</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Collection of <see cref="Wager"/> objects</returns>
+        Task<IEnumerable<Wager>> GetWeekWagersAsync(string weekId, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Pays out a <see cref="Wager"/>
+        /// </summary>
+        /// <param name="source">Source <see cref="Wager"/></param>
+        /// <param name="amount">Amount granted</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        Task PayoutWagerAsync(Wager source, decimal amount, CancellationToken cancellationToken = default);
         /// <summary>
         /// Places a <see cref="Wager"/>
         /// </summary>
@@ -116,5 +150,11 @@ namespace FootballShare.DAL.Services
         /// <param name="wagerId"><see cref="Wager"/> ID</param>
         /// <param name="cancellationToken">Cancellation token</param>
         Task RemoveWagerAsync(int wagerId, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Updates a <see cref="Wager"/>
+        /// </summary>
+        /// <param name="wager"><see cref="Wager"/> to update</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        Task UpdateWagerAsync(Wager wager, CancellationToken cancellationToken = default);
     }
 }
