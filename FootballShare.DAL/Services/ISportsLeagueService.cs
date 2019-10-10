@@ -53,11 +53,34 @@ namespace FootballShare.DAL.Services
         /// <returns>Collection of <see cref="SeasonWeek"/> objects</returns>
         Task<IEnumerable<SeasonWeek>> GetSeasonWeeksAsync(string seasonId, CancellationToken cancellationToken = default);
         /// <summary>
+        /// Gets the requested <see cref="Team"/>
+        /// </summary>
+        /// <param name="teamId"><see cref="Team"/> ID</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Matching <see cref="Team"/> or <see cref="null"/></returns>
+        Task<Team> GetTeamAsync(string teamId, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Gets the requested <see cref="Team"/> by its name
+        /// </summary>
+        /// <param name="teamName"><see cref="Team"/> name</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Matching <see cref="Team"/> or <see cref="null"/></returns>
+        Task<Team> GetTeamByNameAsync(string teamName, CancellationToken cancellationToken = default);
+        /// <summary>
         /// Gets the requested <see cref="WeekEvent"/>
         /// </summary>
         /// <param name="eventId"><see cref="WeekEvent"/> ID</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns><see cref="WeekEvent"/> or null if not found</returns>
         Task<WeekEvent> GetWeekEventAsync(int eventId, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Gets a <see cref="WeekEvent"/> based on <see cref="Team"/> playing and <see cref="SeasonWeek"/> ID
+        /// </summary>
+        /// <param name="weekId"><see cref="SeasonWeek"/> ID</param>
+        /// <param name="awayTeamId">Away <see cref="Team"/> ID</param>
+        /// <param name="homeTeamId">Home <see cref="Team"/> ID</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Matching <see cref="WeekEvent"/> or <see cref="null"/></returns>
+        Task<WeekEvent> GetWeekEventByWeekAndTeamsAsync(string weekId, string awayTeamId, string homeTeamId, CancellationToken cancellationToken = default);
     }
 }

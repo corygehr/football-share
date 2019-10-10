@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using FootballShare.Entities.Betting;
 using FootballShare.Entities.Leagues;
 
 using System;
@@ -256,6 +255,67 @@ namespace FootballShare.DAL.Repositories
         {
             // Use overload
             return await this.GetAsync(entity.Id.ToString(), cancellationToken);
+        }
+
+        public async Task<WeekEvent> GetWeekEventByWeekAndTeamsAsync(string weekId, string awayTeamId, string homeTeamId, CancellationToken cancellationToken = default)
+        {
+            if(String.IsNullOrEmpty(weekId))
+            {
+                throw new ArgumentNullException(nameof(weekId));
+            }
+
+            if(String.IsNullOrEmpty(awayTeamId))
+            {
+                throw new ArgumentNullException(nameof(awayTeamId));
+            }
+
+            if(String.IsNullOrEmpty(homeTeamId))
+            {
+                throw new ArgumentNullException(nameof(homeTeamId));
+            }
+
+            string query = $@"SELECT
+                                TOP 1 [we].*,
+                                [t_a].*,
+                                [t_h].*,
+                                [sw].*,
+                                [sw_s].*
+                              FROM [dbo].[WeekEvents] [we]
+                              INNER JOIN [dbo].[Teams] [t_a]
+                                ON [we].[AwayTeamId] = [t_a].[Id]
+                              INNER JOIN [dbo].[Teams] [t_h]
+                                ON [we].[HomeTeamId] = [t_h].[Id]
+                              INNER JOIN [dbo].[SeasonWeeks] [sw]
+                                ON [we].[SeasonWeekId] = [sw].[Id]
+                              INNER JOIN [dbo].[Seasons] [sw_s]
+                                ON [sw].[SeasonId] = [sw_s].[Id]
+                              WHERE [we].[SeasonWeekId] = @weekId
+                              AND [we].[AwayTeamId] = @awayTeamId 
+                              AND [we].[HomeTeamId] = @homeTeamId";
+
+            using(var connection = this._connectionFactory.CreateConnection())
+            {
+                IEnumerable<WeekEvent> result = await connection.QueryAsync<WeekEvent, Team, Team, SeasonWeek, Season, WeekEvent>(
+                    query,
+                    (weekEvent, awayTeam, homeTeam, seasonWeek, season) =>
+                    {
+                        weekEvent.AwayTeam = awayTeam;
+                        weekEvent.HomeTeam = homeTeam;
+                        weekEvent.Week = seasonWeek;
+                        weekEvent.Week.Season = season;
+
+                        return weekEvent;
+                    },
+                    new
+                    {
+                        weekId = weekId,
+                        awayTeamId = awayTeamId,
+                        homeTeamId = homeTeamId
+                    }
+                );
+
+                return result.FirstOrDefault();
+            }
         }
 
         public async Task<IEnumerable<WeekEvent>> GetWeekEventsAsync(string weekId, CancellationToken cancellationToken = default)

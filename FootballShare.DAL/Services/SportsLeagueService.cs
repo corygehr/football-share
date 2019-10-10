@@ -22,6 +22,10 @@ namespace FootballShare.DAL.Services
         /// </summary>
         private readonly ISeasonRepository _seasonRepo;
         /// <summary>
+        /// <see cref="Team"/> repository
+        /// </summary>
+        private readonly ITeamRepository _teamRepo;
+        /// <summary>
         /// <see cref="WeekEvent"/> repository
         /// </summary>
         private readonly IWeekEventRepository _weekEventRepo;
@@ -31,11 +35,13 @@ namespace FootballShare.DAL.Services
         /// </summary>
         /// <param name="leagueRepo"><see cref="SportsLeague"/> repository</param>
         /// <param name="seasonRepo"><see cref="Season"/> repository</param>
+        /// <param name="teamRepo"><see cref="Team"/> repository</param>
         /// <param name="weekEventRepo"><see cref="WeekEvent"/> repository</param>
-        public SportsLeagueService(ISportsLeagueRepository leagueRepo, ISeasonRepository seasonRepo, IWeekEventRepository weekEventRepo)
+        public SportsLeagueService(ISportsLeagueRepository leagueRepo, ISeasonRepository seasonRepo, ITeamRepository teamRepo, IWeekEventRepository weekEventRepo)
         {
             this._leagueRepo = leagueRepo;
             this._seasonRepo = seasonRepo;
+            this._teamRepo = teamRepo;
             this._weekEventRepo = weekEventRepo;
         }
 
@@ -69,9 +75,24 @@ namespace FootballShare.DAL.Services
             throw new NotImplementedException();
         }
 
+        public async Task<Team> GetTeamAsync(string teamId, CancellationToken cancellationToken = default)
+        {
+            return await this._teamRepo.GetAsync(teamId, cancellationToken);
+        }
+
+        public async Task<Team> GetTeamByNameAsync(string teamName, CancellationToken cancellationToken = default)
+        {
+            return await this._teamRepo.GetByNameAsync(teamName, cancellationToken);
+        }
+
         public async Task<WeekEvent> GetWeekEventAsync(int eventId, CancellationToken cancellationToken = default)
         {
             return await this._weekEventRepo.GetAsync(eventId.ToString(), cancellationToken);
+        }
+
+        public async Task<WeekEvent> GetWeekEventByWeekAndTeamsAsync(string weekId, string awayTeamId, string homeTeamId, CancellationToken cancellationToken = default)
+        {
+            return await this._weekEventRepo.GetWeekEventByWeekAndTeamsAsync(weekId, awayTeamId, homeTeamId, cancellationToken);
         }
     }
 }

@@ -1,7 +1,6 @@
 using FootballShare.DAL.Services;
 using FootballShare.Entities.Betting;
 using FootballShare.Entities.Leagues;
-using FootballShare.Entities.Pools;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 

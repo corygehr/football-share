@@ -1,4 +1,5 @@
 ﻿using FootballShare.DAL.Repositories;
+using FootballShare.DAL.Services;
 using FootballShare.Entities.Betting;
 using FootballShare.Entities.Leagues;
 using HtmlAgilityPack;
@@ -17,17 +18,23 @@ namespace FootballShare.Automation.Parsers
     public class SpreadsParser : HtmlParser
     {
         /// <summary>
-        /// <see cref="Team"/> repository
+        /// Betting Service class
         /// </summary>
-        private readonly ITeamRepository _teamRepo;
+        private readonly IBettingService _bettingService;
+        /// <summary>
+        /// Sports League Service class
+        /// </summary>
+        private readonly ISportsLeagueService _leagueService;
 
         /// <summary>
         /// Creates a new <see cref="SpreadsParser"/> instance
         /// </summary>
-        /// <param name="teamRepo"><see cref="Team"/> repository</param>
-        public SpreadsParser(ITeamRepository teamRepo)
+        /// <param name="bettingService">Betting service</param>
+        /// <param name="leagueService">Sports League service</param>
+        public SpreadsParser(IBettingService bettingService, ISportsLeagueService leagueService)
         {
-            this._teamRepo = teamRepo;
+            this._bettingService = bettingService;
+            this._leagueService = leagueService;
         }
 
         /// <summary>
@@ -68,19 +75,54 @@ namespace FootballShare.Automation.Parsers
                         string homeTeamName = teams[1];
 
                         // Get team IDs
-                        Team awayTeam = await this._teamRepo.GetByNameAsync(awayTeamName, cancellationToken);
-                        Team homeTeam = await this._teamRepo.GetByNameAsync(homeTeamName, cancellationToken);
+                        Team awayTeam = await this._leagueService.GetTeamByNameAsync(awayTeamName, cancellationToken);
+                        Team homeTeam = await this._leagueService.GetTeamByNameAsync(homeTeamName, cancellationToken);
 
-                        // Get game time
-                        HtmlNode timeNode = node.SelectSingleNode("./table/tr/td[@class='viBodyBorderNorm']/table/tr/td[contains(@class, 'viSubHeader1')]");
-                        string eventTimeRaw = timeNode.FirstChild.GetDirectInnerText().Replace(" Game Time", "");
-
-                        DateTime eventTime = DateTime.Parse(eventTimeRaw);
-                        DateTimeOffset eventTimeFull = currentEventDate.AddHours(eventTime.Hour).AddMinutes(eventTime.Minute);
-
+                        // Confirm we have the teams for this matchup
                         if(awayTeam != null && homeTeam != null)
                         {
+                            // Get event for playing teams
+                            WeekEvent associatedEvent = await this._leagueService.GetWeekEventByWeekAndTeamsAsync(target.Id, awayTeam.Id, homeTeam.Id, cancellationToken);
 
+                            // Get current spread object for playing team
+                            Spread currentSpread = await this._bettingService.GetSpreadForEventAsync(associatedEvent.Id, cancellationToken);
+
+                            // Parse spread from site
+                            HtmlNodeCollection spreadNodes = node.SelectNodes("./table/tr/td[@class='viBodyBorderNorm']/table/tr/td[contains(@class, 'viCellBg2')]");
+                            
+                            // These are static - it's hard to determine this via context clues
+                            HtmlNode awaySpreadNode = spreadNodes[4];
+                            HtmlNode homeSpreadNode = spreadNodes[12];
+
+                            // Check for "Even"
+                            if(awaySpreadNode.InnerText == "PK" || homeSpreadNode.InnerText == "PK")
+                            {
+                                // Even spread
+                                currentSpread.AwaySpread = 0;
+                                currentSpread.HomeSpread = 0;
+                            }
+                            else
+                            {
+                                double awaySpread = Double.Parse(awaySpreadNode.InnerText);
+                                double homeSpread = Double.Parse(homeSpreadNode.InnerText);
+
+                                // Smaller value is best indicator of spread for how this application checks it
+                                double usableSpread = Math.Min(awaySpread, homeSpread);
+
+                                if (usableSpread == awaySpread)
+                                {
+                                    currentSpread.AwaySpread = awaySpread;
+                                    currentSpread.HomeSpread = -awaySpread;
+                                }
+                                else
+                                {
+                                    currentSpread.AwaySpread = -homeSpread;
+                                    currentSpread.HomeSpread = homeSpread;
+                                }
+                            }
+
+                            // Store new spread
+                            events.Add(currentSpread);
                         }
                         else
                         {

@@ -124,7 +124,7 @@ namespace FootballShare.Web.Controllers
 
             if (userMembership != null)
             {
-                IEnumerable<Spread> events = await this._bettingService.GetWeekSpreads(seasonWeekId);
+                IEnumerable<Spread> events = await this._bettingService.GetWeekSpreadsAsync(seasonWeekId);
                 IEnumerable<Wager> weekWagers = await this._bettingService.GetUserWagersForWeekByPoolAsync(user.Id, seasonWeekId, poolId);
 
                 // Get SeasonWeek details
