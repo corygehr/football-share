@@ -82,5 +82,13 @@ namespace FootballShare.DAL.Services
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Matching <see cref="WeekEvent"/> or <see cref="null"/></returns>
         Task<WeekEvent> GetWeekEventByWeekAndTeamsAsync(string weekId, string awayTeamId, string homeTeamId, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Updates the score for a specific <see cref="WeekEvent"/>
+        /// </summary>
+        /// <param name="eventId"><see cref="WeekEvent"/> ID</param>
+        /// <param name="awayScore">Away <see cref="Team"/> score</param>
+        /// <param name="homeScore">Home <see cref="Team"/> score</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        Task UpdateEventScoreAsync(int eventId, int awayScore, int homeScore, CancellationToken cancellationToken = default);
     }
 }

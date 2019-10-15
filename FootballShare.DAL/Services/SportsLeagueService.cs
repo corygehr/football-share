@@ -94,5 +94,20 @@ namespace FootballShare.DAL.Services
         {
             return await this._weekEventRepo.GetWeekEventByWeekAndTeamsAsync(weekId, awayTeamId, homeTeamId, cancellationToken);
         }
+
+        public async Task UpdateEventScoreAsync(int eventId, int awayScore, int homeScore, CancellationToken cancellationToken = default)
+        {
+            // Get the WeekEvent targeted by this invocation
+            WeekEvent targetEvent = await this._weekEventRepo.GetAsync(eventId.ToString(), cancellationToken);
+
+            if(targetEvent != null)
+            {
+                // Update object and commit
+                targetEvent.AwayScore = awayScore;
+                targetEvent.HomeScore = homeScore;
+
+                await this._weekEventRepo.UpdateAsync(targetEvent, cancellationToken);
+            }
+        }
     }
 }
