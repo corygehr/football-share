@@ -41,8 +41,11 @@ namespace FootballShare.Automation.Functions
         /// </summary>
         /// <param name="myTimer">Invoking timer</param>
         /// <param name="log">Log provider</param>
+        /// <remarks>
+        /// 0 0 7 * * Tue
+        /// </remarks>
         [FunctionName("UpdatePayoutsActivity")]
-        public async Task Run([TimerTrigger("0 0 7 * * Tue")]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
+        public async Task Run([TimerTrigger("*/2 * * * * *")]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
         {
             log.LogInformation($"{nameof(UpdatePayoutsActivity)} executed at: {DateTime.Now}");
 
