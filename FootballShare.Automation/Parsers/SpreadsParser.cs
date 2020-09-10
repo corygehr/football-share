@@ -94,10 +94,17 @@ namespace FootballShare.Automation.Parsers
                             HtmlNode awaySpreadNode = spreadNodes[4];
                             HtmlNode homeSpreadNode = spreadNodes[12];
 
-                            // Check for "Even"
-                            if(awaySpreadNode.InnerText == "PK" || homeSpreadNode.InnerText == "PK")
+                            string[] evenIndicators = new string[]
                             {
-                                // Even spread
+                                "&nbsp;",
+                                "",
+                                "PK"
+                            };
+
+                            // Check for "Even" or empty
+                            if(evenIndicators.Contains(awaySpreadNode.InnerText) || evenIndicators.Contains(homeSpreadNode.InnerText))
+                            {
+                                // Even or null spread
                                 currentSpread.AwaySpread = 0;
                                 currentSpread.HomeSpread = 0;
                             }

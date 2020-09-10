@@ -56,8 +56,11 @@ namespace FootballShare.Automation.Functions.Activities
         /// <param name="myTimer">Invoking timer</param>
         /// <param name="log">Log provider</param>
         /// <param name="cancellationToken">Cancellation token</param>
+        /// <remarks>
+        /// Every hour (0 0 * * * *)
+        /// </remarks>
         [FunctionName("UpdateSpreadsActivity")]
-        public async Task Run([TimerTrigger("0 0 14 * * Tue")]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
+        public async Task Run([TimerTrigger("0 0 * * * *")]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
         {
             log.LogInformation($"UpdateSpreads invoked at {DateTime.UtcNow}");
 
