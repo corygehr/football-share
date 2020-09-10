@@ -187,8 +187,15 @@ namespace FootballShare.DAL.Services
             foreach(WeekEvent weekEvent in events)
             {
                 Spread eventSpread = await this.GetSpreadForEventAsync(weekEvent.Id, cancellationToken);
-                eventSpread.Event = weekEvent;
-                spreads.Add(eventSpread);
+                if(eventSpread != null)
+                {
+                    eventSpread.Event = weekEvent;
+                    spreads.Add(eventSpread);
+                }
+                else
+                {
+                    throw new MissingSpreadsException();
+                }
             }
 
             return spreads;
