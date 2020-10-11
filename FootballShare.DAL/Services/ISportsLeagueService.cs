@@ -32,6 +32,13 @@ namespace FootballShare.DAL.Services
         /// <returns>Current <see cref="SportsLeague"/> <see cref="Season"/></returns>
         Task<Season> GetLeagueCurrentSeasonAsync(string leagueId, CancellationToken cancellationToken = default);
         /// <summary>
+        /// Gets the previous <see cref="SeasonWeek"/> for the specified <see cref="SportsLeague"/>
+        /// </summary>
+        /// <param name="leagueId">Requested <see cref="SportsLeague"/> ID</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Previous <see cref="SportsLeague"/> <see cref="SeasonWeek"/></returns>
+        Task<SeasonWeek> GetLeaguePreviousWeekAsync(string leagueId, CancellationToken cancellationToken = default);
+        /// <summary>
         /// Gets the specified <see cref="Season"/>
         /// </summary>
         /// <param name="seasonId"><see cref="Season"/> ID</param>
