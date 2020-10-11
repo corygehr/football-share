@@ -1,4 +1,5 @@
 ﻿using FootballShare.DAL.Repositories;
+using FootballShare.Entities.Betting;
 using FootballShare.Entities.Leagues;
 
 using System;
@@ -26,6 +27,10 @@ namespace FootballShare.DAL.Services
         /// </summary>
         private readonly ISeasonWeekRepository _seasonWeekRepo;
         /// <summary>
+        /// <see cref="Spread"/> repository
+        /// </summary>
+        private readonly ISpreadRepository _spreadRepo;
+        /// <summary>
         /// <see cref="Team"/> repository
         /// </summary>
         private readonly ITeamRepository _teamRepo;
@@ -40,13 +45,15 @@ namespace FootballShare.DAL.Services
         /// <param name="leagueRepo"><see cref="SportsLeague"/> repository</param>
         /// <param name="seasonRepo"><see cref="Season"/> repository</param>
         /// <param name="seasonWeekRepo"><see cref="SeasonWeek"/> repository</param>
+        /// <param name="spreadRepo"><see cref="Spread"/> repository</param>
         /// <param name="teamRepo"><see cref="Team"/> repository</param>
         /// <param name="weekEventRepo"><see cref="WeekEvent"/> repository</param>
-        public SportsLeagueService(ISportsLeagueRepository leagueRepo, ISeasonRepository seasonRepo, ISeasonWeekRepository seasonWeekRepo, ITeamRepository teamRepo, IWeekEventRepository weekEventRepo)
+        public SportsLeagueService(ISportsLeagueRepository leagueRepo, ISeasonRepository seasonRepo, ISeasonWeekRepository seasonWeekRepo, ISpreadRepository spreadRepo, ITeamRepository teamRepo, IWeekEventRepository weekEventRepo)
         {
             this._leagueRepo = leagueRepo;
             this._seasonRepo = seasonRepo;
             this._seasonWeekRepo = seasonWeekRepo;
+            this._spreadRepo = spreadRepo;
             this._teamRepo = teamRepo;
             this._weekEventRepo = weekEventRepo;
         }
@@ -66,7 +73,14 @@ namespace FootballShare.DAL.Services
         /// <inheritdoc/>
         public async Task<Season> GetLeagueCurrentSeasonAsync(string leagueId, CancellationToken cancellationToken = default)
         {
-            return await this._seasonRepo.GetCurrentLeagueSeasonAsync(leagueId.ToString(), cancellationToken);
+            return await this._seasonRepo.GetCurrentLeagueSeasonAsync(leagueId, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<SeasonWeek> GetLeagueCurrentSeasonWeekAsync(string leagueId, CancellationToken cancellationToken = default)
+        {
+            Season currentSeason = await this._seasonRepo.GetCurrentLeagueSeasonAsync(leagueId.ToString(), cancellationToken);
+            return await this._seasonWeekRepo.GetCurrentSeasonWeekAsync(currentSeason.Id, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -135,6 +149,12 @@ namespace FootballShare.DAL.Services
 
                 await this._weekEventRepo.UpdateAsync(targetEvent, cancellationToken);
             }
+        }
+
+        /// <inheritdoc/>
+        public async Task UpsertWeekEventSpreadAsync(Spread spread, CancellationToken cancellationToken = default)
+        {
+            await this._spreadRepo.UpsertAsync(spread, cancellationToken);
         }
     }
 }
