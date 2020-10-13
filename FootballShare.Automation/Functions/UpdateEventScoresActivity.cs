@@ -47,6 +47,7 @@ namespace FootballShare.Automation.Functions.Activities
         /// 0 0 5 * * Tue
         /// </remarks>
         [FunctionName("UpdateEventScoresActivity")]
+        [Disable]
         public async Task Run([TimerTrigger("* */2 * * * *")]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
         {
             log.LogInformation($"{nameof(UpdateEventScoresActivity)} invoked at {DateTime.UtcNow}");
@@ -55,12 +56,12 @@ namespace FootballShare.Automation.Functions.Activities
             SeasonWeek previousWeek = await this._leagueService.GetLeaguePreviousWeekAsync("national-football-league", cancellationToken);
 
             // Get spreads
-            IEnumerable<WeekEvent> weekSpreads = await this._scoresParser.GetScoresForWeekAsync(previousWeek, cancellationToken);
+            IEnumerable<WeekEvent> weekScores = await this._scoresParser.GetScoresForWeekAsync(previousWeek, cancellationToken);
 
             // Update or create spreads
-            foreach(WeekEvent game in weekSpreads)
+            foreach(WeekEvent game in weekScores)
             {
-                //await this._leagueService.UpdateEventScoreAsync(game.Id, game.AwayScore, game.HomeScore, cancellationToken);
+                await this._leagueService.UpdateEventScoreAsync(game.Id, game.AwayScore, game.HomeScore, cancellationToken);
             }
         }
     }

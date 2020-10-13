@@ -44,12 +44,12 @@ namespace FootballShare.Automation.Parsers
             HtmlDocument htmlDoc = await this.WebClient.LoadFromWebAsync(targetUrl, cancellationToken);
 
             // Get all score tables
-            HtmlNodeCollection eventNodes = htmlDoc
+            HtmlNodeCollection scoreNodes = htmlDoc
                 .DocumentNode
                 .SelectNodes("//table[not(@id) and @class='scoreboardMatchUpContainer']");
 
             // Process each result
-            foreach(HtmlNode node in eventNodes)
+            foreach (HtmlNode node in scoreNodes)
             {
                 // Ignore non-HTML nodes (e.g. #text)
                 if(node.NodeType == HtmlNodeType.Element)
@@ -57,7 +57,7 @@ namespace FootballShare.Automation.Parsers
                     if(node.Name == "table")
                     {
                         // Determine which event this is by its title
-                        HtmlNode titleNode = node.SelectSingleNode("./td[@class='yeallowBg2 sportPicksBorderR2 fourleft']");
+                        HtmlNode titleNode = node.SelectSingleNode("td[@class='yeallowBg2 sportPicksBorderR2 fourleft']");
                         string eventName = titleNode.InnerText;
 
                         // Parse teams
