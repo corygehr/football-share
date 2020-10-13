@@ -60,7 +60,7 @@ namespace FootballShare.Automation.Functions
                 WeekEvent wagerEvent = await this._leagueService.GetWeekEventAsync(wager.WeekEventId, cancellationToken);
 
                 // Calculate payout if event has concluded
-                if(wagerEvent.Time.AddHours(8) < DateTimeOffset.UtcNow)
+                if(wagerEvent.Time.AddHours(6) < DateTimeOffset.UtcNow)
                 {
                     double chosenTeamScore = 0;
                     double opponentScore = 0;
