@@ -3,7 +3,7 @@ using FootballShare.DAL.Services;
 using FootballShare.Entities.Betting;
 using FootballShare.Entities.Leagues;
 using HtmlAgilityPack;
-
+using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,52 +84,57 @@ namespace FootballShare.Automation.Parsers
                             // Get event for playing teams
                             WeekEvent associatedEvent = await this._leagueService.GetWeekEventByWeekAndTeamsAsync(target.Id, awayTeam.Id, homeTeam.Id, cancellationToken);
 
-                            // Get current spread object for playing team
-                            Spread currentSpread = await this._bettingService.GetSpreadForEventAsync(associatedEvent.Id, cancellationToken);
-
-                            // Parse spread from site
-                            HtmlNodeCollection spreadNodes = node.SelectNodes("./table/tr/td[@class='viBodyBorderNorm']/table/tr/td[contains(@class, 'viCellBg2')]");
-                            
-                            // These are static - it's hard to determine this via context clues
-                            HtmlNode awaySpreadNode = spreadNodes[4];
-                            HtmlNode homeSpreadNode = spreadNodes[12];
-
-                            string[] evenIndicators = new string[]
+                            // Ensure there's a matching event in the database
+                            // For now, skip if there isn't since the local database is more accurate (usually)
+                            if(associatedEvent != null)
                             {
+                                // Get current spread object for playing team
+                                Spread currentSpread = await this._bettingService.GetSpreadForEventAsync(associatedEvent.Id, cancellationToken);
+
+                                // Parse spread from site
+                                HtmlNodeCollection spreadNodes = node.SelectNodes("./table/tr/td[@class='viBodyBorderNorm']/table/tr/td[contains(@class, 'viCellBg2')]");
+
+                                // These are static - it's hard to determine this via context clues
+                                HtmlNode awaySpreadNode = spreadNodes[4];
+                                HtmlNode homeSpreadNode = spreadNodes[12];
+
+                                string[] evenIndicators = new string[]
+                                {
                                 "&nbsp;",
                                 "",
                                 "PK"
-                            };
+                                };
 
-                            // Check for "Even" or empty
-                            if(evenIndicators.Contains(awaySpreadNode.InnerText) || evenIndicators.Contains(homeSpreadNode.InnerText))
-                            {
-                                // Even or null spread
-                                currentSpread.AwaySpread = 0;
-                                currentSpread.HomeSpread = 0;
-                            }
-                            else
-                            {
-                                double awaySpread = Double.Parse(awaySpreadNode.InnerText);
-                                double homeSpread = Double.Parse(homeSpreadNode.InnerText);
-
-                                // Smaller value is best indicator of spread for how this application checks it
-                                double usableSpread = Math.Min(awaySpread, homeSpread);
-
-                                if (usableSpread == awaySpread)
+                                // Check for "Even" or empty
+                                if (evenIndicators.Contains(awaySpreadNode.InnerText) || evenIndicators.Contains(homeSpreadNode.InnerText))
                                 {
-                                    currentSpread.AwaySpread = awaySpread;
-                                    currentSpread.HomeSpread = -awaySpread;
+                                    // Even or null spread
+                                    currentSpread.AwaySpread = 0;
+                                    currentSpread.HomeSpread = 0;
                                 }
                                 else
                                 {
-                                    currentSpread.AwaySpread = -homeSpread;
-                                    currentSpread.HomeSpread = homeSpread;
-                                }
-                            }
+                                    double awaySpread = Double.Parse(awaySpreadNode.InnerText);
+                                    double homeSpread = Double.Parse(homeSpreadNode.InnerText);
 
-                            // Store new spread
-                            events.Add(currentSpread);
+                                    // Smaller value is best indicator of spread for how this application checks it
+                                    double usableSpread = Math.Min(awaySpread, homeSpread);
+
+                                    if (usableSpread == awaySpread)
+                                    {
+                                        currentSpread.AwaySpread = awaySpread;
+                                        currentSpread.HomeSpread = -awaySpread;
+                                    }
+                                    else
+                                    {
+                                        currentSpread.AwaySpread = -homeSpread;
+                                        currentSpread.HomeSpread = homeSpread;
+                                    }
+                                }
+
+                                // Store new spread
+                                events.Add(currentSpread);
+                            }
                         }
                         else
                         {
