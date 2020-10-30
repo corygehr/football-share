@@ -7,6 +7,7 @@
     {
         Push,
         Loss,
-        Win
+        Win,
+        Refund
     }
 }

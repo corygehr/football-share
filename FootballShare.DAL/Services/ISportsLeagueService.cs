@@ -1,4 +1,5 @@
-﻿using FootballShare.Entities.Leagues;
+﻿using FootballShare.Entities.Betting;
+using FootballShare.Entities.Leagues;
 
 using System.Collections.Generic;
 using System.Threading;
@@ -31,6 +32,20 @@ namespace FootballShare.DAL.Services
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Current <see cref="SportsLeague"/> <see cref="Season"/></returns>
         Task<Season> GetLeagueCurrentSeasonAsync(string leagueId, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Gets the current <see cref="SeasonWeek"/> for the specified <see cref="SportsLeague"/>
+        /// </summary>
+        /// <param name="leagueId">Requested <see cref="SportsLeague"/> ID</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Current <see cref="SportsLeague"/> <see cref="SeasonWeek"/></returns>
+        Task<SeasonWeek> GetLeagueCurrentSeasonWeekAsync(string leagueId, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Gets the previous <see cref="SeasonWeek"/> for the specified <see cref="SportsLeague"/>
+        /// </summary>
+        /// <param name="leagueId">Requested <see cref="SportsLeague"/> ID</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Previous <see cref="SportsLeague"/> <see cref="SeasonWeek"/></returns>
+        Task<SeasonWeek> GetLeaguePreviousWeekAsync(string leagueId, CancellationToken cancellationToken = default);
         /// <summary>
         /// Gets the specified <see cref="Season"/>
         /// </summary>
@@ -90,5 +105,11 @@ namespace FootballShare.DAL.Services
         /// <param name="homeScore">Home <see cref="Team"/> score</param>
         /// <param name="cancellationToken">Cancellation token</param>
         Task UpdateEventScoreAsync(int eventId, int awayScore, int homeScore, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Updates or inserts (if no entry exists) the <see cref="Spread"/> for a specific <see cref="WeekEvent"/>
+        /// </summary>
+        /// <param name="spread"><see cref="Spread"/> to replace</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        Task UpsertWeekEventSpreadAsync(Spread spread, CancellationToken cancellationToken = default);
     }
 }

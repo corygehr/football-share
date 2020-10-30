@@ -61,6 +61,10 @@ namespace FootballShare.Automation.Functions.Activities
         /// </summary>
         /// <param name="myTimer">Invoking timer</param>
         /// <param name="log">Log provider</param>
+        /// <remarks>
+        /// Annually, on September 1 at midnight UTC
+        /// 0 0 0 1 Sep *
+        /// </remarks>
         [FunctionName("GetWeekEventsActivity")]
         public async Task Run([TimerTrigger("0 0 0 1 Sep *")]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
         {
