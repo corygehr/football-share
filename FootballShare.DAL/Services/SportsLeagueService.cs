@@ -120,7 +120,16 @@ namespace FootballShare.DAL.Services
         /// <inheritdoc/>
         public async Task<Team> GetTeamByNameAsync(string teamName, CancellationToken cancellationToken = default)
         {
-            return await this._teamRepo.GetByNameAsync(teamName, cancellationToken);
+            Team result = await this._teamRepo.GetByNameAsync(teamName, cancellationToken);
+
+            // Is this LA? There are quirks with it being abbreviated
+            if(result == null && teamName.StartsWith("LA"))
+            {
+                teamName = teamName.Replace("LA", "Los Angeles");
+                result = await this._teamRepo.GetByNameAsync(teamName, cancellationToken);
+            }
+
+            return result;
         }
 
         /// <inheritdoc/>

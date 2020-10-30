@@ -17,6 +17,17 @@ namespace FootballShare.Automation.Functions.Activities
     public class UpdateEventScoresActivity
     {
         /// <summary>
+        /// Function schedule in cron syntax
+        /// </summary>
+        /// <remarks>
+        /// In Debug mode, the schedule is set to run more frequently.
+        /// </remarks>
+#if DEBUG
+        private const string _functionSchedule = "* */2 * * * *";
+#else
+        private const string _functionSchedule = "0 0 5 * * Tue";
+#endif
+        /// <summary>
         /// <see cref="ISportsLeagueService"/> instance
         /// </summary>
         private readonly ISportsLeagueService _leagueService;
@@ -47,8 +58,7 @@ namespace FootballShare.Automation.Functions.Activities
         /// 0 0 5 * * Tue
         /// </remarks>
         [FunctionName("UpdateEventScoresActivity")]
-        [Disable]
-        public async Task Run([TimerTrigger("* */2 * * * *")]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
+        public async Task Run([TimerTrigger(_functionSchedule)]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
         {
             log.LogInformation($"{nameof(UpdateEventScoresActivity)} invoked at {DateTime.UtcNow}");
 

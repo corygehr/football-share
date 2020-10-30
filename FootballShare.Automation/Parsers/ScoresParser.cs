@@ -52,52 +52,50 @@ namespace FootballShare.Automation.Parsers
             foreach (HtmlNode node in scoreNodes)
             {
                 // Ignore non-HTML nodes (e.g. #text)
-                if(node.NodeType == HtmlNodeType.Element)
+                if(node.NodeType == HtmlNodeType.Element && node.Name == "table")
                 {
-                    if(node.Name == "table")
+                    // Determine which event this is by its title
+                    HtmlNode titleNode = node.SelectSingleNode("descendant::td[@class='yeallowBg2 sportPicksBorderR2 fourleft']");
+                    string eventName = titleNode.InnerText;
+
+                    // Parse teams
+                    string[] teams = eventName.Split(" @ ");
+                    string awayTeamName = teams[0];
+                    string homeTeamName = teams[1];
+
+                    // Get team IDs
+                    Team awayTeam = await this._leagueService.GetTeamByNameAsync(awayTeamName, cancellationToken);
+                    Team homeTeam = await this._leagueService.GetTeamByNameAsync(homeTeamName, cancellationToken);
+
+                    if (awayTeam != null && homeTeam != null)
                     {
-                        // Determine which event this is by its title
-                        HtmlNode titleNode = node.SelectSingleNode("td[@class='yeallowBg2 sportPicksBorderR2 fourleft']");
-                        string eventName = titleNode.InnerText;
+                        // Lookup event in current week matching team pattern
+                        WeekEvent currentEvent = await this._leagueService
+                            .GetWeekEventByWeekAndTeamsAsync(
+                            target.Id,
+                            awayTeam.Id,
+                            homeTeam.Id,
+                            cancellationToken
+                        );
 
-                        // Parse teams
-                        string[] teams = eventName.Split(" @ ");
-                        string awayTeamName = teams[0];
-                        string homeTeamName = teams[1];
+                        // Get score for event
+                        HtmlNodeCollection scores = node.SelectNodes("descendant::td[not(@width)]/font[@color='#b20000']");
 
-                        // Get team IDs
-                        Team awayTeam = await this._leagueService.GetTeamByNameAsync(awayTeamName, cancellationToken);
-                        Team homeTeam = await this._leagueService.GetTeamByNameAsync(homeTeamName, cancellationToken);
-
-                        if (awayTeam != null && homeTeam != null)
+                        // Can skip if no score, event may not be over
+                        if(scores.Count == 2)
                         {
-                            // Lookup event in current week matching team pattern
-                            WeekEvent currentEvent = await this._leagueService
-                                .GetWeekEventByWeekAndTeamsAsync(
-                                target.Id,
-                                awayTeam.Id,
-                                homeTeam.Id,
-                                cancellationToken
-                            );
+                            HtmlNode awayScore = scores[0];
+                            HtmlNode homeScore = scores[1];
 
-                            // Get score for event
-                            HtmlNodeCollection scores = node.SelectNodes("./td[@class='sportPicksBorderL2 zerocenter']/font[@color='#b20000']");
+                            currentEvent.AwayScore = Int32.Parse(awayScore.InnerText.Replace("&nbsp;", ""));
+                            currentEvent.HomeScore = Int32.Parse(homeScore.InnerText.Replace("&nbsp;", ""));
 
-                            if(scores.Count == 2)
-                            {
-                                HtmlNode awayScore = scores[0];
-                                HtmlNode homeScore = scores[1];
-
-                                currentEvent.AwayScore = Int32.Parse(awayScore.InnerText);
-                                currentEvent.HomeScore = Int32.Parse(homeScore.InnerText);
-
-                                events.Add(currentEvent);
-                            }
+                            events.Add(currentEvent);
                         }
-                        else
-                        {
-                            throw new Exception($"Team could not be located for match {eventName}.");
-                        }
+                    }
+                    else
+                    {
+                        throw new Exception($"Team could not be located for match {eventName}.");
                     }
                 }
             }
