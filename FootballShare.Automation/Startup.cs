@@ -60,8 +60,9 @@ namespace FootballShare.Automation
             builder.Services.AddTransient<ISportsLeagueService, SportsLeagueService>();
 
             // Add parsers
-            builder.Services.AddTransient<WeekEventsParser>();
+            builder.Services.AddTransient<ScoresParser>();
             builder.Services.AddTransient<SpreadsParser>();
+            builder.Services.AddTransient<WeekEventsParser>();
         }
     }
 }

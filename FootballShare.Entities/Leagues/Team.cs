@@ -14,6 +14,10 @@ namespace FootballShare.Entities.Leagues
         [ExplicitKey]
         public string Id { get; set; }
         /// <summary>
+        /// Team scoreboard abbreviation
+        /// </summary>
+        public string Abbreviation { get; set; }
+        /// <summary>
         /// Affiliated <see cref="League"/> ID
         /// </summary>
         public string LeagueId { get; set; }

@@ -1,9 +1,8 @@
 using FootballShare.Automation.Parsers;
-using FootballShare.DAL.Repositories;
+using FootballShare.DAL.Services;
 using FootballShare.Entities.Betting;
 using FootballShare.Entities.Leagues;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 using System;
@@ -19,17 +18,9 @@ namespace FootballShare.Automation.Functions.Activities
     public class UpdateSpreadsActivity
     {
         /// <summary>
-        /// <see cref="Season"/> repository
+        /// <see cref="SportsLeague"/> service
         /// </summary>
-        private readonly ISeasonRepository _seasonRepo;
-        /// <summary>
-        /// <see cref="SeasonWeek"/> repository
-        /// </summary>
-        private readonly ISeasonWeekRepository _seasonWeekRepo;
-        /// <summary>
-        /// <see cref="Spread"/> repository
-        /// </summary>
-        private readonly ISpreadRepository _spreadRepo;
+        private readonly ISportsLeagueService _leagueService;
         /// <summary>
         /// <see cref="Spread"/> parser
         /// </summary>
@@ -38,15 +29,11 @@ namespace FootballShare.Automation.Functions.Activities
         /// <summary>
         /// Creates a new <see cref="GetWeekEventsActivity"/> instance
         /// </summary>
-        /// <param name="seasonRepo"><see cref="Season"/> repository</param>
-        /// <param name="seasonWeekRepo"><see cref="SeasonWeek"/> repository</param>
-        /// <param name="spreadRepo"><see cref="Spread"/> repository</param>
+        /// <param name="leagueService"><see cref="SportsLeague"/> service</param>
         /// <param name="spreadsParser"><see cref="Spread"/> parser</param>
-        public UpdateSpreadsActivity(IConfiguration configuration, ISeasonRepository seasonRepo, ISeasonWeekRepository seasonWeekRepo, ISpreadRepository spreadRepo, SpreadsParser spreadsParser)
+        public UpdateSpreadsActivity(ISportsLeagueService leagueService, SpreadsParser spreadsParser)
         {
-            this._seasonRepo = seasonRepo;
-            this._seasonWeekRepo = seasonWeekRepo;
-            this._spreadRepo = spreadRepo;
+            this._leagueService = leagueService;
             this._spreadsParser = spreadsParser;
         }
 
@@ -57,20 +44,16 @@ namespace FootballShare.Automation.Functions.Activities
         /// <param name="log">Log provider</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <remarks>
-        /// Every hour (0 0 * * * *)
+        /// Every hour
+        /// 0 0 * * * *
         /// </remarks>
         [FunctionName("UpdateSpreadsActivity")]
         public async Task Run([TimerTrigger("0 0 * * * *")]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
         {
             log.LogInformation($"UpdateSpreads invoked at {DateTime.UtcNow}");
 
-            // Get current season
-            Season currentSeason = await this._seasonRepo
-                .GetCurrentLeagueSeasonAsync("national-football-league", cancellationToken);
-
-            // Get active week
-            SeasonWeek currentWeek = await this._seasonWeekRepo
-                .GetCurrentSeasonWeekAsync(currentSeason.Id, cancellationToken);
+            // Get active SeasonWeek
+            SeasonWeek currentWeek = await this._leagueService.GetLeagueCurrentSeasonWeekAsync("national-football-league", cancellationToken);
 
             // Get spreads
             IEnumerable<Spread> weekSpreads = await this._spreadsParser.GetSpreadsForWeekAsync(currentWeek, cancellationToken);
@@ -78,7 +61,7 @@ namespace FootballShare.Automation.Functions.Activities
             // Update or create spreads
             foreach(Spread spread in weekSpreads)
             {
-                await this._spreadRepo.UpsertAsync(spread, cancellationToken);
+                await this._leagueService.UpsertWeekEventSpreadAsync(spread, cancellationToken);
             }
         }
     }

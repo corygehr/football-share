@@ -42,10 +42,11 @@ namespace FootballShare.Automation.Functions
         /// <param name="myTimer">Invoking timer</param>
         /// <param name="log">Log provider</param>
         /// <remarks>
-        /// 0 0 7 * * Tue
+        /// Every Tuesday at 12PM UTC (8AM ET)
+        /// 0 0 12 * * Tue
         /// </remarks>
         [FunctionName("UpdatePayoutsActivity")]
-        public async Task Run([TimerTrigger("*/2 * * * * *")]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
+        public async Task Run([TimerTrigger("0 0 12 * * Tue")]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
         {
             log.LogInformation($"{nameof(UpdatePayoutsActivity)} executed at: {DateTime.Now}");
 
@@ -59,42 +60,54 @@ namespace FootballShare.Automation.Functions
                 WeekEvent wagerEvent = await this._leagueService.GetWeekEventAsync(wager.WeekEventId, cancellationToken);
 
                 // Calculate payout if event has concluded
-                if(wagerEvent.Time.AddHours(8) < DateTimeOffset.UtcNow)
+                if (wagerEvent.Time.AddHours(6) < DateTimeOffset.UtcNow)
                 {
-                    double chosenTeamScore = 0;
-                    double opponentScore = 0;
-
-                    if(wager.SelectedTeamId == wagerEvent.HomeTeamId)
+                    // Was the event played?
+                    if(wagerEvent.Postponed)
                     {
-                        // User picked home team
-                        chosenTeamScore = wagerEvent.HomeScore;
-                        opponentScore = wagerEvent.AwayScore;
-                    }
-                    else
-                    {
-                        chosenTeamScore = wagerEvent.AwayScore;
-                        opponentScore = wagerEvent.HomeScore;
-                    }
-
-                    double chosenTeamScoreWithSpread = chosenTeamScore + wager.SelectedTeamSpread;
-
-                    if(chosenTeamScoreWithSpread > opponentScore)
-                    {
-                        wager.Result = WagerResult.Win;
-
-                        // Update ledger and pool member
-                        this._bettingService.PayoutWagerAsync(wager, wager.Amount * 2).GetAwaiter().GetResult();
-                    }
-                    else if(chosenTeamScoreWithSpread == opponentScore)
-                    {
-                        wager.Result = WagerResult.Push;
+                        // Postponed events are refunded in full
+                        wager.Result = WagerResult.Refund;
 
                         // Update ledger and pool member
                         this._bettingService.PayoutWagerAsync(wager, wager.Amount).GetAwaiter().GetResult();
                     }
                     else
                     {
-                        wager.Result = WagerResult.Loss;
+                        double chosenTeamScore = 0;
+                        double opponentScore = 0;
+
+                        if (wager.SelectedTeamId == wagerEvent.HomeTeamId)
+                        {
+                            // User picked home team
+                            chosenTeamScore = wagerEvent.HomeScore;
+                            opponentScore = wagerEvent.AwayScore;
+                        }
+                        else
+                        {
+                            chosenTeamScore = wagerEvent.AwayScore;
+                            opponentScore = wagerEvent.HomeScore;
+                        }
+
+                        double chosenTeamScoreWithSpread = chosenTeamScore + wager.SelectedTeamSpread;
+
+                        if (chosenTeamScoreWithSpread > opponentScore)
+                        {
+                            wager.Result = WagerResult.Win;
+
+                            // Update ledger and pool member
+                            this._bettingService.PayoutWagerAsync(wager, wager.Amount * 2).GetAwaiter().GetResult();
+                        }
+                        else if (chosenTeamScoreWithSpread == opponentScore)
+                        {
+                            wager.Result = WagerResult.Push;
+
+                            // Update ledger and pool member
+                            this._bettingService.PayoutWagerAsync(wager, wager.Amount).GetAwaiter().GetResult();
+                        }
+                        else
+                        {
+                            wager.Result = WagerResult.Loss;
+                        }
                     }
 
                     // Update wager
