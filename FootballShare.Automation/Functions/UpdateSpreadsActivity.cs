@@ -38,17 +38,26 @@ namespace FootballShare.Automation.Functions.Activities
         }
 
         /// <summary>
+        /// Function schedule in cron syntax
+        /// </summary>
+        /// <remarks>
+        /// In Debug mode, the schedule is set to run more frequently.
+        /// In Release mode, it runs every hour on the hour.
+        /// </remarks>
+#if DEBUG
+        private const string _functionSchedule = "* */2 * * * *";
+#else
+        private const string _functionSchedule = "0 * * * * *";
+#endif
+
+        /// <summary>
         /// Function entry point
         /// </summary>
         /// <param name="myTimer">Invoking timer</param>
         /// <param name="log">Log provider</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <remarks>
-        /// Every hour
-        /// 0 0 * * * *
-        /// </remarks>
         [FunctionName("UpdateSpreadsActivity")]
-        public async Task Run([TimerTrigger("0 0 * * * *")]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
+        public async Task Run([TimerTrigger(_functionSchedule)]TimerInfo myTimer, ILogger log, CancellationToken cancellationToken)
         {
             log.LogInformation($"UpdateSpreads invoked at {DateTime.UtcNow}");
 
