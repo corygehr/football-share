@@ -4,6 +4,7 @@ using FootballShare.Entities.Leagues;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,6 +36,10 @@ namespace FootballShare.DAL.Services
         /// </summary>
         private readonly ITeamRepository _teamRepo;
         /// <summary>
+        /// <see cref="TeamAlias"/> repository
+        /// </summary>
+        private readonly ITeamAliasRepository _teamAliasRepo;
+        /// <summary>
         /// <see cref="WeekEvent"/> repository
         /// </summary>
         private readonly IWeekEventRepository _weekEventRepo;
@@ -47,14 +52,16 @@ namespace FootballShare.DAL.Services
         /// <param name="seasonWeekRepo"><see cref="SeasonWeek"/> repository</param>
         /// <param name="spreadRepo"><see cref="Spread"/> repository</param>
         /// <param name="teamRepo"><see cref="Team"/> repository</param>
+        /// <param name="teamAliasRepo"><see cref="TeamAlias"/> repository</param>
         /// <param name="weekEventRepo"><see cref="WeekEvent"/> repository</param>
-        public SportsLeagueService(ISportsLeagueRepository leagueRepo, ISeasonRepository seasonRepo, ISeasonWeekRepository seasonWeekRepo, ISpreadRepository spreadRepo, ITeamRepository teamRepo, IWeekEventRepository weekEventRepo)
+        public SportsLeagueService(ISportsLeagueRepository leagueRepo, ISeasonRepository seasonRepo, ISeasonWeekRepository seasonWeekRepo, ISpreadRepository spreadRepo, ITeamRepository teamRepo, ITeamAliasRepository teamAliasRepo, IWeekEventRepository weekEventRepo)
         {
             this._leagueRepo = leagueRepo;
             this._seasonRepo = seasonRepo;
             this._seasonWeekRepo = seasonWeekRepo;
             this._spreadRepo = spreadRepo;
             this._teamRepo = teamRepo;
+            this._teamAliasRepo = teamAliasRepo;
             this._weekEventRepo = weekEventRepo;
         }
 
@@ -122,11 +129,16 @@ namespace FootballShare.DAL.Services
         {
             Team result = await this._teamRepo.GetByNameAsync(teamName, cancellationToken);
 
-            // Is this LA? There are quirks with it being abbreviated
-            if(result == null && teamName.StartsWith("LA"))
+            // Attempt lookup assuming provided team name is simply an alias
+            if(result == null)
             {
-                teamName = teamName.Replace("LA", "Los Angeles");
-                result = await this._teamRepo.GetByNameAsync(teamName, cancellationToken);
+                IEnumerable<TeamAlias> aliasResult = await this._teamAliasRepo.GetByAliasAsync(teamName, cancellationToken);
+
+                // Should only be one alias match
+                if(aliasResult.Count() == 1)
+                {
+                    result = aliasResult.First().Team;
+                }
             }
 
             return result;
