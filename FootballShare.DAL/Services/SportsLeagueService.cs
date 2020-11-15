@@ -66,6 +66,33 @@ namespace FootballShare.DAL.Services
         }
 
         /// <inheritdoc/>
+        public async Task<WeekEvent> CreateWeekEventAsync(WeekEvent newEvent, CancellationToken cancellationToken = default)
+        {
+            // Insert the new WeekEvent
+            WeekEvent createdEvent = await this._weekEventRepo.CreateAsync(newEvent, cancellationToken);
+
+            if(createdEvent != null)
+            {
+                // Create the Spread associated with this new event
+                Spread newSpread = new Spread
+                {
+                    WeekEventId = createdEvent.Id
+                };
+
+                Spread createdSpread = await this._spreadRepo.CreateAsync(newSpread, cancellationToken);
+
+                if(createdSpread == null)
+                {
+                    // Rollback created event
+                    await this._weekEventRepo.DeleteAsync(createdEvent, cancellationToken);
+                    throw new Exception("Failed to create Spread for new WeekEvent. Operation cancelled and rolled back.");
+                }
+            }
+
+            return createdEvent;
+        }
+
+        /// <inheritdoc/>
         public async Task<IEnumerable<Season>> GetAllCurrentSeasonsAsync(CancellationToken cancellationToken = default)
         {
             return await this._seasonRepo.GetAllCurrentSeasonsAsync(cancellationToken);
