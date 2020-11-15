@@ -13,6 +13,13 @@ namespace FootballShare.DAL.Services
     public interface ISportsLeagueService : IService
     {
         /// <summary>
+        /// Creates a new <see cref="WeekEvent"/> entity and its associated <see cref="Spread"/> reference
+        /// </summary>
+        /// <param name="newEvent"><see cref="WeekEvent"/> to be created</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns></returns>
+        Task<WeekEvent> CreateWeekEventAsync(WeekEvent newEvent, CancellationToken cancellationToken = default);
+        /// <summary>
         /// Gets all current <see cref="Season"/> objects
         /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>

@@ -110,7 +110,7 @@ namespace FootballShare.DAL.Repositories
         public async Task<Team> GetAsync(Team entity, CancellationToken cancellationToken = default)
         {
             // Use overload
-            return await this.GetAsync(entity.Id.ToString());
+            return await this.GetAsync(entity.Id.ToString(), cancellationToken);
         }
 
         public async Task<Team> GetByNameAsync(string name, CancellationToken cancellationToken = default)

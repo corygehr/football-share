@@ -95,7 +95,7 @@ namespace FootballShare.Automation.Parsers
                     }
                     else
                     {
-                        throw new Exception($"Team could not be located for match {eventName}.");
+                        throw new Exception($"Team could not be located or determined for match {eventName}.");
                     }
                 }
             }

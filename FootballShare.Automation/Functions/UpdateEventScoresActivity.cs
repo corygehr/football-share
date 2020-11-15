@@ -21,6 +21,7 @@ namespace FootballShare.Automation.Functions.Activities
         /// </summary>
         /// <remarks>
         /// In Debug mode, the schedule is set to run more frequently.
+        /// In Release mode, the function executes every Tuesday at 5AM UTC.
         /// </remarks>
 #if DEBUG
         private const string _functionSchedule = "* */2 * * * *";

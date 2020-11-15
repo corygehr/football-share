@@ -43,6 +43,7 @@ namespace FootballShare.Web
             services.AddTransient<ISportsLeagueRepository, SqlSportsLeagueRepository>();
             services.AddTransient<ISpreadRepository, SqlSpreadRepository>();
             services.AddTransient<ITeamRepository, SqlTeamRepository>();
+            services.AddTransient<ITeamAliasRepository, SqlTeamAliasRepository>();
             services.AddTransient<IWagerRepository, SqlWagerRepository>();
             services.AddTransient<IWeekEventRepository, SqlWeekEventRepository>();
 
