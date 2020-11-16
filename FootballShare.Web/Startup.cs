@@ -25,6 +25,9 @@ namespace FootballShare.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Set ApplicationInsights for logging
+            services.AddApplicationInsightsTelemetry();
+
             // Set database connection provider
             services.AddTransient<IDbConnectionFactory>(db => new SqlDbConnectionFactory(
                 Configuration.GetConnectionString("DefaultConnection")
@@ -65,7 +68,7 @@ namespace FootballShare.Web
 
             services.AddIdentity<SiteUser, SiteRole>()
                 .AddDefaultTokenProviders()
-                .AddDefaultUI(UIFramework.Bootstrap4);
+                .AddDefaultUI();
 
             services.AddAuthentication()
                 .AddMicrosoftAccount(msaOptions =>
@@ -79,16 +82,15 @@ namespace FootballShare.Web
                     googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
                 });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.EnvironmentName == "Development")
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
             }
             else
             {
@@ -97,17 +99,19 @@ namespace FootballShare.Web
                 app.UseHsts();
             }
 
+            app.UseRouting();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
             app.UseAuthentication();
+            app.UseAuthorization();
 
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }
