@@ -1,15 +1,14 @@
 using FootballShare.Automation.Functions;
-using FootballShare.Automation.Parsers;
 using FootballShare.DAL.Repositories;
 using FootballShare.DAL.Services;
 using FootballShare.Entities.Betting;
 using FootballShare.Entities.Leagues;
 using FootballShare.Entities.Pools;
 using FootballShare.Entities.Users;
-using Microsoft.Azure.WebJobs.Extensions.Timers;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,6 +56,10 @@ namespace FootballShare.Automation.Test.Functions
         /// <see cref="ITeamRepository"/> mock.
         /// </summary>
         private readonly Mock<ITeamRepository> _teamRepo;
+        /// <summary>
+        /// <see cref="ITeamAliasRepository"/> mock.
+        /// </summary>
+        private readonly Mock<ITeamAliasRepository> _teamAliasRepo;
         /// <summary>
         /// <see cref="ISiteUserRepository"/> mock.
         /// </summary>
@@ -180,7 +183,28 @@ namespace FootballShare.Automation.Test.Functions
                 WhenUpdated = new DateTimeOffset(2019, 12, 25, 0, 0, 0, TimeSpan.Zero)
             }
         };
-
+        /// <summary>
+        /// Default <see cref="TeamAlias"/> object collection;
+        /// </summary>
+        private static IEnumerable<TeamAlias> TEAM_ALIASES = new List<TeamAlias>
+        {
+            new TeamAlias
+            {
+                Alias = "Test 1",
+                Id = 1,
+                TeamId = "test-team-1",
+                WhenCreated = new DateTimeOffset(2019, 12, 25, 0, 0, 0, TimeSpan.Zero),
+                WhenUpdated = new DateTimeOffset(2019, 12, 25, 0, 0, 0, TimeSpan.Zero)
+            },
+            new TeamAlias
+            {
+                Alias = "Test 2",
+                Id = 2,
+                TeamId = "test-team-2",
+                WhenCreated = new DateTimeOffset(2019, 12, 25, 0, 0, 0, TimeSpan.Zero),
+                WhenUpdated = new DateTimeOffset(2019, 12, 25, 0, 0, 0, TimeSpan.Zero)
+            }
+        };
         /// <summary>
         /// Default <see cref="SiteUser"/> object collection.
         /// </summary>
@@ -230,6 +254,7 @@ namespace FootballShare.Automation.Test.Functions
             this._seasonWeekRepo = new Mock<ISeasonWeekRepository>();
             this._spreadRepo = new Mock<ISpreadRepository>();
             this._teamRepo = new Mock<ITeamRepository>();
+            this._teamAliasRepo = new Mock<ITeamAliasRepository>();
             this._userRepo = new Mock<ISiteUserRepository>();
             this._wagerRepo = new Mock<IWagerRepository>();
             this._weekEventRepo = new Mock<IWeekEventRepository>();
@@ -292,6 +317,27 @@ namespace FootballShare.Automation.Test.Functions
             this._teamRepo
                 .Setup(t => t.GetByNameAsync(TEAMS.ElementAt(1).Name, CancellationToken.None))
                 .Returns(Task.FromResult(TEAMS.ElementAt(1)));
+            this._teamAliasRepo
+                .Setup(t => t.GetAllAsync(CancellationToken.None))
+                .Returns(Task.FromResult(TEAM_ALIASES));
+            this._teamAliasRepo
+                .Setup(t => t.GetAsync(TEAM_ALIASES.ElementAt(1).Id.ToString(), CancellationToken.None))
+                .Returns(Task.FromResult(TEAM_ALIASES.ElementAt(1)));
+            this._teamAliasRepo
+                .Setup(t => t.GetAsync(TEAM_ALIASES.ElementAt(2).Id.ToString(), CancellationToken.None))
+                .Returns(Task.FromResult(TEAM_ALIASES.ElementAt(2)));
+            this._teamAliasRepo
+                .Setup(t => t.GetTeamAliasesAsync(TEAMS.ElementAt(1).Id, CancellationToken.None))
+                .Returns(Task.FromResult((IEnumerable<TeamAlias>)new List<TeamAlias> { TEAM_ALIASES.ElementAt(1) }));
+            this._teamAliasRepo
+                .Setup(t => t.GetTeamAliasesAsync(TEAMS.ElementAt(2).Id, CancellationToken.None))
+                .Returns(Task.FromResult((IEnumerable<TeamAlias>)new List<TeamAlias> { TEAM_ALIASES.ElementAt(2) }));
+            this._teamAliasRepo
+                .Setup(t => t.GetByAliasAsync(TEAM_ALIASES.ElementAt(1).Alias, CancellationToken.None))
+                .Returns(Task.FromResult((IEnumerable<TeamAlias>)new List<TeamAlias> { TEAM_ALIASES.ElementAt(1) }));
+            this._teamAliasRepo
+                .Setup(t => t.GetByAliasAsync(TEAM_ALIASES.ElementAt(2).Alias, CancellationToken.None))
+                .Returns(Task.FromResult((IEnumerable<TeamAlias>)new List<TeamAlias> { TEAM_ALIASES.ElementAt(2) }));
 
             // Configure services
             this._bettingService = new BettingService(
@@ -310,7 +356,10 @@ namespace FootballShare.Automation.Test.Functions
             this._leagueService = new SportsLeagueService(
                 this._leagueRepo.Object,
                 this._seasonRepo.Object,
+                this._seasonWeekRepo.Object,
+                this._spreadRepo.Object,
                 this._teamRepo.Object,
+                this._teamAliasRepo.Object,
                 this._weekEventRepo.Object
                 );
 
@@ -370,7 +419,7 @@ namespace FootballShare.Automation.Test.Functions
                 PoolId = POOL.Id,
                 SelectedTeam = weekEvent.AwayTeam,
                 SelectedTeamId = weekEvent.AwayTeamId,
-                SelectedTeamSpread = spread.AwaySpread,
+                SelectedTeamSpread = spread.AwaySpread.Value,
                 SiteUserId = USERS.ElementAt(0).Id,
                 User = USERS.ElementAt(0),
                 WeekEventId = weekEvent.Id,
@@ -442,7 +491,7 @@ namespace FootballShare.Automation.Test.Functions
                 PoolId = POOL.Id,
                 SelectedTeam = weekEvent.HomeTeam,
                 SelectedTeamId = weekEvent.HomeTeamId,
-                SelectedTeamSpread = spread.HomeSpread,
+                SelectedTeamSpread = spread.HomeSpread.Value,
                 SiteUserId = USERS.ElementAt(0).Id,
                 User = USERS.ElementAt(0),
                 WeekEventId = weekEvent.Id,
@@ -515,7 +564,7 @@ namespace FootballShare.Automation.Test.Functions
                 PoolId = POOL.Id,
                 SelectedTeam = weekEvent.AwayTeam,
                 SelectedTeamId = weekEvent.AwayTeamId,
-                SelectedTeamSpread = spread.AwaySpread,
+                SelectedTeamSpread = spread.AwaySpread.Value,
                 SiteUserId = USERS.ElementAt(0).Id,
                 User = USERS.ElementAt(0),
                 WeekEventId = weekEvent.Id,
