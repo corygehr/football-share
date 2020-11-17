@@ -1,9 +1,8 @@
-﻿using FootballShare.DAL.Repositories;
-using FootballShare.DAL.Services;
+﻿using FootballShare.DAL.Services;
 using FootballShare.Entities.Betting;
 using FootballShare.Entities.Leagues;
 using HtmlAgilityPack;
-using Microsoft.Build.Utilities;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
