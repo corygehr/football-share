@@ -23,44 +23,56 @@
 @foreach (var item in Model.EventSpreads) {
     var eventWager = Model.WeekWagers.Where(w => w.WeekEventId == item.WeekEventId).FirstOrDefault();
         <tr>
+            @if(item.AwaySpread.HasValue && item.HomeSpread.HasValue)
+            {
             <td>
                 @Html.DisplayFor(modelName => item.Event.AwayTeam.Name) (@Html.DisplayFor(modelName => item.AwaySpread)) @@ @Html.DisplayFor(modelName => item.Event.HomeTeam.Name) (@Html.DisplayFor(modelItem => item.HomeSpread))
             </td>
+            }
+            else {
+            <td>
+                @Html.DisplayFor(modelName => item.Event.AwayTeam.Name) (N/A) @@ @Html.DisplayFor(modelName => item.Event.HomeTeam.Name) (N/A)
+            </td>
+            }
             <td>
                 @Html.DisplayFor(modelName => item.Event.Time)
             </td>
             @if(eventWager != null)
             {
-                <td>
-                    @eventWager.SelectedTeam.Name (@eventWager.SelectedTeamSpread): $@eventWager.Amount
-                </td>
+            <td>
+                @eventWager.SelectedTeam.Name (@eventWager.SelectedTeamSpread): $@eventWager.Amount
+            </td>
             }
             else
             {
-                <td></td>
+            <td></td>
             }
 
             @if (item.Event.Time <= DateTimeOffset.Now)
             {
-                <td>
-                    (Past Deadline)
-                </td>
+            <td>
+                (Past Deadline)
+            </td>
             }
             else if (eventWager != null)
             {
-                <td>
-                    @Html.ActionLink("Cancel Bet", "Cancel", new { id = eventWager.Id })
-                </td>
+            <td>
+                @Html.ActionLink("Cancel Bet", "Cancel", new { id = eventWager.Id })
+            </td>
             }
             else if (Model.WeekWagers.Count() >= Model.PoolMembership.Pool.WagersPerWeek)
             {
-                <td></td>
+            <td></td>
+            }
+            else if (!item.AwaySpread.HasValue || !item.HomeSpread.HasValue)
+            {
+            <td>Spread Unavailable</td>
             }
             else
             {
-                <td>
-                    @Html.ActionLink("Place Bet", "Place", new { eventId = item.WeekEventId, poolId = Model.PoolMembership.PoolId })
-                </td>
+            <td>
+                @Html.ActionLink("Place Bet", "Place", new { eventId = item.WeekEventId, poolId = Model.PoolMembership.PoolId })
+            </td>
             }
         </tr>
 }

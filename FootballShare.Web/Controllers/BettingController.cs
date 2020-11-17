@@ -183,7 +183,6 @@ namespace FootballShare.Web.Controllers
                 return NotFound();
             }
 
-
             // Get event
             WeekEvent weekEvent = await this._bettingService.GetWeekEventAsync(eventId);
 
@@ -204,6 +203,28 @@ namespace FootballShare.Web.Controllers
                         poolId = poolId
                     }
                 );
+            }
+
+            // Get event spread
+            Spread eventSpread = await this._bettingService.GetSpreadForEventAsync(eventId);
+
+            if (!eventSpread.AwaySpread.HasValue || !eventSpread.HomeSpread.HasValue)
+            {
+                // Spreads have not yet been pulled for this event
+                TempData.Put("UserMessage", new UserMessageViewModel
+                {
+                    CssClassName = "alert-warning",
+                    Title = "No Spreads",
+                    Message = $"Spreads are not yet available for this event. Please check back soon."
+                });
+
+                return RedirectToAction(
+                    nameof(Events),
+                    new
+                    {
+                        seasonWeekId = weekEvent.SeasonWeekId,
+                        poolId = poolId
+                    });
             }
 
             // Check if user has already submitted their bet limit for the week
@@ -250,9 +271,7 @@ namespace FootballShare.Web.Controllers
                 );
             }
 
-            // Checks pass, get spread and return View Model
-            Spread eventSpread = await this._bettingService.GetSpreadForEventAsync(eventId);
-
+            // Checks pass, allow page to load
             PlaceBetViewModel vm = new PlaceBetViewModel
             {
                 Event = weekEvent,
@@ -283,6 +302,24 @@ namespace FootballShare.Web.Controllers
             if (eventSpread == null)
             {
                 return NotFound();
+            }
+            else if(!eventSpread.AwaySpread.HasValue || !eventSpread.HomeSpread.HasValue)
+            {
+                // Spreads have not yet been pulled for this event
+                TempData.Put("UserMessage", new UserMessageViewModel
+                {
+                    CssClassName = "alert-warning",
+                    Title = "No Spreads",
+                    Message = $"Spreads are not yet available for this event. Please check back soon."
+                });
+
+                return RedirectToAction(
+                    nameof(Events),
+                    new
+                    {
+                        seasonWeekId = eventSpread.Event.SeasonWeekId,
+                        poolId = submission.PoolId
+                    });
             }
 
             // Check if bet can no longer be submitted
@@ -361,11 +398,11 @@ namespace FootballShare.Web.Controllers
 
             if(eventSpread.Event.AwayTeamId == submission.SelectedTeamId)
             {
-                targetSpread = eventSpread.AwaySpread;
+                targetSpread = eventSpread.AwaySpread.Value;
             }
             else
             {
-                targetSpread = eventSpread.HomeSpread;
+                targetSpread = eventSpread.HomeSpread.Value;
             }
 
             Wager wager = new Wager

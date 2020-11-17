@@ -17,11 +17,11 @@ namespace FootballShare.Entities.Betting
         /// <summary>
         /// Away Team Spread
         /// </summary>
-        public double AwaySpread { get; set; }
+        public double? AwaySpread { get; set; }
         /// <summary>
         /// Home Team Spread
         /// </summary>
-        public double HomeSpread { get; set; }
+        public double? HomeSpread { get; set; }
         /// <summary>
         /// <see cref="WeekEvent"/> for this <see cref="Spread"/>
         /// </summary>

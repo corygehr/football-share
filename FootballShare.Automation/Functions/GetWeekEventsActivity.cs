@@ -1,5 +1,5 @@
 using FootballShare.Automation.Parsers;
-using FootballShare.DAL.Repositories;
+using FootballShare.DAL.Services;
 using FootballShare.Entities.Leagues;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
@@ -23,17 +23,9 @@ namespace FootballShare.Automation.Functions.Activities
         /// </summary>
         private readonly IConfiguration _configuration;
         /// <summary>
-        /// <see cref="Season"/> repository
+        /// <see cref="ISportsLeagueService"/> used for data persistence
         /// </summary>
-        private readonly ISeasonRepository _seasonRepo;
-        /// <summary>
-        /// <see cref="SeasonWeek"/> repository
-        /// </summary>
-        private readonly ISeasonWeekRepository _seasonWeekRepo;
-        /// <summary>
-        /// <see cref="WeekEvent"/> repository
-        /// </summary>
-        private readonly IWeekEventRepository _weekEventRepo;
+        private readonly ISportsLeagueService _leagueService;
         /// <summary>
         /// <see cref="WeekEvent"/> parser
         /// </summary>
@@ -43,16 +35,12 @@ namespace FootballShare.Automation.Functions.Activities
         /// Creates a new <see cref="GetWeekEventsActivity"/> instance
         /// </summary>
         /// <param name="configuration">Application configuration</param>
-        /// <param name="seasonRepo"><see cref="Season"/> repository</param>
-        /// <param name="seasonWeekRepo"><see cref="SeasonWeek"/> repository</param>
-        /// <param name="weekEventRepo"><see cref="WeekEvent"/> repository</param>
+        /// <param name="leagueService"><see cref="ISportsLeagueService"/> implementation</param>
         /// <param name="weekEventsParser"><see cref="WeekEvent"/> parser</param>
-        public GetWeekEventsActivity(IConfiguration configuration, ISeasonRepository seasonRepo, ISeasonWeekRepository seasonWeekRepo, IWeekEventRepository weekEventRepo, WeekEventsParser weekEventsParser)
+        public GetWeekEventsActivity(IConfiguration configuration, ISportsLeagueService leagueService, WeekEventsParser weekEventsParser)
         {
             this._configuration = configuration;
-            this._seasonRepo = seasonRepo;
-            this._seasonWeekRepo = seasonWeekRepo;
-            this._weekEventRepo = weekEventRepo;
+            this._leagueService = leagueService;
             this._weekEventsParser = weekEventsParser;
         }
 
@@ -71,11 +59,11 @@ namespace FootballShare.Automation.Functions.Activities
             log.LogInformation($"{nameof(GetWeekEventsActivity)} executed at: {DateTime.UtcNow}");
 
             // Get current season
-            Season currentSeason = await this._seasonRepo
-                .GetCurrentLeagueSeasonAsync("national-football-league", cancellationToken);
+            Season currentSeason = await this._leagueService
+                .GetLeagueCurrentSeasonAsync("national-football-league", cancellationToken);
 
             // Get season weeks
-            IEnumerable<SeasonWeek> weeks = await this._seasonWeekRepo.GetAllForSeasonAsync(currentSeason.Id, cancellationToken);
+            IEnumerable<SeasonWeek> weeks = await this._leagueService.GetSeasonWeeksAsync(currentSeason.Id, cancellationToken);
 
             // Get possible starting week limiter
             int startingWeek = 1;
@@ -95,7 +83,7 @@ namespace FootballShare.Automation.Functions.Activities
             // Commit all to database
             foreach(WeekEvent weekEvent in allEvents)
             {
-                await this._weekEventRepo.CreateAsync(weekEvent, cancellationToken);
+                await this._leagueService.CreateWeekEventAsync(weekEvent, cancellationToken);
             }
         }
     }
