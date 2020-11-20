@@ -344,10 +344,8 @@ namespace FootballShare.Automation.Test.Functions
                 this._ledgerRepo.Object,
                 this._poolRepo.Object,
                 this._poolMemberRepo.Object,
-                this._seasonRepo.Object,
                 this._seasonWeekRepo.Object,
                 this._spreadRepo.Object,
-                this._teamRepo.Object,
                 this._userRepo.Object,
                 this._wagerRepo.Object,
                 this._weekEventRepo.Object
