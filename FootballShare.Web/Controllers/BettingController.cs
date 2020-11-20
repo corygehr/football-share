@@ -409,6 +409,7 @@ namespace FootballShare.Web.Controllers
             {
                 Amount = submission.WagerAmount,
                 PoolId = submission.PoolId,
+                Result = WagerResult.None,
                 SelectedTeamId = submission.SelectedTeamId,
                 SelectedTeamSpread = targetSpread,
                 SiteUserId = user.Id,
