@@ -47,7 +47,7 @@ namespace FootballShare.Tasks
         [FunctionName("RecurringTaskOrchestrator")]
         public async Task Run([OrchestrationTrigger]IDurableOrchestrationContext context, ILogger log, CancellationToken cancellationToken = default)
         {
-            log.LogInformation($"{nameof(RecurringTaskOrchestrator)} executed at: {DateTime.Now}");
+            log.LogInformation($"{nameof(RecurringTaskOrchestrator)} executed at: {context.CurrentUtcDateTime}");
 
             try
             {
@@ -58,7 +58,7 @@ namespace FootballShare.Tasks
                 IEnumerable<WeekEvent> finishedEvents = await context
                     .CallActivityAsync<IEnumerable<WeekEvent>>(nameof(FetchEventScoresActivity), this._targetLeagues);
 
-                // If new scores were pulled, payout bets
+                // If new scores were pulled, determine bet payouts
                 if(finishedEvents.Count() > 0)
                 {
                     await context.CallActivityAsync(nameof(PayoutBetsActivity), finishedEvents);
@@ -66,16 +66,8 @@ namespace FootballShare.Tasks
             }
             catch(Exception ex)
             {
-                log.LogError(ex, "An error occurred running {0}. See InnerException for details.", nameof(RecurringTaskOrchestrator));
+                log.LogError(ex, "An error occurred in {0}.", nameof(RecurringTaskOrchestrator));
             }
-            finally
-            {
-                // Sleep for specified duration
-                DateTime nextRefresh = context.CurrentUtcDateTime.AddHours(this._sleepDurationHours);
-                await context.CreateTimer(nextRefresh, cancellationToken);
-            }
-
-            context.ContinueAsNew(null);
         }
     }
 }

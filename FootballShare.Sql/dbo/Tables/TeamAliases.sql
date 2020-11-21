@@ -1,0 +1,9 @@
+﻿CREATE TABLE [dbo].[TeamAliases]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [TeamId] VARCHAR(64) NOT NULL, 
+    [Alias] NVARCHAR(64) NOT NULL, 
+    [WhenCreated] DATETIMEOFFSET NOT NULL DEFAULT (GETDATE()), 
+    [WhenUpdated] DATETIMEOFFSET NOT NULL DEFAULT (GETDATE()), 
+    CONSTRAINT [FK_TeamAliases_ToTeams] FOREIGN KEY ([TeamId]) REFERENCES [Teams]([Id])
+)

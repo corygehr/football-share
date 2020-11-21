@@ -127,7 +127,7 @@
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\UserRoles.sql">
+    <Build Include="dbo\Tables\SiteUserRoles.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
@@ -139,19 +139,11 @@
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\BettingGroupMembers.sql">
+    <Build Include="dbo\Tables\Spreads.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\Table.sql">
-      <AnsiNulls>On</AnsiNulls>
-      <QuotedIdentifier>On</QuotedIdentifier>
-    </Build>
-    <Build Include="dbo\Tables\BettingGroupPools.sql">
-      <AnsiNulls>On</AnsiNulls>
-      <QuotedIdentifier>On</QuotedIdentifier>
-    </Build>
-    <Build Include="dbo\Tables\BettingGroups.sql">
+    <Build Include="dbo\Tables\Pools.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
@@ -159,7 +151,7 @@
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\Leagues.sql">
+    <Build Include="dbo\Tables\SportsLeagues.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
@@ -179,14 +171,16 @@
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\WeekEvent.sql">
-      <AnsiNulls>On</AnsiNulls>
-      <QuotedIdentifier>On</QuotedIdentifier>
-    </Build>
     <Build Include="Security\footballshareweb.sql" />
     <Build Include="Security\web_role.sql" />
     <Build Include="Security\web_role_1.sql" />
     <Build Include="Security\RoleMemberships.sql" />
     <Build Include="Security\Permissions.sql" />
+    <Build Include="dbo\Tables\Wagers.sql" />
+    <Build Include="dbo\Tables\TeamAliases.sql" />
+    <Build Include="dbo\Tables\Ledger.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="FootballShare.Sql.refactorlog" />
   </ItemGroup>
 </Project>
