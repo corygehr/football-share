@@ -47,7 +47,7 @@ namespace FootballShare.Tasks.Activities
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Collection of updated <see cref="Spread"/> entities</returns>
         [FunctionName("FetchEventSpreadsActivity")]
-        public async Task<IEnumerable<Spread>> Run([ActivityTrigger]IDurableActivityContext context, ILogger log, CancellationToken cancellationToken = default)
+        public async Task Run([ActivityTrigger]IDurableActivityContext context, ILogger log, CancellationToken cancellationToken = default)
         {
             log.LogInformation($"{nameof(FetchEventSpreadsActivity)} executed at: {DateTime.Now}");
 
@@ -62,26 +62,36 @@ namespace FootballShare.Tasks.Activities
                 log.LogDebug("Fetching spreads for {0}.", leagueId);
 
                 // Get league data
-                SeasonWeek currentWeek = await this._leagueService.GetLeagueCurrentSeasonWeekAsync(leagueId, cancellationToken);
+                SeasonWeek currentWeek = await this._leagueService
+                    .GetLeagueCurrentSeasonWeekAsync(leagueId, cancellationToken);
                 log.LogDebug("Current {0} week is {1}.", leagueId, currentWeek.Sequence);
 
                 // Get spread data
-                IEnumerable<Spread> weekSpreads = await this._spreadsParser.GetSpreadsForWeekAsync(currentWeek, cancellationToken);
+                IEnumerable<Spread> weekSpreads = await this._spreadsParser
+                    .GetSpreadsForWeekAsync(currentWeek, cancellationToken);
                 log.LogInformation("Received spreads for {0} {1} event(s).", weekSpreads.Count(), leagueId);
 
                 // Merge with updated entities
                 updatedEntities.AddRange(weekSpreads);
             }
 
-            log.LogInformation("Received {0} spreads total across {1} league(s).", updatedEntities.Count, targetLeagueIds.Count());
+            log.LogInformation(
+                "Received {0} spreads total across {1} league(s).",
+                updatedEntities.Count,
+                targetLeagueIds.Count()
+            );
 
             // Commit updates to database
             foreach(Spread spread in updatedEntities)
             {
+                log.LogDebug(
+                    "Updating spread for {0} (AwaySpread: {1}; HomeSpread: {2}).",
+                    spread.Id,
+                    spread.AwaySpread,
+                    spread.HomeSpread
+                );
                 await this._leagueService.UpsertWeekEventSpreadAsync(spread, cancellationToken);
             }
-
-            return updatedEntities;
         }
     }
 }
