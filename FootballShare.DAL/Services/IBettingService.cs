@@ -132,6 +132,13 @@ namespace FootballShare.DAL.Services
         /// <returns>Collection of <see cref="Spread"/> objects or null if <see cref="SeasonWeek"/> not found</returns>
         Task<IEnumerable<Spread>> GetWeekSpreadsAsync(string weekId, CancellationToken cancellationToken = default);
         /// <summary>
+        /// Provides the timestamp from when the <see cref="Spread"/> data was last refreshed for a given <see cref="SeasonWeek"/>
+        /// </summary>
+        /// <param name="weekId">Target <see cref="SeasonWeek"/> unique identifier</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Last update timestamp, or null if never refreshed</returns>
+        Task<DateTimeOffset> GetWeekSpreadLastUpdateAsync(string weekId, CancellationToken cancellationToken = default);
+        /// <summary>
         /// Retrieves all <see cref="Wager"/> objects created for a specific <see cref="SeasonWeek"/>
         /// </summary>
         /// <param name="weekId"><see cref="SeasonWeek"/> ID</param>
