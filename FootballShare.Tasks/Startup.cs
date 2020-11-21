@@ -5,8 +5,7 @@ using FootballShare.Tasks.Parsers;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
-using System.Linq;
+using System.IO;
 
 [assembly: FunctionsStartup(typeof(FootballShare.Tasks.Startup))]
 namespace FootballShare.Tasks
@@ -17,26 +16,20 @@ namespace FootballShare.Tasks
     public class Startup : FunctionsStartup
     {
         /// <summary>
-        /// Application configuration
-        /// </summary>
-        public IConfiguration Configuration;
-
-        /// <summary>
         /// Configures services for use in the Function app
         /// </summary>
         /// <param name="builder"></param>
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            // Get configuration
-            this.Configuration = builder.Services
-                .Where(s => s.ServiceType == typeof(IConfiguration)).First()
-                .ImplementationInstance as IConfiguration;
+            // Get HostBuilder context data for configuration
+            FunctionsHostBuilderContext context = builder.GetContext();
 
+            // Allow HTTP Client requests
             builder.Services.AddHttpClient();
 
             // Add database connections
             builder.Services.AddSingleton<IDbConnectionFactory>(db => new SqlDbConnectionFactory(
-                Configuration.GetConnectionString("DefaultConnection")
+                context.Configuration.GetConnectionString("DefaultConnection")
             ));
 
             // Add data repositories
@@ -50,6 +43,7 @@ namespace FootballShare.Tasks
             builder.Services.AddTransient<ISportsLeagueRepository, SqlSportsLeagueRepository>();
             builder.Services.AddTransient<ISpreadRepository, SqlSpreadRepository>();
             builder.Services.AddTransient<ITeamRepository, SqlTeamRepository>();
+            builder.Services.AddTransient<ITeamAliasRepository, SqlTeamAliasRepository>();
             builder.Services.AddTransient<IWagerRepository, SqlWagerRepository>();
             builder.Services.AddTransient<IWeekEventRepository, SqlWeekEventRepository>();
 
