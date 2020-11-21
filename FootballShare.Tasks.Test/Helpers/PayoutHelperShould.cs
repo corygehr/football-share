@@ -18,12 +18,12 @@ namespace FootballShare.Tasks.Test.Helpers
         public void ReturnDoubleOriginalBetOnWin()
         {
             // Arrange
-            double originalBet = 100.00;
-            double expectedPayout = 200.00;
+            decimal originalBet = 100;
+            decimal expectedPayout = 200;
             WagerResult wagerResult = WagerResult.Win;
 
             // Act
-            double actualPayout = PayoutHelper.GetPayoutForWagerResult(wagerResult, originalBet);
+            decimal actualPayout = PayoutHelper.GetPayoutForWagerResult(wagerResult, originalBet);
 
             // Assert
             Assert.AreEqual(expectedPayout, actualPayout);
@@ -37,12 +37,12 @@ namespace FootballShare.Tasks.Test.Helpers
         public void ReturnOriginalBetOnPush()
         {
             // Arrange
-            double originalBet = 100.00;
-            double expectedPayout = 100.00;
+            decimal originalBet = 100;
+            decimal expectedPayout = 100;
             WagerResult wagerResult = WagerResult.Push;
 
             // Act
-            double actualPayout = PayoutHelper.GetPayoutForWagerResult(wagerResult, originalBet);
+            decimal actualPayout = PayoutHelper.GetPayoutForWagerResult(wagerResult, originalBet);
 
             // Assert
             Assert.AreEqual(expectedPayout, actualPayout);
@@ -56,12 +56,12 @@ namespace FootballShare.Tasks.Test.Helpers
         public void ReturnOriginalBetOnRefund()
         {
             // Arrange
-            double originalBet = 100.00;
-            double expectedPayout = 100.00;
+            decimal originalBet = 100;
+            decimal expectedPayout = 100;
             WagerResult wagerResult = WagerResult.Refund;
 
             // Act
-            double actualPayout = PayoutHelper.GetPayoutForWagerResult(wagerResult, originalBet);
+            decimal actualPayout = PayoutHelper.GetPayoutForWagerResult(wagerResult, originalBet);
 
             // Assert
             Assert.AreEqual(expectedPayout, actualPayout);
@@ -75,12 +75,12 @@ namespace FootballShare.Tasks.Test.Helpers
         public void ReturnZeroOnLoss()
         {
             // Arrange
-            double originalBet = 100.00;
-            double expectedPayout = 0.00;
+            decimal originalBet = 100;
+            decimal expectedPayout = 0;
             WagerResult wagerResult = WagerResult.Loss;
 
             // Act
-            double actualPayout = PayoutHelper.GetPayoutForWagerResult(wagerResult, originalBet);
+            decimal actualPayout = PayoutHelper.GetPayoutForWagerResult(wagerResult, originalBet);
 
             // Assert
             Assert.AreEqual(expectedPayout, actualPayout);
@@ -92,18 +92,17 @@ namespace FootballShare.Tasks.Test.Helpers
         /// with <see cref="WagerResult.None"/>.
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(InvalidWagerResultPayoutException))]
         public void ThrowExceptionOnNone()
         {
             // Arrange
-            double originalBet = 100.00;
+            decimal originalBet = 100;
             WagerResult wagerResult = WagerResult.None;
 
             // Act
             // Assert
             Assert.ThrowsException<InvalidWagerResultPayoutException>(() =>
             {
-                double actualPayout = PayoutHelper.GetPayoutForWagerResult(wagerResult, originalBet);
+                decimal actualPayout = PayoutHelper.GetPayoutForWagerResult(wagerResult, originalBet);
             });
         }
     }
