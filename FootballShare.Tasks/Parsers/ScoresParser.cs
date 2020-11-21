@@ -39,63 +39,56 @@ namespace FootballShare.Tasks.Parsers
         {
             List<WeekEvent> events = new List<WeekEvent>();
 
-            string targetUrl = $"http://www.vegasinsider.com/nfl/scoreboard/scores.cfm/week/{target.Sequence}/season/{target.Season.StartDate.Year}";
-
+            string targetUrl = $"https://www.cbssports.com/nfl/scoreboard/{target.Season.StartDate.Year}/regular/{target.Sequence}/";
             HtmlDocument htmlDoc = await this.WebClient.LoadFromWebAsync(targetUrl, cancellationToken);
 
             // Get all score tables
             HtmlNodeCollection scoreNodes = htmlDoc
                 .DocumentNode
-                .SelectNodes("//table[not(@id) and @class='scoreboardMatchUpContainer']");
+                .SelectNodes("//div[@class='live-update']");
 
             // Process each result
             foreach (HtmlNode node in scoreNodes)
             {
-                // Ignore non-HTML nodes (e.g. #text)
-                if(node.NodeType == HtmlNodeType.Element && node.Name == "table")
+                // Ensure the game has completed
+                // CBS Sports notes this by adding a 'postgame' class to the title
+                if (node.SelectSingleNode("descendant::div[@class='game-status postgame']") != null)
                 {
-                    // Determine which event this is by its title
-                    HtmlNode titleNode = node.SelectSingleNode("descendant::td[@class='yeallowBg2 sportPicksBorderR2 fourleft']");
-                    string eventName = titleNode.InnerText;
+                    // Game has completed, get detail
+                    HtmlNodeCollection scoreRows = node.SelectNodes("descendant::div[contains(@class, 'in-progress-table')]/table/tbody/tr");
 
-                    // Parse teams
-                    string[] teams = eventName.Split(" @ ");
-                    string awayTeamName = teams[0];
-                    string homeTeamName = teams[1];
-
-                    // Get team IDs
-                    Team awayTeam = await this._leagueService.GetTeamByNameAsync(awayTeamName, cancellationToken);
-                    Team homeTeam = await this._leagueService.GetTeamByNameAsync(homeTeamName, cancellationToken);
-
-                    if (awayTeam != null && homeTeam != null)
+                    if (scoreRows.Count == 2)
                     {
-                        // Lookup event in current week matching team pattern
-                        WeekEvent currentEvent = await this._leagueService
-                            .GetWeekEventByWeekAndTeamsAsync(
-                            target.Id,
-                            awayTeam.Id,
-                            homeTeam.Id,
-                            cancellationToken
-                        );
+                        // Parse teams
+                        string awayTeamName = scoreRows[0].SelectSingleNode("descendant::td/a[contains(@class, 'helper-team-name')]").InnerText;
+                        int awayTeamScore = Int32.Parse(scoreRows[0].SelectSingleNode("descendant::td[@class='total-score']").InnerText);
+                        string homeTeamName = scoreRows[1].SelectSingleNode("descendant::td/a[contains(@class, 'helper-team-name')]").InnerText;
+                        int homeTeamScore = Int32.Parse(scoreRows[1].SelectSingleNode("descendant::td[@class='total-score']").InnerText);
 
-                        // Get score for event
-                        HtmlNodeCollection scores = node.SelectNodes("descendant::td[not(@width)]/font[@color='#b20000']");
-
-                        // Can skip if no score, event may not be over
-                        if(scores.Count == 2)
+                        if (!String.IsNullOrEmpty(awayTeamName) && !String.IsNullOrEmpty(homeTeamName))
                         {
-                            HtmlNode awayScore = scores[0];
-                            HtmlNode homeScore = scores[1];
+                            // Get Team objects
+                            Team awayTeam = await this._leagueService.GetTeamByNameAsync(awayTeamName, cancellationToken);
+                            Team homeTeam = await this._leagueService.GetTeamByNameAsync(homeTeamName, cancellationToken);
 
-                            currentEvent.AwayScore = Int32.Parse(awayScore.InnerText.Replace("&nbsp;", ""));
-                            currentEvent.HomeScore = Int32.Parse(homeScore.InnerText.Replace("&nbsp;", ""));
+                            WeekEvent thisEvent = await this._leagueService
+                                .GetWeekEventByWeekAndTeamsAsync(
+                                    target.Id,
+                                    awayTeam.Id,
+                                    homeTeam.Id,
+                                    cancellationToken
+                                );
 
-                            events.Add(currentEvent);
+                            // Ensure event has not already concluded
+                            if (thisEvent.HomeScore == 0 && thisEvent.AwayScore == 0)
+                            {
+                                thisEvent.AwayScore = awayTeamScore;
+                                thisEvent.HomeScore = homeTeamScore;
+
+                                // Update event
+                                events.Add(thisEvent);
+                            }
                         }
-                    }
-                    else
-                    {
-                        throw new Exception($"Team could not be located or determined for match {eventName}.");
                     }
                 }
             }
