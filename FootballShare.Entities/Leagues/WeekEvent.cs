@@ -38,6 +38,10 @@ namespace FootballShare.Entities.Leagues
         /// </summary>
         public int Overtime { get; set; }
         /// <summary>
+        /// Event has finished
+        /// </summary>
+        public bool Completed { get; set; }
+        /// <summary>
         /// <see cref="WeekEvent"/> is/was postponed
         /// </summary>
         public bool Postponed { get; set; }
@@ -64,6 +68,7 @@ namespace FootballShare.Entities.Leagues
         /// </summary>
         public SeasonWeek Week = null;
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             if(this.AwayTeam != null && this.HomeTeam != null)

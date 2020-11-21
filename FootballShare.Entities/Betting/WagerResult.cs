@@ -5,9 +5,10 @@
     /// </summary>
     public enum WagerResult
     {
-        Push,
-        Loss,
-        Win,
-        Refund
+        None = -1,
+        Push = 0,
+        Loss = 1,
+        Win = 2,
+        Refund = 3
     }
 }

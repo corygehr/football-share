@@ -98,10 +98,10 @@ namespace FootballShare.DAL.Repositories
         public async Task<IEnumerable<TeamAlias>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             string query = $@"SELECT
-                                [a].[*],
-                                [a_t].[*],
-                                [a_t_sl].[*],
-                                [a_t_sl_s].[*]
+                                [a].*,
+                                [a_t].*,
+                                [a_t_sl].*,
+                                [a_t_sl_s].*
                               FROM [dbo].[TeamAliases] [a]
                               INNER JOIN [Teams] [a_t]
                                 ON [a].[TeamId] = [a_t].[Id]
@@ -129,10 +129,10 @@ namespace FootballShare.DAL.Repositories
         public async Task<TeamAlias> GetAsync(string entityId, CancellationToken cancellationToken = default)
         {
             string query = $@"SELECT
-                                [a].[*],
-                                [a_t].[*],
-                                [a_t_sl].[*],
-                                [a_t_sl_s].[*]
+                                [a].*,
+                                [a_t].*,
+                                [a_t_sl].*,
+                                [a_t_sl_s].*
                               FROM [dbo].[TeamAliases] [a]
                               INNER JOIN [Teams] [a_t]
                                 ON [a].[TeamId] = [a_t].[Id]
@@ -174,10 +174,10 @@ namespace FootballShare.DAL.Repositories
         public async Task<IEnumerable<TeamAlias>> GetByAliasAsync(string teamAlias, CancellationToken cancellationToken = default)
         {
             string query = $@"SELECT
-                                [a].[*],
-                                [a_t].[*],
-                                [a_t_sl].[*],
-                                [a_t_sl_s].[*]
+                                [a].*,
+                                [a_t].*,
+                                [a_t_sl].*,
+                                [a_t_sl_s].*
                               FROM [dbo].[TeamAliases] [a]
                               INNER JOIN [Teams] [a_t]
                                 ON [a].[TeamId] = [a_t].[Id]
@@ -212,10 +212,10 @@ namespace FootballShare.DAL.Repositories
         public async Task<IEnumerable<TeamAlias>> GetTeamAliasesAsync(string teamId, CancellationToken cancellationToken = default)
         {
             string query = $@"SELECT
-                                [a].[*],
-                                [a_t].[*],
-                                [a_t_sl].[*],
-                                [a_t_sl_s].[*]
+                                [a].*,
+                                [a_t].*,
+                                [a_t_sl].*,
+                                [a_t_sl_s].*
                               FROM [dbo].[TeamAliases] [a]
                               INNER JOIN [Teams] [a_t]
                                 ON [a].[TeamId] = [a_t].[Id]

@@ -1,6 +1,6 @@
 ﻿using HtmlAgilityPack;
 
-namespace FootballShare.Automation.Parsers
+namespace FootballShare.Tasks.Parsers
 {
     /// <summary>
     /// Helper class for parsing HTML pages

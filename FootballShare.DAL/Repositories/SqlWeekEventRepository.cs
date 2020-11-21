@@ -28,6 +28,7 @@ namespace FootballShare.DAL.Repositories
             this._connectionFactory = connectionFactory;
         }
 
+        /// <inheritdoc/>
         public async Task<WeekEvent> CreateAsync(WeekEvent entity, CancellationToken cancellationToken = default)
         {
             if(entity == null)
@@ -41,6 +42,7 @@ namespace FootballShare.DAL.Repositories
                                 [HomeScore],
                                 [HomeTeamId],
                                 [Overtime],
+                                [Completed],
                                 [Postponed],
                                 [SeasonWeekId],
                                 [Time],
@@ -53,6 +55,7 @@ namespace FootballShare.DAL.Repositories
                                 @{nameof(WeekEvent.HomeTeamId)},
                                 @{nameof(WeekEvent.Overtime)},
                                 @{nameof(WeekEvent.Postponed)},
+                                @{nameof(WeekEvent.Completed)},
                                 @{nameof(WeekEvent.SeasonWeekId)},
                                 @{nameof(WeekEvent.Time)},
                                 CURRENT_TIMESTAMP
@@ -94,12 +97,14 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
+        /// <inheritdoc/>
         public async Task DeleteAsync(WeekEvent entity, CancellationToken cancellationToken = default)
         {
             // Use overload
             await this.DeleteAsync(entity.Id.ToString(), cancellationToken);
         }
 
+        /// <inheritdoc/>
         public async Task DeleteAsync(string entityId, CancellationToken cancellationToken = default)
         {
             if (String.IsNullOrEmpty(entityId))
@@ -122,6 +127,7 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
+        /// <inheritdoc/>
         public async Task<WeekEvent> FindByIdAsync(string id, CancellationToken cancellationToken = default)
         {
             if(String.IsNullOrEmpty(id))
@@ -169,6 +175,7 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<WeekEvent>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             string query = $@"SELECT
@@ -204,6 +211,7 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
+        /// <inheritdoc/>
         public async Task<WeekEvent> GetAsync(string entityId, CancellationToken cancellationToken = default)
         {
             if(String.IsNullOrEmpty(entityId))
@@ -251,12 +259,14 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
+        /// <inheritdoc/>
         public async Task<WeekEvent> GetAsync(WeekEvent entity, CancellationToken cancellationToken = default)
         {
             // Use overload
             return await this.GetAsync(entity.Id.ToString(), cancellationToken);
         }
 
+        /// <inheritdoc/>
         public async Task<WeekEvent> GetWeekEventByWeekAndTeamsAsync(string weekId, string awayTeamId, string homeTeamId, CancellationToken cancellationToken = default)
         {
             if(String.IsNullOrEmpty(weekId))
@@ -318,6 +328,7 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<WeekEvent>> GetWeekEventsAsync(string weekId, CancellationToken cancellationToken = default)
         {
             string query = $@"SELECT
@@ -359,6 +370,7 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
+        /// <inheritdoc/>
         public async Task<WeekEvent> UpdateAsync(WeekEvent entity, CancellationToken cancellationToken = default)
         {
             if(entity == null)
@@ -372,6 +384,7 @@ namespace FootballShare.DAL.Repositories
                                   [HomeScore] = @{nameof(WeekEvent.HomeScore)},
                                   [HomeTeamId] = @{nameof(WeekEvent.HomeTeamId)},
                                   [Overtime] = @{nameof(WeekEvent.Overtime)},
+                                  [Completed] = @{nameof(WeekEvent.Completed)},
                                   [Postponed] = @{nameof(WeekEvent.Postponed)},
                                   [SeasonWeekId] = @{nameof(WeekEvent.SeasonWeekId)},
                                   [Time] = @{nameof(WeekEvent.Time)},

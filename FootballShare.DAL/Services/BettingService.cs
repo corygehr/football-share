@@ -39,10 +39,6 @@ namespace FootballShare.DAL.Services
         /// </summary>
         private readonly ISpreadRepository _spreadRepo;
         /// <summary>
-        /// <see cref="Team"/> repository
-        /// </summary>
-        private readonly ITeamRepository _teamRepo;
-        /// <summary>
         /// <see cref="Wager"/> repository
         /// </summary>
         private readonly IWagerRepository _wagerRepo;
@@ -57,14 +53,12 @@ namespace FootballShare.DAL.Services
         /// <param name="ledgerRepo"><see cref="LedgerEntry"/> repository</param>
         /// <param name="poolRepo"><see cref="Pool"/> repository</param>
         /// <param name="poolMemberRepo"><see cref="PoolMember"/> repository</param>
-        /// <param name="seasonRepo"><see cref="Season"/> repository</param>
         /// <param name="seasonWeekRepo"><see cref="SeasonWeek"/> repository</param>
-        /// <param name="teamRepo"><see cref="Team"/> repository</param>
         /// <param name="userRepo"><see cref="SiteUser"/> repository</param>
         /// <param name="wagerRepo"><see cref="Wager"/> repository</param>
         public BettingService(ILedgerEntryRepository ledgerRepo, IPoolRepository poolRepo, 
-            IPoolMemberRepository poolMemberRepo, ISeasonRepository seasonRepo, ISeasonWeekRepository seasonWeekRepo, 
-            ISpreadRepository spreadRepo, ITeamRepository teamRepo, ISiteUserRepository userRepo,
+            IPoolMemberRepository poolMemberRepo, ISeasonWeekRepository seasonWeekRepo, 
+            ISpreadRepository spreadRepo, ISiteUserRepository userRepo,
             IWagerRepository wagerRepo, IWeekEventRepository weekEventRepo)
         {
             this._ledgerRepo = ledgerRepo;
@@ -72,16 +66,17 @@ namespace FootballShare.DAL.Services
             this._poolMemberRepo = poolMemberRepo;
             this._seasonWeekRepo = seasonWeekRepo;
             this._spreadRepo = spreadRepo;
-            this._teamRepo = teamRepo;
             this._wagerRepo = wagerRepo;
             this._weekEventRepo = weekEventRepo;
         }
 
+        /// <inheritdoc/>
         public async Task<SeasonWeek> GetCurrentSeasonWeekAsync(string seasonId, CancellationToken cancellationToken = default)
         {
             return await this._seasonWeekRepo.GetCurrentSeasonWeekAsync(seasonId, cancellationToken);
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<Wager>> GetPoolWagersForSeasonAsync(int poolId, string seasonId, CancellationToken cancellationToken = default)
         {
             if(String.IsNullOrEmpty(seasonId))
@@ -113,71 +108,95 @@ namespace FootballShare.DAL.Services
             return null;
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<Wager>> GetPoolWagersForWeekAsync(int poolId, string weekId, CancellationToken cancellationToken = default)
         {
             return await this._wagerRepo.GetForPoolByWeekAsync(poolId, weekId, cancellationToken);
         }
 
+        /// <inheritdoc/>
         public async Task<SeasonWeek> GetPreviousSeasonWeekAsync(string seasonId, CancellationToken cancellationToken = default)
         {
             return await this._seasonWeekRepo.GetPreviousSeasonWeekAsync(seasonId, cancellationToken);
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<SeasonWeek>> GetPreviousSeasonWeeksAsync(string seasonId, CancellationToken cancellationToken = default)
         {
             return await this._seasonWeekRepo.GetPreviousSeasonWeeksAsync(seasonId, cancellationToken);
         }
 
+        /// <inheritdoc/>
         public Task<IEnumerable<SeasonWeek>> GetSeasonScheduleAsync(int seasonId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public async Task<SeasonWeek> GetSeasonWeekAsync(string seasonWeekId, CancellationToken cancellationToken = default)
         {
             return await this._seasonWeekRepo.GetAsync(seasonWeekId, cancellationToken);
         }
 
+        /// <inheritdoc/>
         public async Task<Spread> GetSpreadForEventAsync(int eventId, CancellationToken cancellationToken = default)
         {
             return await this._spreadRepo.GetByWeekEventAsync(eventId, cancellationToken);
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<Wager>> GetUnresolvedWagersAsync(CancellationToken cancellationToken = default)
         {
             return await this._wagerRepo.GetUnresolvedWagersAsync(cancellationToken);
         }
 
+        /// <inheritdoc/>
         public Task<IEnumerable<Wager>> GetUserWagersForSeasonAsync(Guid userId, string seasonId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<Wager>> GetUserWagersForWeekAsync(Guid userId, string weekId, CancellationToken cancellationToken = default)
         {
             return await this._wagerRepo.GetForUserByWeekAsync(userId, weekId, cancellationToken);
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<Wager>> GetUserWagersForWeekByPoolAsync(Guid userId, string weekId, int poolId, CancellationToken cancellationToken = default)
         {
             return await this._wagerRepo.GetForUserByPoolAndWeekAsync(userId, poolId, weekId, cancellationToken);
         }
 
+        /// <inheritdoc/>
         public async Task<Wager> GetWagerAsync(string id, CancellationToken cancellationToken = default)
         {
             return await this._wagerRepo.GetAsync(id, cancellationToken);
         }
 
+        /// <inheritdoc/>
+        public async Task<IEnumerable<Wager>> GetWagersForWeekEventAsync(int weekEventId, CancellationToken cancellationToken = default)
+        {
+            // Get all wagers
+            IEnumerable<Wager> wagers = await this._wagerRepo.GetAllAsync(cancellationToken);
+
+            // Return wagers matching the provided WeekEvent Id
+            return wagers.Where(w => w.WeekEventId == weekEventId);
+        }
+
+        /// <inheritdoc/>
         public async Task<WeekEvent> GetWeekEventAsync(int eventId, CancellationToken cancellationToken = default)
         {
             return await this._weekEventRepo.GetAsync(eventId.ToString());
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<WeekEvent>> GetWeekEventsAsync(string weekId, CancellationToken cancellationToken = default)
         {
             return await this._weekEventRepo.GetWeekEventsAsync(weekId, cancellationToken);
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<Spread>> GetWeekSpreadsAsync(string weekId, CancellationToken cancellationToken = default)
         {
             // Get events for the specified week
@@ -201,11 +220,13 @@ namespace FootballShare.DAL.Services
             return spreads;
         }
 
+        /// <inheritdoc/>
         public Task<IEnumerable<Wager>> GetWeekWagersAsync(string weekId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public async Task PayoutWagerAsync(Wager source, decimal amount, CancellationToken cancellationToken = default)
         {
             // Get user data
@@ -231,6 +252,7 @@ namespace FootballShare.DAL.Services
             await this._poolMemberRepo.UpdateAsync(member, cancellationToken);
         }
 
+        /// <inheritdoc/>
         public async Task PlaceWagerAsync(Wager wager, CancellationToken cancellationToken = default)
         {
             // Get PoolMember
@@ -297,6 +319,7 @@ namespace FootballShare.DAL.Services
             await this._poolMemberRepo.UpdateAsync(bettor);
         }
 
+        /// <inheritdoc/>
         public async Task RemoveWagerAsync(int wagerId, CancellationToken cancellationToken = default)
         {
             // Get wager
@@ -334,6 +357,7 @@ namespace FootballShare.DAL.Services
             await this._poolMemberRepo.UpdateAsync(user);
         }
 
+        /// <inheritdoc/>
         public async Task UpdateWagerAsync(Wager wager, CancellationToken cancellationToken = default)
         {
             await this._wagerRepo.UpdateAsync(wager, cancellationToken);

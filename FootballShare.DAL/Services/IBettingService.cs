@@ -104,6 +104,13 @@ namespace FootballShare.DAL.Services
         /// <returns>Requested <see cref="Wager"/> or null if not found</returns>
         Task<Wager> GetWagerAsync(string id, CancellationToken cancellationToken = default);
         /// <summary>
+        /// Retrieves a collection of <see cref="Wager"/> objects made for a specific <see cref="WeekEvent"/>
+        /// </summary>
+        /// <param name="weekEventId">Target <see cref="WeekEvent"/> unique identifier</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Collection of <see cref="Wager"/> objects</returns>
+        Task<IEnumerable<Wager>> GetWagersForWeekEventAsync(int weekEventId, CancellationToken cancellationToken = default);
+        /// <summary>
         /// Retrieves a specific <see cref="WeekEvent"/>
         /// </summary>
         /// <param name="eventId"><see cref="WeekEvent"/> ID</param>

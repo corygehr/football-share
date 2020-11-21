@@ -205,7 +205,8 @@ namespace FootballShare.DAL.Repositories
 
             string query = $@"UPDATE [dbo].[Spreads]
                               SET [AwaySpread] = @{nameof(Spread.AwaySpread)},
-                                  [HomeSpread] = @{nameof(Spread.HomeSpread)}
+                                  [HomeSpread] = @{nameof(Spread.HomeSpread)},
+                                  [WhenUpdated] = CURRENT_TIMESTAMP
                               WHERE [Id] = @{nameof(Spread.Id)}";
 
             using (var connection = this._connectionFactory.CreateConnection())

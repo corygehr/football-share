@@ -7,8 +7,8 @@
     [Email]              NVARCHAR (128)     NULL,
     [NormalizedEmail]    NVARCHAR (128)     NULL,
     [EmailConfirmed]     BIT                NOT NULL,
-    [WhenRegistered]     DATETIMEOFFSET (7) NOT NULL,
-    [WhenUpdated]        DATETIMEOFFSET (7) NOT NULL,
+    [WhenCreated]     DATETIMEOFFSET (7) NOT NULL DEFAULT (GETDATE()),
+    [WhenUpdated]        DATETIMEOFFSET (7) NOT NULL DEFAULT (GETDATE()),
     PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 

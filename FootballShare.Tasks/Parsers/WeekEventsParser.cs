@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FootballShare.Automation.Parsers
+namespace FootballShare.Tasks.Parsers
 {
     /// <summary>
     /// Pulls <see cref="WeekEvent"/> objects from Vegas Insider

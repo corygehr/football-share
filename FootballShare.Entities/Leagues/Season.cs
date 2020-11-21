@@ -9,7 +9,7 @@ namespace FootballShare.Entities.Leagues
     /// Base <see cref="League"/> <see cref="Season"/> class
     /// </summary>
     [Table("Seasons")]
-    public class Season : Entity
+    public class Season : EditableEntity
     {
         /// <summary>
         /// <see cref="Season"/> unique identifier

@@ -184,7 +184,7 @@ namespace FootballShare.DAL.Services
         }
 
         /// <inheritdoc/>
-        public async Task UpdateEventScoreAsync(int eventId, int awayScore, int homeScore, CancellationToken cancellationToken = default)
+        public async Task UpdateEventScoreAsync(int eventId, int awayScore, int homeScore, bool gameCompleted, CancellationToken cancellationToken = default)
         {
             // Get the WeekEvent targeted by this invocation
             WeekEvent targetEvent = await this._weekEventRepo.GetAsync(eventId.ToString(), cancellationToken);
@@ -194,6 +194,7 @@ namespace FootballShare.DAL.Services
                 // Update object and commit
                 targetEvent.AwayScore = awayScore;
                 targetEvent.HomeScore = homeScore;
+                targetEvent.Completed = gameCompleted;
 
                 await this._weekEventRepo.UpdateAsync(targetEvent, cancellationToken);
             }

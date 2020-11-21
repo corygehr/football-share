@@ -1,16 +1,15 @@
-﻿using FootballShare.DAL.Repositories;
-using FootballShare.DAL.Services;
+﻿using FootballShare.DAL.Services;
 using FootballShare.Entities.Betting;
 using FootballShare.Entities.Leagues;
 using HtmlAgilityPack;
-using Microsoft.Build.Utilities;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FootballShare.Automation.Parsers
+namespace FootballShare.Tasks.Parsers
 {
     /// <summary>
     /// Pulls <see cref="SpreadsParser"/> objects from Vegas Insider

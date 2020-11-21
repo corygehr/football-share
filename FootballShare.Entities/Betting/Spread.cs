@@ -7,7 +7,7 @@ namespace FootballShare.Entities.Betting
     /// <see cref="Spread"/> class
     /// </summary>
     [Table("Spreads")]
-    public class Spread : Entity
+    public class Spread : EditableEntity
     {
         /// <summary>
         /// <see cref="Spread"/> unique identifier
