@@ -194,6 +194,7 @@ namespace FootballShare.DAL.Services
                 // Update object and commit
                 targetEvent.AwayScore = awayScore;
                 targetEvent.HomeScore = homeScore;
+                targetEvent.Completed = true;
 
                 await this._weekEventRepo.UpdateAsync(targetEvent, cancellationToken);
             }
