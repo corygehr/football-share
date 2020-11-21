@@ -78,6 +78,19 @@
 }
     </tbody>
 </table>
+<div>
+    <p>
+        Last Spread Refresh: 
+        @if(Model.LastSpreadUpdate.HasValue)
+        {
+            <b>@Model.LastSpreadUpdate.Value.ToString("u")</b>
+        }
+        else
+        {
+            <b>Never. Please check back soon.</b>
+        }
+    </p>
+</div>
 <hr />
 <div>
     <a asp-action="Details" asp-controller="Pools" asp-all-route-data="parameters">Back to Pool</a>

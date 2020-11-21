@@ -29,7 +29,7 @@ namespace FootballShare.Entities.Betting
         /// <summary>
         /// Result of this <see cref="Wager"/>
         /// </summary>
-        public WagerResult Result { get; set; }
+        public WagerResult Result { get; set; } = WagerResult.None;
         /// <summary>
         /// Selected <see cref="Team"/> ID
         /// </summary>

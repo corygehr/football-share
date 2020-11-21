@@ -45,6 +45,7 @@ namespace FootballShare.DAL.Repositories
                                 [SelectedTeamId],
                                 [Amount],
                                 [SelectedTeamSpread],
+                                [Result],
                                 [WhenCreated]
                               )
                               VALUES (
@@ -54,6 +55,7 @@ namespace FootballShare.DAL.Repositories
                                 @{nameof(Wager.SelectedTeamId)},
                                 @{nameof(Wager.Amount)},
                                 @{nameof(Wager.SelectedTeamSpread)},
+                                @{nameof(Wager.Result)},
                                 CURRENT_TIMESTAMP
                               );
                               SELECT TOP 1 *

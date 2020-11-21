@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="8fca5d9c-62f4-48a4-a9ca-8afa102ea57b" ChangeDateTime="11/21/2020 21:50:16">
+    <Property Name="ElementName" Value="[dbo].[UserRoles].[UserId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[UserRoles]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SiteUserId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f6e0d47f-3861-4c6d-ab88-e10a07de40c2" ChangeDateTime="11/21/2020 21:50:19">
+    <Property Name="ElementName" Value="[dbo].[UserRoles].[RoleId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[UserRoles]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SiteRoleId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d55e4f10-00e4-4930-9d67-916dbaefb31d" ChangeDateTime="11/21/2020 21:50:55">
+    <Property Name="ElementName" Value="[dbo].[Teams].[LeagueId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Teams]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SportsLeagueId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5727002e-aca7-46f3-92b0-7fc6bcaabd2e" ChangeDateTime="11/21/2020 21:57:53">
+    <Property Name="ElementName" Value="[dbo].[Spreads].[BettingGroupId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Spreads]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AwaySpread" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="38a851ad-b518-4e1e-980c-3f49123ef908" ChangeDateTime="11/21/2020 22:03:16">
+    <Property Name="ElementName" Value="[dbo].[Ledger].[NewBalanace]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Ledger]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="NewBalance" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9347d64a-c399-4c06-bc07-3bb112b7fa22" ChangeDateTime="11/21/2020 22:05:45">
+    <Property Name="ElementName" Value="[dbo].[Seasons].[LeagueId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Seasons]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SportsLeagueId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="044daeef-2a96-42ff-bbcc-f1c11628394e" ChangeDateTime="11/21/2020 22:10:22">
+    <Property Name="ElementName" Value="[dbo].[SiteUserLoginProviders].[WhenRegistered]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SiteUserLoginProviders]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="WhenCreated" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="479a93bb-3539-4cc7-89bf-9037bf273879" ChangeDateTime="11/21/2020 22:10:45">
+    <Property Name="ElementName" Value="[dbo].[SiteUsers].[WhenRegistered]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SiteUsers]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="WhenCreated" />
+  </Operation>
+</Operations>

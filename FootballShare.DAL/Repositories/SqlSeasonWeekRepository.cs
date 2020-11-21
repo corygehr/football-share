@@ -292,6 +292,7 @@ namespace FootballShare.DAL.Repositories
             }
         }
 
+        /// <inheritdoc/>
         public Task<SeasonWeek> UpdateAsync(SeasonWeek entity, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
