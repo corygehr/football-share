@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
@@ -23,8 +23,5 @@
   <ItemGroup>
     <ProjectReference Include="..\FootballShare.DAL\FootballShare.DAL.csproj" />
     <ProjectReference Include="..\FootballShare.Entities\FootballShare.Entities.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Exceptions\" />
   </ItemGroup>
 </Project>

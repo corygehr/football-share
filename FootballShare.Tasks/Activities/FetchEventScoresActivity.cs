@@ -60,23 +60,36 @@ namespace FootballShare.Tasks.Activities
                 log.LogDebug("Fetching scores for {0}.", leagueId);
 
                 // Get current SeasonWeek to scope event
-                SeasonWeek currentWeek = await this._leagueService.GetLeagueCurrentSeasonWeekAsync(leagueId, cancellationToken);
+                SeasonWeek currentWeek = await this._leagueService
+                    .GetLeagueCurrentSeasonWeekAsync(leagueId, cancellationToken);
                 log.LogDebug("Current {0} week is {1}.", leagueId, currentWeek.Sequence);
 
                 // Get available scores
-                IEnumerable<WeekEvent> weekScores = await this._scoreParser.GetScoresForWeekAsync(currentWeek, cancellationToken);
-                log.LogDebug("Received scores for {0} {1} event(s).", weekScores.Count(), leagueId);
+                IEnumerable<WeekEvent> weekScores = await this._scoreParser
+                    .GetScoresForWeekAsync(currentWeek, cancellationToken);
+                log.LogDebug("Received score(s) for {0} {1} event(s).", weekScores.Count(), leagueId);
 
                 // Merge with updated entities
                 updatedEvents.AddRange(weekScores);
             }
 
-            log.LogInformation("Received {0} scores total across {1} league(s)", updatedEvents.Count, targetLeagueIds.Count());
+            log.LogInformation(
+                "Received {0} score(s) total across {1} league(s)",
+                updatedEvents.Count,
+                targetLeagueIds.Count()
+            );
 
             // Commit updates to database
             foreach(WeekEvent game in updatedEvents)
             {
-                await this._leagueService.UpdateEventScoreAsync(game.Id, game.AwayScore, game.HomeScore, cancellationToken);
+                log.LogDebug(
+                    "Updating score for {0} (AwayScore: {1}; HomeScore: {2}).",
+                    game.ToString(),
+                    game.AwayScore,
+                    game.HomeScore
+                );
+                await this._leagueService
+                    .UpdateEventScoreAsync(game.Id, game.AwayScore, game.HomeScore, game.Completed, cancellationToken);
             }
 
             return updatedEvents;

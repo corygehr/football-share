@@ -110,8 +110,9 @@ namespace FootballShare.DAL.Services
         /// <param name="eventId"><see cref="WeekEvent"/> ID</param>
         /// <param name="awayScore">Away <see cref="Team"/> score</param>
         /// <param name="homeScore">Home <see cref="Team"/> score</param>
+        /// <param name="gameCompleted">Event has completed</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        Task UpdateEventScoreAsync(int eventId, int awayScore, int homeScore, CancellationToken cancellationToken = default);
+        Task UpdateEventScoreAsync(int eventId, int awayScore, int homeScore, bool gameCompleted, CancellationToken cancellationToken = default);
         /// <summary>
         /// Updates or inserts (if no entry exists) the <see cref="Spread"/> for a specific <see cref="WeekEvent"/>
         /// </summary>

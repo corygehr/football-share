@@ -80,10 +80,11 @@ namespace FootballShare.Tasks.Parsers
                                 );
 
                             // Ensure event has not already concluded
-                            if (thisEvent.HomeScore == 0 && thisEvent.AwayScore == 0)
+                            if (!thisEvent.Completed)
                             {
                                 thisEvent.AwayScore = awayTeamScore;
                                 thisEvent.HomeScore = homeTeamScore;
+                                thisEvent.Completed = true;
 
                                 // Update event
                                 events.Add(thisEvent);
