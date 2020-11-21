@@ -125,12 +125,14 @@ namespace FootballShare.Web.Controllers
             if (userMembership != null)
             {
                 IEnumerable<Spread> events = await this._bettingService.GetWeekSpreadsAsync(seasonWeekId);
+                DateTimeOffset lastSpreadUpdate = await this._bettingService.GetWeekSpreadLastUpdateAsync(seasonWeekId);
                 IEnumerable<Wager> weekWagers = await this._bettingService.GetUserWagersForWeekByPoolAsync(user.Id, seasonWeekId, poolId);
 
                 // Get SeasonWeek details
                 SeasonWeekEventsViewModel vm = new SeasonWeekEventsViewModel
                 {
                     EventSpreads = events.ToList(),
+                    LastSpreadUpdate = lastSpreadUpdate,
                     PoolMembership = userMembership,
                     WeekWagers = weekWagers.ToList()
                 };
