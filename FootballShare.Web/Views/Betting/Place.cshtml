@@ -44,7 +44,18 @@
         </form>
     </div>
 </div>
-
+<div>
+    Last Spread Refresh: 
+    @if (Model.Spread.WhenUpdated != null)
+    {
+        <b>@Model.Spread.WhenUpdated.ToString("u")</b>
+    }
+    else
+    {
+        <b>Spread has never been refreshed for this event.</b>
+    }
+</div>
+<hr />
 <div>
     <a asp-action="Events" asp-all-route-data="backParameters">Back to Event List</a>
 </div>

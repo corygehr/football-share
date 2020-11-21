@@ -2,6 +2,7 @@
 using FootballShare.Entities.Leagues;
 using FootballShare.Entities.Pools;
 
+using System;
 using System.Collections.Generic;
 
 namespace FootballShare.Web.Models
@@ -12,6 +13,10 @@ namespace FootballShare.Web.Models
         /// <see cref="SeasonWeek"/> events
         /// </summary>
         public List<Spread> EventSpreads { get; set; }
+        /// <summary>
+        /// Last time <see cref="Spread"/> data was refreshed
+        /// </summary>
+        public DateTimeOffset? LastSpreadUpdate { get; set; }
         /// <summary>
         /// <see cref="SiteUser"/> <see cref="PoolMember"/> instance
         /// </summary>

@@ -197,6 +197,17 @@ namespace FootballShare.DAL.Services
         }
 
         /// <inheritdoc/>
+        public async Task<DateTimeOffset> GetWeekSpreadLastUpdateAsync(string weekId, CancellationToken cancellationToken = default)
+        {
+            // Get all WeekEvents for the specified week
+            IEnumerable<Spread> events = await this.GetWeekSpreadsAsync(weekId, cancellationToken);
+
+            // Get the max LastUpdated timestamp
+            return events
+                .Max(e => e.WhenUpdated);
+        }
+
+        /// <inheritdoc/>
         public async Task<IEnumerable<Spread>> GetWeekSpreadsAsync(string weekId, CancellationToken cancellationToken = default)
         {
             // Get events for the specified week
